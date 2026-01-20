@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:31:03 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/20 14:03:03 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/20 14:42:16 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 int	main(void)
 {
@@ -71,6 +73,20 @@ int	main(void)
 						if(poll_fds[i].fd == listen_fd)
 						{
 							//le client essaye de se connecter
+							struct sockaddr_in clientaddr;
+							socklen_t addr_len = sizeof(clientaddr);
+							int client_fd = accept(listen_fd, (sockaddr *)&clientaddr, &addr_len);
+							std::cout << "New client connected !" << std::endl;
+							std::cout << "INFORMATIONS :" << std::endl;
+							std::cout << "Client FD: " << client_fd << std::endl;
+							std::cout << "Client IP: " << inet_ntoa(clientaddr.sin_addr) << std::endl;
+							std::cout << "Client PORT: " << clientaddr.sin_port << std::endl;
+							
+							struct pollfd client;
+							client.fd = client_fd;
+							client.events = POLLIN;
+							client.revents = 0;
+							poll_fds.push_back(client);
 						}
 						else
 						{
