@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:31:03 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/20 14:51:59 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/20 15:30:00 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,24 @@ int	main(void)
 				}
 				else
 				{
-					std::cout << "tout doux le loup" << std::endl;
+					std::cout << "Signal received" << std::endl;
+					//TODO fix cette condition
+					// char buffer[1024];
+					// int n = recv(poll_fds[i].fd, buffer, 1024, 0);
+					
+					// if(n > 0)
+					// {
+					// 	std::cout << "Received" 
+					// 			  <<  n 
+					// 			  << " bytes from client "
+					// 			  << poll_fds[i].fd
+					// 			  << std::endl;
+					// 	std::cout << "Content: " << std::string(buffer, n) << std::endl;
+					// 	std::string response = "HTTP/1.1 is ok";
+					// 	send(poll_fds[i].fd, response.c_str(), response.length(), 0);
+					// 	close(poll_fds[i].fd);
+					// 	poll_fds.erase(poll_fds.begin() + i);
+					// }
 					// je recois les donnees du client
 				}
 				poll_value--;
