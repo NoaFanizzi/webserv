@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:31:03 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/20 14:42:16 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/20 14:51:59 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	main(void)
 	//2.c. je listen
 	listen(listen_fd, 4096);
 	
-	size_t	i = 0;
+	size_t	i;
 	
 	//3.0. Je lance ma boucle
 	while(true)
@@ -61,42 +61,42 @@ int	main(void)
 			perror("poll error");
 			exit(1);
 		}
-		if(poll_value)
+		i = 0;
+		while(i < poll_fds.size() && poll_value != 0)
 		{
-			while(poll_value > 0)
+			if(!poll_fds[i].revents)
 			{
-				i = 0;
-				while(i < poll_fds.size() && poll_value != 0)
-				{
-					if(poll_fds[i].revents & POLLIN)
-					{
-						if(poll_fds[i].fd == listen_fd)
-						{
-							//le client essaye de se connecter
-							struct sockaddr_in clientaddr;
-							socklen_t addr_len = sizeof(clientaddr);
-							int client_fd = accept(listen_fd, (sockaddr *)&clientaddr, &addr_len);
-							std::cout << "New client connected !" << std::endl;
-							std::cout << "INFORMATIONS :" << std::endl;
-							std::cout << "Client FD: " << client_fd << std::endl;
-							std::cout << "Client IP: " << inet_ntoa(clientaddr.sin_addr) << std::endl;
-							std::cout << "Client PORT: " << clientaddr.sin_port << std::endl;
-							
-							struct pollfd client;
-							client.fd = client_fd;
-							client.events = POLLIN;
-							client.revents = 0;
-							poll_fds.push_back(client);
-						}
-						else
-						{
-							// je recois les donnees du client
-						}
-						poll_value--;
-					}
-					i++;
-				}
+				i++;
+				continue;
 			}
+			if(poll_fds[i].revents & POLLIN)
+			{
+				if(poll_fds[i].fd == listen_fd)
+				{
+					//le client essaye de se connecter
+					struct sockaddr_in clientaddr;
+					socklen_t addr_len = sizeof(clientaddr);
+					int client_fd = accept(listen_fd, (sockaddr *)&clientaddr, &addr_len);
+					std::cout << "New client connected !" << std::endl;
+					std::cout << "INFORMATIONS :" << std::endl;
+					std::cout << "Client FD: " << client_fd << std::endl;
+					std::cout << "Client IP: " << inet_ntoa(clientaddr.sin_addr) << std::endl;
+					std::cout << "Client PORT: " << clientaddr.sin_port << std::endl;
+					
+					struct pollfd client;
+					client.fd = client_fd;
+					client.events = POLLIN;
+					client.revents = 0;
+					poll_fds.push_back(client);
+				}
+				else
+				{
+					std::cout << "tout doux le loup" << std::endl;
+					// je recois les donnees du client
+				}
+				poll_value--;
+			}
+			i++;
 		}
 	}
 }
