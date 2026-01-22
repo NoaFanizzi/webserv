@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 12:27:28 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/22 13:26:06 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ class	Server
 		int _listen_fd;
 		struct sockaddr_in _servaddr;
 		struct pollfd _data;
-		std::vector<struct pollfd> _poll_fds;
 		void createSocket();
 		void createSocketAdress();
 	public:

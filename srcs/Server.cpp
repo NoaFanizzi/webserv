@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:41:15 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 12:52:15 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/22 13:31:37 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Server::Server()
 	createSocket();
 	createSocketAdress();
 	bindClient();
-	pollFdCreation(_data, _listen_fd, _poll_fds);
+	_data = ManageAll::pollFdCreation(_listen_fd);
 }
 
 int Server::getListen_fd() const
@@ -52,11 +52,4 @@ void Server::bindClient()
 	bind(_listen_fd, (sockaddr *)&_servaddr, sizeof(_servaddr));
 }
 
-struct pollfd pollFdCreation(struct pollfd poll, int src_fd, std::vector<pollfd> &poll_fds)
-{
-	poll.fd = src_fd;
-	poll.events = POLLIN;
-	poll.revents = 0;
-	poll_fds.push_back(poll);
-}
 
