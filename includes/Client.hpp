@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:32:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 12:06:43 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/22 18:08:12 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,19 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-class Client
+#include "AManager.hpp"
+#include "ManageAll.hpp"
+
+class Client : public AManager
 {
 	private:
 		std::string request[1024];
 	public:
-		void updateRequest(std::string &buffer, int n);
-		void handleRequestReception();		
+		Client(int fd);
+		void	updateRequest(std::string &buffer, int n);
+		void	handleRequestReception();		
+		void	PollInHandler();
+		void	PollOutHandler();
 };
 
 #endif

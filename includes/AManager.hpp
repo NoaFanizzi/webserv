@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   AManager.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 17:52:44 by nofanizz         ###   ########.fr       */
+/*   Created: 2026/01/22 16:11:39 by nofanizz          #+#    #+#             */
+/*   Updated: 2026/01/22 18:03:41 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef AMANAGER_HPP
+#define AMANAGER_HPP
 
 #include "iostream"
 #include <sys/socket.h>
@@ -26,28 +26,24 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#include <map>
-#include "AManager.hpp"
-
-class	Server : public AManager
+class AManager
 {
-	private:
-		struct sockaddr_in _servaddr;
-		void createSocket();
-		void createSocketAdress();
+	protected:
+		struct pollfd _fd;
 	public:
-		//constructor
-		Server();
-		//getters
-		int 			getListen_fd() const;
-		sockaddr_in 	getSockddr_in() const;
-		struct pollfd 	getPollFd() const;
-		void 			bindClient();
-
-		void PollInHandler();
-		void PollOutHandler();
-		
-		
+		AManager();
+		~AManager();
+		virtual void PollInHandler() = 0;
+		virtual void PollOutHandler() = 0;
 };
+
+AManager::AManager()
+{
+}
+
+AManager::~AManager()
+{
+}
+
 
 #endif

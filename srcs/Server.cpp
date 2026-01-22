@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:41:15 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 13:48:19 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/22 18:05:47 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,14 @@ Server::Server()
 	createSocket();
 	createSocketAdress();
 	bindClient();
-	_data = ManageAll::pollFdCreation(_listen_fd);
-	listen(_listen_fd, 4096);
+	listen(_fd.fd, 4096);
+	ManageAll::pollFdCreation(_fd);
 	ManageAll::addServer(*this);
 }
 
 int Server::getListen_fd() const
 {
-	return(_listen_fd);
+	return(_fd.fd);
 }
 
 sockaddr_in Server::getSockddr_in() const
@@ -34,12 +34,14 @@ sockaddr_in Server::getSockddr_in() const
 
 struct pollfd Server::getPollFd() const
 {
-	return(_data);
+	return(_fd);
 }
 
 void	Server::createSocket()
 {
-	_listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+	_fd.fd = socket(AF_INET, SOCK_STREAM, 0);
+	_fd.events= POLLIN;
+	_fd.revents = 0;
 }
 
 void Server::createSocketAdress()
@@ -51,7 +53,26 @@ void Server::createSocketAdress()
 
 void Server::bindClient()
 {
-	bind(_listen_fd, (sockaddr *)&_servaddr, sizeof(_servaddr));
+	bind(_fd.fd, (sockaddr *)&_servaddr, sizeof(_servaddr));
 }
+
+void	Server::PollInHandler()
+{
+	struct sockaddr_in clientaddr;
+	socklen_t addr_len = sizeof(clientaddr);
+	int client_fd = accept(_fd.fd, (sockaddr *)&clientaddr, &addr_len);
+	std::cout << "New client connected !" << std::endl;
+	std::cout << "INFORMATIONS :" << std::endl;
+	std::cout << "Client FD: " << client_fd << std::endl;
+	std::cout << "Client IP: " << inet_ntoa(clientaddr.sin_addr) << std::endl;
+	std::cout << "Client PORT: " << clientaddr.sin_port << std::endl;
+	Client nclient(client_fd);
+}
+
+void	Server::AManager::PollOutHandler()
+{
+	
+}
+
 
 
