@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:41:15 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 13:31:37 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/22 13:48:19 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ Server::Server()
 	createSocketAdress();
 	bindClient();
 	_data = ManageAll::pollFdCreation(_listen_fd);
+	listen(_listen_fd, 4096);
+	ManageAll::addServer(*this);
 }
 
 int Server::getListen_fd() const

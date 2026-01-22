@@ -6,7 +6,7 @@
 #    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/20 12:29:36 by nofanizz         ###   ########.fr        #
+#    Updated: 2026/01/22 13:52:47 by nofanizz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,14 +17,14 @@ INCLUDES    = -I includes
 RM          = rm -rf
 
 SRCS_DIR    = srcs
-SRCS        = main.cpp
+SRCS        = main.cpp Client.cpp Server.cpp ManageAll.cpp
 SRCS_PATH   = $(addprefix $(SRCS_DIR)/, $(SRCS))
 
 BUILD_DIR   = .build
 OBJS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
 DEPS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.d))
 
-HEADERS     = 
+HEADERS     = Client.hpp ManageAll.hpp Server.hpp
 
 GREEN       = \033[0;32m
 RED         = \033[0;31m
