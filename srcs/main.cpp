@@ -6,41 +6,21 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:31:03 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/20 15:30:00 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/22 12:45:50 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <sys/socket.h>
-#include <vector>
-#include <netinet/in.h>
-#include <iostream>
-#include <poll.h>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include "ManageAll.hpp"
 
 int	main(void)
 {
-	//1. Je cree mon serveur et je listen
+	Server server;
 
-	//1.a. Je cree le socket du serveur
-	int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-	
-	//1.b. Je cree et fill la structure stockadress_in
-	struct sockaddr_in servaddr;
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = INADDR_ANY;
-	servaddr.sin_port = htons(8080);
-	
-	//1.c. Je bind pour associer mon socket avec l'ip et le port
-	bind(listen_fd, (sockaddr *)&servaddr, sizeof(servaddr));
 	
 	//2.a. Je cree la struct pollfd;
 	std::vector<struct pollfd> poll_fds;
 	
-	//2.b. Je cree la structure poll_fd du serveur et je pushback dans poll_fds;
+	//2.b. Je cree la structure pollfd du serveur et je pushback dans poll_fds;
 	struct pollfd server;
 	server.fd = listen_fd;
 	server.events = POLLIN;
@@ -91,25 +71,27 @@ int	main(void)
 				}
 				else
 				{
+					handleRequestReception();
 					std::cout << "Signal received" << std::endl;
 					//TODO fix cette condition
-					// char buffer[1024];
-					// int n = recv(poll_fds[i].fd, buffer, 1024, 0);
+					char buffer[1024];
+					int n = recv(poll_fds[i].fd, buffer, 1024, 0);
+
 					
-					// if(n > 0)
-					// {
-					// 	std::cout << "Received" 
-					// 			  <<  n 
-					// 			  << " bytes from client "
-					// 			  << poll_fds[i].fd
-					// 			  << std::endl;
-					// 	std::cout << "Content: " << std::string(buffer, n) << std::endl;
-					// 	std::string response = "HTTP/1.1 is ok";
-					// 	send(poll_fds[i].fd, response.c_str(), response.length(), 0);
-					// 	close(poll_fds[i].fd);
-					// 	poll_fds.erase(poll_fds.begin() + i);
-					// }
-					// je recois les donnees du client
+					if(n > 0)
+					{
+						std::cout << "Received" 
+								  <<  n 
+								  << " bytes from client "
+								  << poll_fds[i].fd
+								  << std::endl;
+						std::cout << "Content: " << std::string(buffer, n) << std::endl;
+						std::string response = "HTTP/1.1 is ok";
+						//parse la requete
+						send(poll_fds[i].fd, response.c_str(), response.length(), 0);
+						close(poll_fds[i].fd);
+						poll_fds.erase(poll_fds.begin() + i);
+					}
 				}
 				poll_value--;
 			}
