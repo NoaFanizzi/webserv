@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:24:07 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/23 01:46:24 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/23 05:29:38 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ struct LocationConfig
     std::string path;
     std::string root;
     std::string index;
-    bool autoindex;
+    bool autoindex;     
     std::vector<std::string> allowed_methods;
 };
 
@@ -55,12 +55,15 @@ class Config
     private:
         std::vector <std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
-        std::string _keys[7];
+        std::string _keysServer[7];
+        std::string _keysLocation[5];
     public:
     int setFile(std::string doc);
     int getInfo();
     void parseServer(ServerConfig &server, const std::string &key, const std::vector<std::string> &line, size_t j);
     void printServers();
+    void parseLocation(ServerConfig &server, size_t *i, size_t *j);
+    void parseKeyLocation(LocationConfig &location, const std::string &key, const std::vector<std::string> &line, size_t j); 
     void newServer(size_t *i);
     // bool validateServer();
     Config();

@@ -6,7 +6,7 @@
 #    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/23 02:38:10 by mvachon          ###   ########.fr        #
+#    Updated: 2026/01/23 05:45:38 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ INCLUDES    = -I includes
 RM          = rm -rf
 
 SRCS_DIR    = srcs
-SRCS        = main.cpp  Config.cpp Client.cpp Server.cpp ManageAll.cpp
+SRCS        = main.cpp  Config.cpp DEBUG_PrintConfig.cpp Client.cpp Server.cpp ManageAll.cpp
 SRCS_PATH   = $(addprefix $(SRCS_DIR)/, $(SRCS))
 
 BUILD_DIR   = .build

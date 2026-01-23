@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:22:15 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/23 02:37:06 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/23 05:43:49 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,38 +14,20 @@
 
 Config::Config()
 {
-    _keys[0] = "port";
-    _keys[1] = "host";
-    _keys[2] = "root";
-    _keys[3] = "index";
-    _keys[4] = "error_page";
-    _keys[5] = "client_max_body_size";
-    _keys[6] = "autoindex";
+    _keysServer[0] = "port";
+    _keysServer[1] = "host";
+    _keysServer[2] = "root";
+    _keysServer[3] = "index";
+    _keysServer[4] = "error_page";
+    _keysServer[5] = "client_max_body_size";
+    _keysServer[6] = "autoindex";
 
-}
+    _keysLocation[0] = "path";
+    _keysLocation[1] = "root";
+    _keysLocation[2] = "index";
+    _keysLocation[3] = "autoindex";
+    _keysLocation[4] = "allow_methods";
 
-void Config::printServers()
-{
-    std::cout << "\n=== SERVERS CONFIG ===\n" << std::endl;
-    for (size_t i = 0; i < _servers.size(); ++i)
-    {
-        const ServerConfig &srv = _servers[i];
-        std::cout << "Server " << i + 1 << ":\n";
-        std::cout << "  Port: " << srv.port << std::endl;
-        std::cout << "  Host: " << srv.host << std::endl;
-        std::cout << "  Root: " << srv.root << std::endl;
-        std::cout << "  Index: " << srv.index << std::endl;
-        std::cout << "  autoindex: " << (srv.autoindex == true ? "yes" : "no") << std::endl;
-        std::cout << "  Error pages:\n";
-        for (size_t j = 0; j < srv.error_page.size(); ++j)
-        {
-            std::cout << "    Code: " << srv.error_page[j].index
-                      << ", Path: " << srv.error_page[j].path << std::endl;
-        }
-        std::cout << "  Max client body size: " << srv.client_max_body_size << std::endl;
-
-        std::cout << "---------------------------\n";
-    }
 }
 
 void Config::parseServer(ServerConfig &server, const std::string &key, const std::vector<std::string> &line, size_t j)
@@ -69,7 +51,7 @@ void Config::parseServer(ServerConfig &server, const std::string &key, const std
     else if (key == "client_max_body_size")
         server.client_max_body_size = value;
     else if (key == "autoindex")
-        server.autoindex = (value == "1");
+        server.autoindex = (value == "on");
     else if (key == "error_page")
     {
         if (j + 2 < line.size())
@@ -87,6 +69,77 @@ void Config::parseServer(ServerConfig &server, const std::string &key, const std
         }
     }
 }
+
+void Config::parseKeyLocation(LocationConfig &location, const std::string &key, const std::vector<std::string> &line, size_t j)
+{
+    if (j + 1 >= line.size())
+        return;
+
+    std::string value = line[j + 1];
+    
+    if (!value.empty() && value[value.size() - 1] == ';')
+        value = value.substr(0, value.size() - 1);
+
+    if (key == "path")
+        location.path = value;
+    else if (key == "root")
+        location.root = value;
+    else if (key == "index")
+        location.index = value;
+    else if (key == "autoindex")
+        location.autoindex = (value == "on");
+    else if (key == "allow_methods")
+    {
+        for (size_t x = j + 1; x < line.size(); x++)
+        {
+            std::string method = line[x];
+            location.allowed_methods.push_back(method);
+        }
+    }
+}
+
+void Config::parseLocation(ServerConfig &server, size_t *i, size_t *j)
+{
+    LocationConfig location;
+    size_t brace_level = 0;
+
+    location.path = _fileContent[*i][*j + 1];
+    (*j)+=2;
+    while (*i < _fileContent.size())
+    {
+        for (; *j < _fileContent[*i].size(); (*j)++)
+        {
+            std::string token = _fileContent[*i][*j];
+
+            if (token == "{")
+            { 
+                brace_level++;
+                continue;
+            }
+            if (token == "}")
+            {
+                brace_level--;
+                if (brace_level == 0)
+                {
+                    server.locations.push_back(location);
+                    (*j)++;
+                    return;
+                }
+                continue;
+            }
+
+            if (brace_level == 1)
+            {
+                for (size_t k = 0; k < 5; k++)
+                    if (token == _keysLocation[k])
+                        parseKeyLocation(location, token, _fileContent[*i], *j);
+            }
+        }
+        *j = 0;
+        (*i)++;
+    }
+}
+
 
 void Config::newServer(size_t *i)
 {
@@ -114,11 +167,16 @@ void Config::newServer(size_t *i)
                 }
                 continue;
             }
-
+            
             for (size_t k = 0; k < 7; k++)
             {
-                if (str == _keys[k] && brace_level == 1)
-                    parseServer(server, _keys[k], _fileContent[*i], j);
+                if (str == _keysServer[k] && brace_level == 1)
+                    parseServer(server, _keysServer[k], _fileContent[*i], j);
+            }
+            if (str == "location" && brace_level == 1)
+            {
+                parseLocation(server, i, &j);
+                break;
             }
         }
         (*i)++;
@@ -127,10 +185,13 @@ void Config::newServer(size_t *i)
 
 int Config::getInfo()
 {
-    for (size_t i = 0; i < _fileContent.size(); i++)
+    size_t i = 0;
+    while (i < _fileContent.size())
     {
         if (!_fileContent[i].empty() && _fileContent[i][0] == "server")
             newServer(&i);
+        else
+            i++;
     }
     printServers();
     return 1;
