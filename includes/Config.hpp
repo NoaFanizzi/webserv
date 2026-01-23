@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:24:07 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/23 05:29:38 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/23 08:45:46 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,17 @@
 #include <string>
 
 
+class Exception : public std::exception {
+	private:
+		std::string _message;
+	public:
+		explicit Exception(const std::string& message) : _message(message) {}
+		virtual ~Exception() throw() {}
+		virtual const char* what() const throw() {
+			return _message.c_str();
+		}
+};
+
 struct LocationConfig
 {
     std::string path;
@@ -32,18 +43,18 @@ struct LocationConfig
 
 struct ErrorPage
 {
-    std::string index;
+    long index;
     std::string path;
 };
 
 struct ServerConfig
 {
-    std::string             port;
+    long                    port;
     std::string             host;
     std::string             root;
     std::string             index;
     std::vector<ErrorPage>  error_page;
-    std::string                  client_max_body_size;
+    long long                  client_max_body_size;
     bool                    autoindex;
 
     std::vector<LocationConfig> locations;
