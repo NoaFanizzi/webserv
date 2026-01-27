@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:24:07 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/23 08:45:46 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/27 18:28:39 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,24 +39,25 @@ struct LocationConfig
     std::string index;
     bool autoindex;     
     std::vector<std::string> allowed_methods;
+    LocationConfig() : autoindex(false){}
 };
 
 struct ErrorPage
 {
-    long index;
+    int index;
     std::string path;
 };
 
 struct ServerConfig
 {
-    long                    port;
+    ServerConfig();
+    int                    port;
     std::string             host;
     std::string             root;
     std::string             index;
     std::vector<ErrorPage>  error_page;
-    long long                  client_max_body_size;
+    long                  client_max_body_size;
     bool                    autoindex;
-
     std::vector<LocationConfig> locations;
 };
 
