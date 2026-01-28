@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ManageAll.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 12:43:22 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 15:22:19 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 19:30:46 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ void ManageAll::updateStatus()
 		AManager *manager = getManager(_pollfds[i].fd);
 		_pollfds[i].events = manager->getEvents();
 		// _pollfds[i].revents = 0;
-		std::cerr << "index: " << i << "events: "  << _pollfds[i].events << std::endl; 
 	}
 }
 
@@ -85,7 +84,6 @@ void	ManageAll::loop()
 			exit(1);
 		}
 		i = 0;
-		std::cerr << "--------------" << std::endl; 
 		while(i < _pollfds.size() && poll_value)
 		{
 			if(!_pollfds[i].revents)
@@ -106,7 +104,6 @@ void	ManageAll::loop()
 				current->PollOutHandler();
 			if (current->getClosedStatus())
 			{
-				std::cerr << "DELETING" << std::endl; 
 				_managers.erase(_pollfds[i].fd);
 				_pollfds.erase(_pollfds.begin() + i);
 				delete current;
@@ -114,7 +111,7 @@ void	ManageAll::loop()
 			}
 			i++;
 		}
-	}	
+	}
 }
 
 

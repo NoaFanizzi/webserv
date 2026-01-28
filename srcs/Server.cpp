@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:41:15 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 15:26:21 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:46:12 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ void	Server::PollInHandler()
 {
 	struct sockaddr_in clientaddr;
 	socklen_t addr_len = sizeof(clientaddr);
-	std::cerr << "WESH Ya quelqun" << std::endl;
 	int client_fd = accept(_fd, (sockaddr *)&clientaddr, &addr_len);
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	new Client(client_fd);
