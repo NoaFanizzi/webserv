@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 12:37:43 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 18:10:53 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 14:56:17 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,22 @@
 #include "Client.hpp"
 #include "Server.hpp"
 #include "AManager.hpp"
+#include <map> 
 
 class ManageAll
 {
 	private:
-		static std::vector <struct pollfd&> _pollfds;
-		static std::map <int, AManager&> _managers;
+		static std::vector <struct pollfd> _pollfds;
+		static std::map <int, AManager *> _managers;
+		static size_t	getPollFdSize();
+		static AManager* getManager(int fd);
+		static void updateStatus();
+
 	public:
-		ManageAll();
-		static void ManageAll::pollFdCreation(struct pollfd &poll);
-		static void addToManager(Server &server);
+		static void pollFdCreation(const int &fd, AManager *manager);
+		
 		struct pollfd& getPollFd(int index);
-		Server& getServer(int index);
+		static void	loop();
 };
 
 #endif

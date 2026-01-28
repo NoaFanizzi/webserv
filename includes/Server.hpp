@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 17:52:44 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 14:42:14 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,18 @@ class	Server : public AManager
 {
 	private:
 		struct sockaddr_in _servaddr;
-		void createSocket();
+		int createSocket();
 		void createSocketAdress();
+		void 			bindClient(int fd);
+
+
 	public:
 		//constructor
 		Server();
+		~Server() {};
 		//getters
 		int 			getListen_fd() const;
 		sockaddr_in 	getSockddr_in() const;
-		struct pollfd 	getPollFd() const;
-		void 			bindClient();
 
 		void PollInHandler();
 		void PollOutHandler();

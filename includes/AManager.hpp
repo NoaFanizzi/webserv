@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 16:11:39 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 18:03:41 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 14:54:52 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,29 @@
 class AManager
 {
 	protected:
-		struct pollfd _fd;
+		int 	_fd;
+		bool 	_closedStatus;
+		short 	_events;
+
 	public:
-		AManager();
-		~AManager();
+		virtual ~AManager() {};
 		virtual void PollInHandler() = 0;
 		virtual void PollOutHandler() = 0;
+
+		bool getClosedStatus() {
+			return _closedStatus;
+		}
+
+		short getEvents() {
+			return _events;
+		}
+
+		void setEvents(short events)
+		{
+			_events = events;
+		}
 };
 
-AManager::AManager()
-{
-}
-
-AManager::~AManager()
-{
-}
 
 
 #endif

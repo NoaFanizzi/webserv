@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:32:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/22 18:08:12 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 15:05:33 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,11 @@
 class Client : public AManager
 {
 	private:
-		std::string request[1024];
+		std::string _request;
 	public:
 		Client(int fd);
+		~Client() {};
+
 		void	updateRequest(std::string &buffer, int n);
 		void	handleRequestReception();		
 		void	PollInHandler();
