@@ -6,7 +6,7 @@
 #    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/23 05:45:38 by mvachon          ###   ########.fr        #
+#    Updated: 2026/01/28 10:25:25 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,14 +17,25 @@ INCLUDES    = -I includes
 RM          = rm -rf
 
 SRCS_DIR    = srcs
-SRCS        = main.cpp  Config.cpp DEBUG_PrintConfig.cpp Client.cpp Server.cpp ManageAll.cpp
+#SRCS        = main.cpp  Config.cpp DEBUG_PrintConfig.cpp ConfigParser.cpp LocationParser.cpp ServerDirectives.cpp LocationParser.cpp 
+SRCS = main.cpp \
+       ConfigParser/ConfigParser.cpp \
+       ConfigParser/ServerParser.cpp \
+       ConfigParser/ServerDirectives.cpp \
+       ConfigParser/LocationParser.cpp \
+	   ConfigParser/Config.cpp \
+	   ConfigParser/DEBUG_PrintConfig.cpp \
+	   #Client.cpp \
+	   Server.cpp \
+	   ManageAll.cpp \
+
 SRCS_PATH   = $(addprefix $(SRCS_DIR)/, $(SRCS))
 
 BUILD_DIR   = .build
 OBJS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
 DEPS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.d))
 
-HEADERS     =  Config.hpp Client.hpp ManageAll.hpp Server.hpp
+HEADERS     =  Config.hpp Client.hpp #ManageAll.hpp Server.hpp
 
 GREEN       = \033[0;32m
 RED         = \033[0;31m
@@ -39,7 +50,8 @@ $(NAME): $(OBJS)
 $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/%.o: $(SRCS_DIR)/%.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: $(SRCS_DIR)/%.cpp
+	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
 	@echo "$(GREEN)✓ Compiled: $<$(RESET)"
 
