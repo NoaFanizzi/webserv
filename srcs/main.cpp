@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:31:03 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 15:07:50 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:48:50 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,18 +15,18 @@
 
 int	main(int ac, char **av)
 {
-	// Config test;
-	// (void)ac;
-	// if (av[1])
-	// 	test.setFile(av[1]);
-	// else
-	// {
-	// 	std::cout << "No config file" << std::endl;
-	// 	return 1;
-	// }
+	Config config;
 	(void)ac;
-	(void)av;
-	
-	new Server();
+	if (av[1])
+		config.setFile(av[1]);
+	else
+	{
+		std::cout << "No config file" << std::endl;
+		return 1;
+	}
+
+	const std::vector<ServerConfig> &SavedServers= config.getServers();
+	for(size_t i = 0; i < SavedServers.size(); i++)
+		new Server(SavedServers[i]);
 	ManageAll::loop();
 }

@@ -1,23 +1,13 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/22 11:41:15 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:46:12 by mvachon          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "ManageAll.hpp"
 #include "fcntl.h"
 
-Server::Server()
+Server::Server(const ServerConfig &serverconfig) : _serverconfig(serverconfig)
 {
 	_closedStatus = false;
 	_fd = createSocket();
-	createSocketAdress();
+	createSocketAdress(serverconfig);
 	int opt = 1;
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	bindClient(_fd);
@@ -43,11 +33,11 @@ int	Server::createSocket()
 	return fd;
 }
 
-void Server::createSocketAdress()
+void Server::createSocketAdress(const ServerConfig &serverconfig)
 {
 	_servaddr.sin_family = AF_INET;
-	_servaddr.sin_addr.s_addr = INADDR_ANY;
-	_servaddr.sin_port = htons(8090);
+	_servaddr.sin_addr.s_addr = inet_addr(serverconfig.host.c_str());
+	_servaddr.sin_port = htons(serverconfig.port);
 }
 
 void Server::bindClient(int fd)
