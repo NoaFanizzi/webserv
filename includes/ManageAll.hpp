@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 12:37:43 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 14:56:17 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:49:00 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "Client.hpp"
 #include "Server.hpp"
 #include "AManager.hpp"
+#include "Config.hpp"
 #include <map> 
 
 class ManageAll

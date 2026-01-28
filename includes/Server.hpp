@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 14:42:14 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:38:54 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,19 +28,20 @@
 
 #include <map>
 #include "AManager.hpp"
+#include "Config.hpp"
 
 class	Server : public AManager
 {
 	private:
 		struct sockaddr_in _servaddr;
 		int createSocket();
-		void createSocketAdress();
+		void createSocketAdress(const ServerConfig &serverconfig);
 		void 			bindClient(int fd);
 
 
 	public:
 		//constructor
-		Server();
+		Server(const ServerConfig &servconfig);
 		~Server() {};
 		//getters
 		int 			getListen_fd() const;
