@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:32:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 15:05:33 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:50:31 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,19 +28,25 @@
 
 #include "AManager.hpp"
 #include "ManageAll.hpp"
+#include "RequestParser.hpp"
 
 class Client : public AManager
 {
 	private:
 		std::string _request;
+		RequestParser _RequestParser;
 	public:
 		Client(int fd);
+		Client() {};
 		~Client() {};
 
 		void	updateRequest(std::string &buffer, int n);
 		void	handleRequestReception();		
 		void	PollInHandler();
 		void	PollOutHandler();
+		std::string GetRequest() {return _request;}
 };
+
+
 
 #endif

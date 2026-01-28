@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
+#    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/28 13:48:10 by nofanizz         ###   ########.fr        #
+#    Updated: 2026/01/28 16:23:08 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,6 +25,7 @@ SRCS = main.cpp \
        ConfigParser/LocationParser.cpp \
 	   ConfigParser/Config.cpp \
 	   ConfigParser/DEBUG_PrintConfig.cpp \
+	   RequestsParser/RequestParser.cpp\
 	   Client.cpp \
 	   Server.cpp \
 	   ManageAll.cpp \
@@ -35,7 +36,7 @@ BUILD_DIR   = .build
 OBJS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
 DEPS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.d))
 
-HEADERS     =  Config.hpp Client.hpp ManageAll.hpp Server.hpp AManager.hpp
+HEADERS     =  Config.hpp Client.hpp ManageAll.hpp Server.hpp AManager.hpp RequestParser.hpp
 
 GREEN       = \033[0;32m
 RED         = \033[0;31m

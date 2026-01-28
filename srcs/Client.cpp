@@ -3,15 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:47:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 15:20:10 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 20:26:56 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "RequestParser.hpp"
 #include "ManageAll.hpp"
+#include <fstream>
+#include <sstream>
 
 Client::Client(int fd)
 {
@@ -26,7 +29,6 @@ void Client::PollInHandler()
 {
     char buffer[4096];
     int n = recv(_fd, buffer, sizeof(buffer) - 1, 0);
-	std::cerr << "READING" << std::endl;
     
     if (n <= 0) {
         _closedStatus = true;
@@ -36,19 +38,37 @@ void Client::PollInHandler()
     buffer[n] = '\0';
     _request.append(buffer, n);
     _events = POLLOUT;
+    _RequestParser.ParseRequest(_request);
 }
 
-void	Client::PollOutHandler()
+std::string readFileTest(const std::string& path)
 {
-	std::string response =
-    "HTTP/1.0 200 OK\r\n"
-    "Content-Type: text/plain\r\n"
-    "Content-Length: 13\r\n"
-    "\r\n"
-    "Hello, world!";
+    std::ifstream file(path.c_str());
+    if (!file.is_open())
+        return "";
 
-	send(_fd, response.c_str(), response.length(), 0);
-	std::cerr << "WESH0" << std::endl;
-	_events = 0;
-	_closedStatus = true;
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+
+void Client::PollOutHandler()
+{
+    std::string body = readFileTest("website/index.html");
+    std::ostringstream oss;
+    oss << body.size();
+
+    std::string header =
+        "HTTP/1.0 200 OK\r\n"
+        "Content-Type: text/html; charset=UTF-8\r\n"
+        "Content-Length: " + oss.str() + "\r\n"
+        "Connection: close\r\n"
+        "\r\n";
+
+
+    std::string response = header + body;
+
+    send(_fd, response.c_str(), response.size(), 0);
+    _events = 0;
+    _closedStatus = true;
 }

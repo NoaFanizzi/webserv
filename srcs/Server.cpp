@@ -1,14 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/22 11:41:15 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:52:59 by nofanizz         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "ManageAll.hpp"
 #include "fcntl.h"
@@ -59,7 +49,6 @@ void	Server::PollInHandler()
 {
 	struct sockaddr_in clientaddr;
 	socklen_t addr_len = sizeof(clientaddr);
-	std::cerr << "WESH Ya quelqun" << std::endl;
 	int client_fd = accept(_fd, (sockaddr *)&clientaddr, &addr_len);
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	new Client(client_fd);
