@@ -6,14 +6,14 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:41:15 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:38:27 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:52:59 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ManageAll.hpp"
 #include "fcntl.h"
 
-Server::Server(const ServerConfig &serverconfig)
+Server::Server(const ServerConfig &serverconfig) : _serverconfig(serverconfig)
 {
 	_closedStatus = false;
 	_fd = createSocket();

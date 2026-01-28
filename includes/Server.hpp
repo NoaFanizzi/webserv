@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:38:54 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/28 16:53:09 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ class	Server : public AManager
 		int createSocket();
 		void createSocketAdress(const ServerConfig &serverconfig);
 		void 			bindClient(int fd);
-
+		const ServerConfig	&_serverconfig;
 
 	public:
 		//constructor
