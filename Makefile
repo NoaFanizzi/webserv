@@ -6,7 +6,7 @@
 #    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/29 13:27:50 by mvachon          ###   ########.fr        #
+#    Updated: 2026/01/29 19:06:23 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,7 @@ SRCS = main.cpp \
 	   ConfigParser/Config.cpp \
 	   ConfigParser/DEBUG_PrintConfig.cpp \
 	   RequestsParser/RequestParser.cpp\
+	   SetupErrorPages.cpp \
 	   Client.cpp \
 	   Server.cpp \
 	   ManageAll.cpp \

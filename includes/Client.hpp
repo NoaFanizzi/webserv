@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:32:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/29 12:22:45 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/29 19:05:44 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class Client : public AManager
 	private:
 		std::string _request;
 		RequestParser _RequestParser;
+		std::map<int, std::string> _errorPages;
 		const ServerConfig _config;
 		bool _requestcomplete;
 	public:
@@ -45,9 +46,11 @@ class Client : public AManager
 		~Client() {};
 
 		void	updateRequest(std::string &buffer, int n);
+		std::string getErrorPage(int code);
 		std::string 	CheckUrl();
 		void	handleRequestReception();		
 		void	PollInHandler();
+		void 	setErrorPages();
 		void	PollOutHandler();
         std::string GetHeaderResponse(size_t contentLength, std::string, std::string);
 		std::string GetRequest() {return _request;}

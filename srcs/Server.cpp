@@ -22,6 +22,12 @@ Server::Server(const ServerConfig &serverconfig) : _serverconfig(serverconfig)
 	_events = POLLIN;
 }
 
+Server::~Server()
+{
+	if (_fd != -1)
+		close(_fd);
+}
+
 int Server::getListen_fd() const
 {
 	return(_fd);
@@ -34,7 +40,9 @@ sockaddr_in Server::getSockddr_in() const
 
 int	Server::createSocket()
 {
-	int fd = socket(AF_INET, SOCK_STREAM, 0);
+	int fd;
+	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		std::cerr << "Socket Error" << std::endl;
 
 	return fd;
 }
@@ -62,7 +70,8 @@ void Server::createSocketAdress(const ServerConfig &serverconfig)
 
 void Server::bindClient(int fd)
 {
-	bind(fd, (sockaddr *)&_servaddr, sizeof(_servaddr));
+	if (bind(fd, (sockaddr *)&_servaddr, sizeof(_servaddr)) == -1)
+		std::cerr << "Open Socket : bind failed" << std::endl;
 }
 
 void	Server::PollInHandler()

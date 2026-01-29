@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/29 10:56:53 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/29 18:13:57 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class	Server : public AManager
 	public:
 		//constructor
 		Server(const ServerConfig &servconfig);
-		~Server() {};
+		~Server();
 		//getters
 		int 			getListen_fd() const;
 		sockaddr_in 	getSockddr_in() const;
