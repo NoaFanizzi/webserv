@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   AManager.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 16:11:39 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 14:54:52 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/29 08:38:08 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class AManager
 	public:
 		virtual ~AManager() {};
 		virtual void PollInHandler() = 0;
-		virtual void PollOutHandler() = 0;
+		virtual void PollOutHandler() {};
 
 		bool getClosedStatus() {
 			return _closedStatus;

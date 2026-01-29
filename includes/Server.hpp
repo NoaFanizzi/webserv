@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:53:09 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/29 10:56:53 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,9 @@ class	Server : public AManager
 		//getters
 		int 			getListen_fd() const;
 		sockaddr_in 	getSockddr_in() const;
+		const ServerConfig getConfig() const {return _serverconfig;}
 
 		void PollInHandler();
-		void PollOutHandler();
 		
 		
 };

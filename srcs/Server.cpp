@@ -51,13 +51,7 @@ void	Server::PollInHandler()
 	socklen_t addr_len = sizeof(clientaddr);
 	int client_fd = accept(_fd, (sockaddr *)&clientaddr, &addr_len);
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
-	new Client(client_fd);
+	new Client(client_fd, _serverconfig);
 }
-
-void	Server::PollOutHandler()
-{
-	
-}
-
 
 

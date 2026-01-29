@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:47:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 20:26:56 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/29 11:17:13 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@
 #include <fstream>
 #include <sstream>
 
-Client::Client(int fd)
+Client::Client(int fd, const ServerConfig &config): _config(config)
 {
-	_closedStatus = false;
-	_fd = fd;
-	ManageAll::pollFdCreation(_fd, this);
-	_events = POLLIN;
+    _fd = fd;
+    _closedStatus = false;
+    _events = POLLIN;
+    ManageAll::pollFdCreation(_fd, this);
 }
 
 
@@ -52,19 +52,27 @@ std::string readFileTest(const std::string& path)
     return buffer.str();
 }
 
+std::string Client::CheckUrl()
+{
+    if (access((_config.root + "/" + _config.index).c_str(), F_OK))
+        return (_config.root + "/" + _config.index);
+    return "website/error404NotFound.html";
+}
+
 void Client::PollOutHandler()
 {
-    std::string body = readFileTest("website/index.html");
-    std::ostringstream oss;
-    oss << body.size();
+    std::string path = _config.root + "/" + _config.index; 
+    std::string body = readFileTest(path);
+    std::string statusCode = "200";
+    std::string statusText = "OK";
+    
+    if (body.empty() || _RequestParser.GetUrl() != "/") {
+        body = readFileTest("website/error404NotFound.html");
+        statusCode = "404";
+        statusText = "Not Found";
+    }
 
-    std::string header =
-        "HTTP/1.0 200 OK\r\n"
-        "Content-Type: text/html; charset=UTF-8\r\n"
-        "Content-Length: " + oss.str() + "\r\n"
-        "Connection: close\r\n"
-        "\r\n";
-
+    std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
 
     std::string response = header + body;
 

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:32:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:50:31 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/29 10:33:48 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,21 +29,25 @@
 #include "AManager.hpp"
 #include "ManageAll.hpp"
 #include "RequestParser.hpp"
+#include "Config.hpp"
 
 class Client : public AManager
 {
 	private:
 		std::string _request;
 		RequestParser _RequestParser;
+		const ServerConfig _config;
 	public:
-		Client(int fd);
+		Client(int fd, const ServerConfig &config);
 		Client() {};
 		~Client() {};
 
 		void	updateRequest(std::string &buffer, int n);
+		std::string 	CheckUrl();
 		void	handleRequestReception();		
 		void	PollInHandler();
 		void	PollOutHandler();
+        std::string GetHeaderResponse(size_t contentLength, std::string, std::string);
 		std::string GetRequest() {return _request;}
 };
 

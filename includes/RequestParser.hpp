@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 16:29:22 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/28 19:48:54 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/29 10:22:02 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,10 @@ class RequestParser
         
 
     public:
+        std::string GetUrl() {return _url;}
         void CheckRequest();
         void ParseRequest(const std::string& request);
-        void printRequest(std::vector<std::string> docRequest);
+        void printRequest(std::vector<std::string> docRequest, std::map<std::string, std::string> &headers);
         RequestParser() {}
         ~RequestParser() {}
 };

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 18:56:53 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/28 20:30:36 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/29 09:35:54 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void RequestParser::CheckRequest()
         throw ExceptionPage("Error 400: Bad Request");
 }
 
-void RequestParser::printRequest(std::vector<std::string> docRequest)
+void RequestParser::printRequest(std::vector<std::string> docRequest, std::map<std::string, std::string> &headers)
 {
     
     // for (size_t i = 0; i < docRequest.size(); i++)
@@ -65,8 +65,6 @@ void RequestParser::printRequest(std::vector<std::string> docRequest)
     std::cout << "|  URL: " << _url << std::endl;
     std::cout << "|  Version: " << _version << std::endl;
     
-    std::map<std::string, std::string> headers = SeparateHeaders(docRequest);
-    
     std::cout << "|\n|  === HEADERS ===" << std::endl;
     std::map<std::string, std::string>::iterator it;
     for (it = headers.begin(); it != headers.end(); ++it) {
@@ -75,6 +73,22 @@ void RequestParser::printRequest(std::vector<std::string> docRequest)
     std::cout << " __________________________________________"<< std::endl;
     std::cout << std::endl;
 }
+
+std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCode, std::string StatusText)
+{
+    std::ostringstream oss;
+    oss << contentLength;
+
+    std::string header =
+        "HTTP/1.1 " + StatusCode + " " + StatusText +" \r\n"
+        "Content-Type: text/html; charset=UTF-8\r\n"
+        "Content-Length: " + oss.str() + "\r\n"
+        "Connection: close\r\n"
+        "\r\n";
+
+    return header;
+}
+
 
 void RequestParser::ParseRequest(const std::string& request)
 {
@@ -97,8 +111,9 @@ void RequestParser::ParseRequest(const std::string& request)
 
     if (docRequest.empty())
         return;
+    std::map<std::string, std::string> headers = SeparateHeaders(docRequest);
 
-    printRequest(docRequest);
+    printRequest(docRequest, headers);
 
     try
     {

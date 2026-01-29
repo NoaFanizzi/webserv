@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:31:03 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:48:50 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/29 08:16:17 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,6 @@ int	main(int ac, char **av)
 
 	const std::vector<ServerConfig> &SavedServers= config.getServers();
 	for(size_t i = 0; i < SavedServers.size(); i++)
-		new Server(SavedServers[i]);
+		new Server (SavedServers[i]);
 	ManageAll::loop();
 }
