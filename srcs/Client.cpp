@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:47:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/29 11:17:13 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/29 14:55:07 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,18 +27,14 @@ Client::Client(int fd, const ServerConfig &config): _config(config)
 
 void Client::PollInHandler()
 {
-    char buffer[4096];
-    int n = recv(_fd, buffer, sizeof(buffer) - 1, 0);
-    
-    if (n <= 0) {
-        _closedStatus = true;
-        return;
-    }
-	
-    buffer[n] = '\0';
-    _request.append(buffer, n);
-    _events = POLLOUT;
+    _RequestParser.RequestReading(_fd, _closedStatus, _request);
+     if(_RequestParser.IsComplete(_request) == true)
+     {
+         _events = POLLOUT;
+        std::cout << _request.length() << std::endl;
+     }
     _RequestParser.ParseRequest(_request);
+    std::cout << "END OF CLIENT POLLINHANDLER" << std::endl;
 }
 
 std::string readFileTest(const std::string& path)

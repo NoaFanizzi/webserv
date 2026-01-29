@@ -18,3 +18,5 @@ server {
     error_page 405 /pages_errors/405.html;
     error_page 500 /pages_errors/500.html;
 }
+
+\r\n\r\n

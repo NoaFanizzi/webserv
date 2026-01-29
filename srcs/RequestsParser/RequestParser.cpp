@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 18:56:53 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/29 09:35:54 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/29 14:51:52 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,4 +123,25 @@ void RequestParser::ParseRequest(const std::string& request)
     {
         std::cout << e.what() << std::endl;
     }
+}
+
+bool    RequestParser::IsComplete(std::string &request)
+{
+    if(request.find("\r\n\r\n", 0) != std::string::npos)
+        return(true);
+    return(false);
+}
+
+void RequestParser::RequestReading(int &fd, bool &closedStatus, std::string &request)
+{
+    char buffer[BUFFER_SIZE];
+    std::cout << "BEGINNING OF CLIENT POLLINHANDLER" << std::endl;
+    int n = recv(fd, buffer, sizeof(buffer) - 1, 0);
+    
+    if (n <= 0) {
+        closedStatus = true;
+        return;
+    }
+    buffer[n] = '\0';
+    request.append(buffer, n);
 }
