@@ -1,14 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Client.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/22 11:47:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/29 14:55:07 by nofanizz         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "Client.hpp"
 #include "RequestParser.hpp"
@@ -48,31 +38,51 @@ std::string readFileTest(const std::string& path)
     return buffer.str();
 }
 
+#include "Http404Exception.hpp"
+#include "Http403Exception.hpp"
+
 std::string Client::CheckUrl()
 {
-    if (access((_config.root + "/" + _config.index).c_str(), F_OK))
-        return (_config.root + "/" + _config.index);
-    return "website/error404NotFound.html";
+    std::string path;
+
+    if (_RequestParser.GetUrl() == "/")
+        path = _config.root + "/" + _config.index;
+    else
+        path = _config.root + _RequestParser.GetUrl();
+
+    if (access(path.c_str(), F_OK) != 0)
+        throw Http404Exception();
+        
+    if (access(path.c_str(), R_OK) != 0)
+        throw Http403Exception();
+
+    return path;
 }
+
 
 void Client::PollOutHandler()
 {
-    std::string path = _config.root + "/" + _config.index; 
-    std::string body = readFileTest(path);
+    std::string body;
     std::string statusCode = "200";
     std::string statusText = "OK";
-    
-    if (body.empty() || _RequestParser.GetUrl() != "/") {
-        body = readFileTest("website/error404NotFound.html");
-        statusCode = "404";
-        statusText = "Not Found";
+
+    try {
+        std::string path = CheckUrl();
+        body = readFileTest(path);
+    }
+    catch (const HttpException& e) {
+        body = readFileTest(e.getPage());
+
+        std::ostringstream oss;
+        oss << e.getStatusCode();
+        statusCode = oss.str();
+        statusText = e.getStatusText();
     }
 
     std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
 
-    std::string response = header + body;
+    send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
 
-    send(_fd, response.c_str(), response.size(), 0);
     _events = 0;
     _closedStatus = true;
 }
