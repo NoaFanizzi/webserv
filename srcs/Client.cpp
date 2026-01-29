@@ -3,6 +3,8 @@
 #include "Client.hpp"
 #include "RequestParser.hpp"
 #include "ManageAll.hpp"
+#include "Http404Exception.hpp"
+#include "Http403Exception.hpp"
 #include <fstream>
 #include <sstream>
 
@@ -21,10 +23,8 @@ void Client::PollInHandler()
      if(_RequestParser.IsComplete(_request) == true)
      {
          _events = POLLOUT;
-        std::cout << _request.length() << std::endl;
      }
     _RequestParser.ParseRequest(_request);
-    std::cout << "END OF CLIENT POLLINHANDLER" << std::endl;
 }
 
 std::string readFileTest(const std::string& path)
@@ -37,9 +37,6 @@ std::string readFileTest(const std::string& path)
     buffer << file.rdbuf();
     return buffer.str();
 }
-
-#include "Http404Exception.hpp"
-#include "Http403Exception.hpp"
 
 std::string Client::CheckUrl()
 {

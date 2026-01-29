@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 18:56:53 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/29 14:51:52 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/29 15:51:38 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,9 @@ void RequestParser::CheckRequest()
 
 void RequestParser::printRequest(std::vector<std::string> docRequest, std::map<std::string, std::string> &headers)
 {
-    
+    (void)docRequest;
     // for (size_t i = 0; i < docRequest.size(); i++)
     //     std::cout << docRequest[i] << std::endl;
-
-    std::istringstream iss(docRequest[0]);
-    iss >> _method >> _url >> _version;
 
     std::cout << " ____________________________\n" << std::endl;
     
@@ -113,6 +110,8 @@ void RequestParser::ParseRequest(const std::string& request)
         return;
     std::map<std::string, std::string> headers = SeparateHeaders(docRequest);
 
+    std::istringstream iss(docRequest[0]);
+    iss >> _method >> _url >> _version;
     printRequest(docRequest, headers);
 
     try
@@ -135,7 +134,6 @@ bool    RequestParser::IsComplete(std::string &request)
 void RequestParser::RequestReading(int &fd, bool &closedStatus, std::string &request)
 {
     char buffer[BUFFER_SIZE];
-    std::cout << "BEGINNING OF CLIENT POLLINHANDLER" << std::endl;
     int n = recv(fd, buffer, sizeof(buffer) - 1, 0);
     
     if (n <= 0) {
