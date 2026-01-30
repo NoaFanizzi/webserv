@@ -18,7 +18,7 @@
         }
 
         .container {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.35);
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
@@ -34,10 +34,21 @@
             opacity: 0.9;
         }
 
-        footer {
-            margin-top: 20px;
-            font-size: 0.9em;
-            opacity: 0.7;
+        .btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 28px;
+            background: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.35);
         }
     </style>
 </head>
@@ -45,9 +56,8 @@
     <div class="container">
         <h1>🚀 Webserv2 OK</h1>
         <p>Votre serveur web fonctionne correctement.</p>
-        <footer>
-            <p>Index2.html</p>
-        </footer>
+
+        <a href="/" class="btn">Retour à l’accueil</a>
     </div>
 </body>
 </html>

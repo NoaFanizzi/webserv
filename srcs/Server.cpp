@@ -72,6 +72,7 @@ void Server::bindClient(int fd)
 {
 	if (bind(fd, (sockaddr *)&_servaddr, sizeof(_servaddr)) == -1)
 		std::cerr << "Open Socket : bind failed" << std::endl;
+	//TODO close/exit if cerr (means multiples serv at the same time)
 }
 
 void	Server::PollInHandler()

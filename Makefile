@@ -6,7 +6,7 @@
 #    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/29 19:06:23 by mvachon          ###   ########.fr        #
+#    Updated: 2026/01/30 09:24:17 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -37,7 +37,7 @@ BUILD_DIR   = .build
 OBJS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
 DEPS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.d))
 
-HEADERS     =  Config.hpp Client.hpp ManageAll.hpp Server.hpp AManager.hpp RequestParser.hpp Http404Exception.hpp Http403Exception.hpp
+HEADERS     =  Config.hpp Client.hpp ManageAll.hpp Server.hpp AManager.hpp RequestParser.hpp HttpException.hpp
 
 GREEN       = \033[0;32m
 RED         = \033[0;31m

@@ -2,47 +2,44 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>404 - Page introuvable</title>
+    <title>Mon Web Server</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #fff;
+            background: linear-gradient(135deg, #265868, #334a70);
+            color: white;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             text-align: center;
         }
 
         .container {
-            max-width: 500px;
+            background: rgba(0, 0, 0, 0.3);
             padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
         h1 {
-            font-size: 120px;
-            margin: 0;
-            line-height: 1;
-        }
-
-        h2 {
-            margin: 10px 0 20px;
-            font-weight: normal;
+            margin-bottom: 10px;
+            font-size: 2.5em;
         }
 
         p {
+            font-size: 1.1em;
             opacity: 0.9;
-            margin-bottom: 30px;
         }
 
         .btn {
             display: inline-block;
-            padding: 12px 30px;
+            margin-top: 25px;
+            padding: 12px 28px;
             background: #ffffff;
-            color: #764ba2;
+            color: #334a70;
             text-decoration: none;
             border-radius: 30px;
             font-weight: bold;
@@ -53,14 +50,15 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.25);
         }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>404</h1>
-        <h2>Page introuvable</h2>
-        <p>Oups… La page que vous cherchez n’existe pas ou a été déplacée.</p>
-        <a href="/" class="btn">Retour au site</a>
+        <h1>🚀 Webserv OK</h1>
+        <p>Votre serveur web fonctionne correctement.</p>
+
+        <a href="/" class="btn">Accéder a index2</a>
     </div>
 </body>
 </html>

@@ -1,12 +1,22 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
+/*   Updated: 2026/01/30 17:27:04 by mvachon          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "Client.hpp"
 #include "RequestParser.hpp"
 #include "ManageAll.hpp"
-#include "Http404Exception.hpp"
-#include "Http403Exception.hpp"
+#include "HttpException.hpp"
 #include <fstream>
 #include <sstream>
+#include <sys/stat.h>
 
 Client::Client(int fd, const ServerConfig &config): _config(config)
 {
@@ -15,6 +25,7 @@ Client::Client(int fd, const ServerConfig &config): _config(config)
     _events = POLLIN;
     ManageAll::pollFdCreation(_fd, this);
     setErrorPages();
+    SetMimes();
 }
 
 
@@ -28,10 +39,10 @@ void Client::PollInHandler()
         }
 }
 
-std::string readFileTest(const std::string& path)
+std::string Client::readFileClient(const std::string& path)
 {
     if (access(path.c_str(), R_OK) != 0)
-        throw Http403Exception();
+        return _errorPages[403];
     std::ifstream file(path.c_str());
     if (!file.is_open())
         return "";
@@ -40,24 +51,6 @@ std::string readFileTest(const std::string& path)
     buffer << file.rdbuf();
     return buffer.str();
 }
-
-std::string Client::getErrorPage(int code)
-{
-    for (size_t i = 0; i < _config.error_page.size(); i++)
-    {
-        if (_config.error_page[i].index == code)
-        {
-            std::string path = _config.root + "/" + _config.error_page[i].path;
-            if (access(path.c_str(), F_OK) != 0)
-                return "404";
-            if (access(path.c_str(), R_OK) != 0)
-                return "403";
-            return path;
-        }
-    }
-    return "404";
-}
-
 
 std::string Client::CheckUrl()
 {
@@ -68,13 +61,38 @@ std::string Client::CheckUrl()
     else
         path = _config.root + _RequestParser.GetUrl();
 
-    if (access(path.c_str(), F_OK) != 0)
+    if (ManageAll::GetError408() == true)
+        throw Http408Exception();
+    if (ManageAll::GetError405() == true)
+        throw Http405Exception();
+    struct stat st;
+    if (stat(path.c_str(), &st) != 0)
         throw Http404Exception();
         
-    if (access(path.c_str(), R_OK) != 0)
+    if (!(st.st_mode & S_IRUSR))
         throw Http403Exception();
-
     return path;
+}
+
+std::string Client::getErrorPageContent(int code)
+{
+    for (size_t i = 0; i < _config.error_page.size(); i++)
+    {
+        if (_config.error_page[i].index == code)
+        {
+            std::string path = _config.root + "/" + _config.error_page[i].path;
+            struct stat st;
+            
+            if (stat(path.c_str(), &st) == 0 && (st.st_mode & S_IRUSR))
+                return readFileClient(path);
+        }
+    }
+    
+    std::map<int, std::string>::iterator it = _errorPages.find(code);
+    if (it != _errorPages.end())
+        return it->second;
+    
+    return _errorPages[404];
 }
 
 void Client::PollOutHandler()
@@ -82,29 +100,78 @@ void Client::PollOutHandler()
     std::string body;
     std::string statusCode = "200";
     std::string statusText = "OK";
+    std::string finalPath;
 
-    try{
-        std::string path = CheckUrl();
-        body = readFileTest(path);
+    try {
+        finalPath = CheckUrl();
+        body = readFileClient(finalPath);
     }
     catch (const HttpException& e)
     {
-        std::string errorPagePath = getErrorPage(e.getStatusCode());
-        if (errorPagePath == "404")
-            body = _errorPages[404];
-        else if (errorPagePath == "403")
-            body = _errorPages[403];
-        else
-            body = readFileTest(errorPagePath);
+        int errorCode = e.getStatusCode();
         std::ostringstream oss;
-        oss << e.getStatusCode();
+        oss << errorCode;
         statusCode = oss.str();
         statusText = e.getStatusText();
+        
+        body = getErrorPageContent(errorCode);
+        finalPath = ".html";
     }
-
+    
+    _RequestParser.SetUrl(finalPath);
     std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
     send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
-
+    ManageAll::SetError400(false);
+    ManageAll::SetError405(false);
+    ManageAll::SetError408(false);
     _events = 0;
     _closedStatus = true;
+}
+
+void Client::SetMimes()
+{
+    mimeTypes[".html"] = "text/html";
+    mimeTypes[".htm"]  = "text/html";
+    mimeTypes[".css"]  = "text/css";
+    mimeTypes[".js"]   = "application/javascript";
+    mimeTypes[".json"] = "application/json";
+    mimeTypes[".xml"]  = "application/xml";
+    mimeTypes[".txt"]  = "text/plain";
+    mimeTypes[".csv"]  = "text/csv";
+
+    mimeTypes[".png"]  = "image/png";
+    mimeTypes[".jpg"]  = "image/jpeg";
+    mimeTypes[".jpeg"] = "image/jpeg";
+    mimeTypes[".gif"]  = "image/gif";
+    mimeTypes[".bmp"]  = "image/bmp";
+    mimeTypes[".svg"]  = "image/svg+xml";
+    mimeTypes[".webp"] = "image/webp";
+    mimeTypes[".ico"]  = "image/x-icon";
+
+    mimeTypes[".mp3"]  = "audio/mpeg";
+    mimeTypes[".wav"]  = "audio/wav";
+    mimeTypes[".ogg"]  = "audio/ogg";
+    mimeTypes[".aac"]  = "audio/aac";
+    mimeTypes[".flac"] = "audio/flac";
+
+    mimeTypes[".mp4"]  = "video/mp4";
+    mimeTypes[".webm"] = "video/webm";
+    mimeTypes[".ogv"]  = "video/ogg";
+    mimeTypes[".avi"]  = "video/x-msvideo";
+    mimeTypes[".mov"]  = "video/quicktime";
+
+    mimeTypes[".zip"]  = "application/zip";
+    mimeTypes[".tar"]  = "application/x-tar";
+    mimeTypes[".gz"]   = "application/gzip";
+    mimeTypes[".7z"]   = "application/x-7z-compressed";
+    mimeTypes[".rar"]  = "application/vnd.rar";
+
+    mimeTypes[".ttf"]  = "font/ttf";
+    mimeTypes[".otf"]  = "font/otf";
+    mimeTypes[".woff"] = "font/woff";
+    mimeTypes[".woff2"]= "font/woff2";
+
+    mimeTypes[".pdf"]  = "application/pdf";
+    mimeTypes[".bin"]  = "application/octet-stream";
+    mimeTypes[".exe"]  = "application/octet-stream";
 }

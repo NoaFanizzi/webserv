@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:31:03 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/29 16:21:40 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/30 13:49:44 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,4 +29,5 @@ int	main(int ac, char **av)
 	for(size_t i = 0; i < SavedServers.size(); i++)
 		new Server (SavedServers[i]);
 	ManageAll::loop();
+
 }
