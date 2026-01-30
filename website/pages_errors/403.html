@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>404 - Page introuvable</title>
+    <title>403 - Page Interdite</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -37,13 +37,29 @@
             opacity: 0.9;
             margin-bottom: 30px;
         }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #ffffff;
+            color: #764ba2;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>404</h1>
-        <h2>Page introuvable</h2>
-        <p>Oups… La page que vous cherchez n’existe pas ou a été déplacée.</p>
+        <h1>403</h1>
+        <h2>Page Interdite</h2>
+        <p>Oups… Vous n'avez pas les droits d'aller sur cette page</p>
+        <a href="/" class="btn">Retour au site</a>
     </div>
 </body>
 </html>

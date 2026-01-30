@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestParser.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 16:29:22 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/29 14:54:05 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/30 08:56:09 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class RequestParser
 
     public:
         std::string GetUrl() {return _url;}
+        void SetUrl(std::string url) {this->_url = url;}
         void CheckRequest();
         void ParseRequest(const std::string& request);
         void printRequest(std::vector<std::string> docRequest, std::map<std::string, std::string> &headers);
@@ -51,6 +52,7 @@ class RequestParser
         bool IsComplete(std::string &request);
         RequestParser() {}
         ~RequestParser() {}
+
 };
 
 #endif

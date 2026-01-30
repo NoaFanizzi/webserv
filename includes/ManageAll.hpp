@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ManageAll.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 12:37:43 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/28 16:49:00 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/30 11:05:07 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,17 @@
 #include "Server.hpp"
 #include "AManager.hpp"
 #include "Config.hpp"
+#include "RequestParser.hpp"
 #include <map> 
+
+
 
 class ManageAll
 {
 	private:
+		static bool error400;
+		static bool error405;
+		static bool error408;
 		static std::vector <struct pollfd> _pollfds;
 		static std::map <int, AManager *> _managers;
 		static size_t	getPollFdSize();
@@ -30,9 +36,14 @@ class ManageAll
 
 	public:
 		static void pollFdCreation(const int &fd, AManager *manager);
-		
 		struct pollfd& getPollFd(int index);
 		static void	loop();
+		static bool GetError408() {return error408;}
+		static bool GetError400() {return error400;}
+		static bool GetError405() {return error405;}
+		static void SetError400(bool error) {error400 = error;}
+		static void SetError405(bool error) {error405 = error;}
+		static void SetError408(bool error) {error408 = error;}
 };
 
 #endif

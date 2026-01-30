@@ -1,7 +1,17 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ManageAll.cpp                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/30 09:27:09 by mvachon           #+#    #+#             */
+/*   Updated: 2026/01/30 10:57:31 by mvachon          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "ManageAll.hpp"
-
+#include "HttpException.hpp"
 #include "iostream"
 #include <sys/socket.h>
 #include <vector>
@@ -17,6 +27,9 @@
 
 std::vector<struct pollfd> ManageAll::_pollfds;
 std::map <int, AManager *> ManageAll::_managers;
+bool ManageAll::error408 = false;
+bool ManageAll::error405 = false;
+bool ManageAll::error400 = false;
 
 
 void ManageAll::pollFdCreation(const int &fd, AManager *manager)
@@ -68,11 +81,12 @@ void	ManageAll::loop()
 	{
 		updateStatus();
 		int poll_value = poll(&_pollfds[0], _pollfds.size(), 1000);
-		if(poll_value < 0)
+		if (poll_value < 0)
 		{
 			perror("poll error");
 			exit(1);
 		}
+		poll_value == 0 ? error408 = true : error408 = false;
 		i = 0;
 		while(i < _pollfds.size() && poll_value)
 		{
