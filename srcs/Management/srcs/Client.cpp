@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/31 11:33:44 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/31 12:32:26 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCo
                 ContentType = it->second;
         }
     }
+
     std::string header =
         "HTTP/1.1 " + StatusCode + " " + StatusText + "\r\n"
         "Content-Type: " + ContentType + "; charset=UTF-8\r\n"
@@ -54,21 +55,22 @@ Client::Client(int fd, const ServerConfig &config): _config(config)
     SetMimes();
 }
 
-
 void Client::PollInHandler()
 {
     _Request.RequestReading(_fd, _closedStatus, _request);
-     if(_Request.IsComplete(_request) == true)
-     {
-         _events = POLLOUT;
-         _Request.Parse(_request);
-        }
+    
+    if(_Request.IsComplete(_request) == true)
+    {
+        _events = POLLOUT;
+        _Request.Parse(_request);
+    }
 }
 
 std::string Client::readFileClient(const std::string& path)
 {
     if (access(path.c_str(), R_OK) != 0)
         return _errorPages[403];
+    
     std::ifstream file(path.c_str());
     if (!file.is_open())
         return "";
@@ -91,12 +93,16 @@ std::string Client::CheckUrl()
         throw Http408Exception();
     if (ManageAll::GetError405() == true)
         throw Http405Exception();
+    if (ManageAll::GetError400() == true)
+        throw Http400Exception();
+        
     struct stat st;
     if (stat(path.c_str(), &st) != 0)
         throw Http404Exception();
         
     if (!(st.st_mode & S_IRUSR))
         throw Http403Exception();
+    
     return path;
 }
 
@@ -147,6 +153,7 @@ void Client::PollOutHandler()
     _Request.SetPath(finalPath);
     std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
     send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
+    
     ManageAll::SetError400(false);
     ManageAll::SetError405(false);
     ManageAll::SetError408(false);
