@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:32:07 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/30 10:25:15 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/31 11:16:53 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 
 #include "AManager.hpp"
 #include "ManageAll.hpp"
-#include "RequestParser.hpp"
+#include "Request.hpp"
 #include "Config.hpp"
 #include "stdbool.h"
 
@@ -36,7 +36,7 @@ class Client : public AManager
 {
 	private:
 		std::string _request;
-		RequestParser _RequestParser;
+		Request _Request;
 		std::map<int, std::string> _errorPages;
 		const ServerConfig _config;
 		bool _requestcomplete;

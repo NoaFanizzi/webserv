@@ -1,7 +1,37 @@
-#include "RequestParser.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Request.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
+/*   Updated: 2026/01/31 11:27:18 by nofanizz         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include "RequestParser.hpp"
+#include "Request.hpp"
 #include <sstream>
+#include <sys/socket.h>
+
+void Request::RequestReading(int &fd, bool &closedStatus, std::string &request)
+{
+    char buffer[BUFFER_SIZE];
+    int n = recv(fd, buffer, sizeof(buffer) - 1, 0);
+
+    if (n <= 0) {
+        closedStatus = true;
+        return;
+    }
+    buffer[n] = '\0';
+    request.append(buffer, n);
+}
+bool    Request::IsComplete(std::string &request)
+{
+    if(request.find("\r\n\r\n", 0) != std::string::npos)
+        return(true);
+    return(false);
+}
 
 // split lines and stores them into a Vector<string>
 // remove the `/n` at the end of each
@@ -28,7 +58,7 @@ static std::vector<std::string> splitLines(const std::string &request)
 
 // Parse the raw request and return a struct Request
 // TODO: parse for queries
-Request RequestParser::Parse(const std::string &raw)
+Request Request::Parse(const std::string &raw)
 {
 	Request req;
 	std::vector<std::string> lines = splitLines(raw); // separate each line

@@ -1,5 +1,17 @@
-#ifndef HTTPEXCEPTION_HPP
-#define HTTPEXCEPTION_HPP
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   HttpExceptions.hpp                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/31 11:24:45 by nofanizz          #+#    #+#             */
+/*   Updated: 2026/01/31 11:24:48 by nofanizz         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef HTTPEXCEPTIONS_HPP
+#define HTTPEXCEPTIONS_HPP
 
 #include <exception>
 #include <string>
