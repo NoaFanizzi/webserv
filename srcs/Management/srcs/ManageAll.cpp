@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ManageAll.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 09:27:09 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/31 11:30:31 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/01/31 15:05:32 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void ManageAll::updateStatus()
 	{
 		AManager *manager = getManager(_pollfds[i].fd);
 		_pollfds[i].events = manager->getEvents();
-		// _pollfds[i].revents = 0;
+		_pollfds[i].revents = 0;
 	}
 }
 
@@ -105,11 +105,12 @@ void	ManageAll::loop()
 			if(_pollfds[i].revents & POLLIN)
 				current->PollInHandler();
 			if(_pollfds[i].revents & POLLOUT)
-				current->PollOutHandler();
+				current->PollOutHandler();	
 			if (current->getClosedStatus())
 			{
 				_managers.erase(_pollfds[i].fd);
 				_pollfds.erase(_pollfds.begin() + i);
+				close(current->getFd());
 				delete current;
 				i--;
 			}

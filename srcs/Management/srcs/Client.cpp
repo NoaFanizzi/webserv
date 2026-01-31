@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/31 12:32:26 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/31 15:27:27 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCo
         "HTTP/1.1 " + StatusCode + " " + StatusText + "\r\n"
         "Content-Type: " + ContentType + "; charset=UTF-8\r\n"
         "Content-Length: " + oss.str() + "\r\n"
-        "Connection: closed\r\n"
+        "Connection: close\r\n"
         "\r\n";
     return header;
 }
@@ -63,6 +63,8 @@ void Client::PollInHandler()
     {
         _events = POLLOUT;
         _Request.Parse(_request);
+        std::cout << _request << std::endl;
+        std::cout << "===============================" << std::endl;
     }
 }
 
@@ -159,6 +161,7 @@ void Client::PollOutHandler()
     ManageAll::SetError408(false);
     _events = 0;
     _closedStatus = true;
+    
 }
 
 void Client::SetMimes()

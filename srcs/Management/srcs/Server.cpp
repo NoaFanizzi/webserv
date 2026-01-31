@@ -42,8 +42,10 @@ int	Server::createSocket()
 {
 	int fd;
 	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-		std::cerr << "Socket Error" << std::endl;
-
+	{
+		close(fd);
+		throw std::runtime_error("Socket error");
+	}
 	return fd;
 }
 
@@ -70,9 +72,11 @@ void Server::createSocketAdress(const ServerConfig &serverconfig)
 
 void Server::bindClient(int fd)
 {
-	if (bind(fd, (sockaddr *)&_servaddr, sizeof(_servaddr)) == -1)
-		std::cerr << "Open Socket : bind failed" << std::endl;
-	//TODO close/exit if cerr (means multiples serv at the same time)
+    if (bind(fd, (sockaddr *)&_servaddr, sizeof(_servaddr)) == -1)
+    {
+        close(fd);
+        throw std::runtime_error("Bind failed");
+    }
 }
 
 void	Server::PollInHandler()

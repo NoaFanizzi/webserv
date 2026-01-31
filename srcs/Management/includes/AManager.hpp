@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 16:11:39 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/29 08:38:08 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/31 14:51:42 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ class AManager
 		short getEvents() {
 			return _events;
 		}
-
+		int getFd(void) {return _fd;}
 		void setEvents(short events)
 		{
 			_events = events;

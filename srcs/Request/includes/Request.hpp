@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:00 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/31 12:25:25 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/31 15:34:08 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <vector>
 #include <map>
 
-#define BUFFER_SIZE 2
+#define BUFFER_SIZE 50
 
 class Request
 {
