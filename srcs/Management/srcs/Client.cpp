@@ -6,17 +6,44 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/30 17:27:04 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/31 12:32:26 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
-#include "RequestParser.hpp"
+#include "Request.hpp"
 #include "ManageAll.hpp"
-#include "HttpException.hpp"
+#include "HttpExceptions.hpp"
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+
+std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCode, std::string StatusText)
+{
+    std::ostringstream oss;
+    oss << contentLength;
+
+    std::string ContentType = "application/octet-stream";
+    std::string url = _Request.GetPath();
+
+    if (!url.empty()) {
+        size_t pos = url.rfind('.');
+        if (pos != std::string::npos && pos != url.size() - 1) { 
+            std::string ext = url.substr(pos);
+            std::map<std::string, std::string>::iterator it = mimeTypes.find(ext);
+            if (it != mimeTypes.end())
+                ContentType = it->second;
+        }
+    }
+
+    std::string header =
+        "HTTP/1.1 " + StatusCode + " " + StatusText + "\r\n"
+        "Content-Type: " + ContentType + "; charset=UTF-8\r\n"
+        "Content-Length: " + oss.str() + "\r\n"
+        "Connection: closed\r\n"
+        "\r\n";
+    return header;
+}
 
 Client::Client(int fd, const ServerConfig &config): _config(config)
 {
@@ -28,21 +55,22 @@ Client::Client(int fd, const ServerConfig &config): _config(config)
     SetMimes();
 }
 
-
 void Client::PollInHandler()
 {
-    _RequestParser.RequestReading(_fd, _closedStatus, _request);
-     if(_RequestParser.IsComplete(_request) == true)
-     {
-         _events = POLLOUT;
-         _RequestParser.ParseRequest(_request);
-        }
+    _Request.RequestReading(_fd, _closedStatus, _request);
+    
+    if(_Request.IsComplete(_request) == true)
+    {
+        _events = POLLOUT;
+        _Request.Parse(_request);
+    }
 }
 
 std::string Client::readFileClient(const std::string& path)
 {
     if (access(path.c_str(), R_OK) != 0)
         return _errorPages[403];
+    
     std::ifstream file(path.c_str());
     if (!file.is_open())
         return "";
@@ -56,21 +84,25 @@ std::string Client::CheckUrl()
 {
     std::string path;
 
-    if (_RequestParser.GetUrl() == "/")
+    if (_Request.GetPath() == "/")
         path = _config.root + "/" + _config.index;
     else
-        path = _config.root + _RequestParser.GetUrl();
+        path = _config.root + _Request.GetPath();
 
     if (ManageAll::GetError408() == true)
         throw Http408Exception();
     if (ManageAll::GetError405() == true)
         throw Http405Exception();
+    if (ManageAll::GetError400() == true)
+        throw Http400Exception();
+        
     struct stat st;
     if (stat(path.c_str(), &st) != 0)
         throw Http404Exception();
         
     if (!(st.st_mode & S_IRUSR))
         throw Http403Exception();
+    
     return path;
 }
 
@@ -118,9 +150,10 @@ void Client::PollOutHandler()
         finalPath = ".html";
     }
     
-    _RequestParser.SetUrl(finalPath);
+    _Request.SetPath(finalPath);
     std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
     send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
+    
     ManageAll::SetError400(false);
     ManageAll::SetError405(false);
     ManageAll::SetError408(false);

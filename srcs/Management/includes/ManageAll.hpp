@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ManageAll.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 12:37:43 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/30 11:05:07 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/01/31 11:16:35 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "Server.hpp"
 #include "AManager.hpp"
 #include "Config.hpp"
-#include "RequestParser.hpp"
+#include "Request.hpp"
 #include <map> 
 
 

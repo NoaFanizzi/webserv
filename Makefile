@@ -3,6 +3,18 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
+#    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
+#    Updated: 2026/01/31 11:19:54 by nofanizz         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
 #    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
@@ -13,31 +25,21 @@
 NAME        = webserv
 CXX         = c++
 CXXFLAGS    = -g3 -Wall -Wextra -Werror -std=c++98
-INCLUDES    = -I includes
 RM          = rm -rf
 
-SRCS_DIR    = srcs
-#SRCS        = main.cpp  Config.cpp DEBUG_PrintConfig.cpp ConfigParser.cpp LocationParser.cpp ServerDirectives.cpp LocationParser.cpp 
-SRCS = main.cpp \
-       ConfigParser/ConfigParser.cpp \
-       ConfigParser/ServerParser.cpp \
-       ConfigParser/ServerDirectives.cpp \
-       ConfigParser/LocationParser.cpp \
-	   ConfigParser/Config.cpp \
-	   ConfigParser/DEBUG_PrintConfig.cpp \
-	   RequestsParser/RequestParser.cpp\
-	   SetupErrorPages.cpp \
-	   Client.cpp \
-	   Server.cpp \
-	   ManageAll.cpp \
+INCLUDES    = -I includes
 
-SRCS_PATH   = $(addprefix $(SRCS_DIR)/, $(SRCS))
+SRCS        = srcs/main.cpp
+
+#include srcs/CGI/cgi.mk
+include srcs/Exceptions/exceptions.mk
+include srcs/ConfigParser/configparser.mk
+include srcs/Management/management.mk
+include srcs/Request/request.mk
 
 BUILD_DIR   = .build
-OBJS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
-DEPS        = $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.d))
-
-HEADERS     =  Config.hpp Client.hpp ManageAll.hpp Server.hpp AManager.hpp RequestParser.hpp HttpException.hpp
+OBJS        = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
+DEPS        = $(OBJS:.o=.d)
 
 GREEN       = \033[0;32m
 RED         = \033[0;31m
@@ -49,10 +51,7 @@ $(NAME): $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) compiled successfully!$(RESET)"
 
-$(BUILD_DIR):
-	@mkdir -p $(BUILD_DIR)
-
-$(BUILD_DIR)/%.o: $(SRCS_DIR)/%.cpp
+$(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
 	@echo "$(GREEN)✓ Compiled: $<$(RESET)"
