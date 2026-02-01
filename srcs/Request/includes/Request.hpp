@@ -21,38 +21,31 @@
 
 class Request
 {
-    private:
-			std::string method;		// GET POST DELETE
-			std::string path;		// file
-			std::string query;		// args for cgi script
-			std::string version;	// HTTP/1.1 usually
-			std::map<std::string, std::string> headers;	//headers
-			std::string body;		// body content
+private:
+	std::string _method;						 // GET POST DELETE
+	std::string _path;							 // file
+	std::string _query;							 // args for cgi script
+	std::string _version;						 // HTTP/1.1 usually
+	std::map<std::string, std::string> _headers; // headers
+	std::string _body;							 // body content
 
-		public:
+public:
+	Request() {}
+	~Request() {}
 
-        Request() {}
-        ~Request() {}
-		
-        void CheckRequest();
-        void Parse(const std::string &raw);
-        
-        bool IsComplete(std::string &request);
-        void RequestReading(int &fd, bool &closedStatus, std::string &request);
+	void CheckRequest();
+	void Parse(const std::string &raw);
 
-        std::string GetPath() { return path; }
-        std::string GetMethod() { return method; }
-        std::string GetVersion() { return version; }
-        std::map<std::string, std::string> GetHeaders() { return headers; }
-        std::string GetBody() { return body; }
+	bool IsComplete(std::string &request);
+	void RequestReading(int &fd, bool &closedStatus, std::string &request);
 
-        void SetPath(std::string &str) { path = str; }
-        
-        static std::string headerFind(const std::map<std::string, std::string>& hdrs, 
-                                       const std::string& key) {
-            std::map<std::string, std::string>::const_iterator it = hdrs.find(key);
-            return (it != hdrs.end()) ? it->second : "";
-        }
+	std::string GetPath() const { return _path; }
+	std::string GetMethod() const { return _method; }
+	std::string GetVersion() const { return _version; }
+	std::string GetHeaders(const std::string toGet) const;
+	std::string GetBody() const { return _body; }
+
+	void SetPath(std::string &str) { _path = str; }
 };
 
 #endif

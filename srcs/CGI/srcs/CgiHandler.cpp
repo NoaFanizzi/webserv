@@ -28,12 +28,12 @@ bool CgiHandler::isCgi(std::string path)
 // functions
 void CgiHandler::buildEnv()
 {
-	_env.push_back("REQUEST_METHOD=" + _request.method);
+	_env.push_back("REQUEST_METHOD=" + _request.GetMethod());
 	_env.push_back("SCRIPT_FILENAME=" + _scriptPath);
-	_env.push_back("SCRIPT_NAME=" + _request.path);
+	_env.push_back("SCRIPT_NAME=" + _request.GetPath());
 	//_env.push_back("QUERY_STRING=" + _request.query); // TODO: parse for query
-	_env.push_back("CONTENT_LENGTH=" + headerFind(_request.headers, "Content-Lenght"));
-	_env.push_back("CONTENT_TYPE=" + headerFind(_request.headers, "Content-Type"));
+	_env.push_back("CONTENT_LENGTH=" + _request.GetHeaders("Content-Length"));
+	_env.push_back("CONTENT_TYPE=" + _request.GetHeaders("Content-Ttype"));
 	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 }
@@ -87,13 +87,13 @@ bool CgiHandler::execute()
 		{
 			close(fdIn[1]);
 			close(fdOut[0]);
-			exit (false);
+			exit(false);
 		}
 		if (dup2(fdOut[1], STDOUT_FILENO) < 0)
 		{
 			close(fdIn[1]);
 			close(fdOut[0]);
-			exit (false);
+			exit(false);
 		}
 		close(fdIn[1]);
 		close(fdOut[0]);
@@ -101,15 +101,15 @@ bool CgiHandler::execute()
 		char *argv[] = {(char *)_scriptPath.c_str(), NULL};
 		execve(_scriptPath.c_str(), argv, envToCharArray());
 		perror("execve failed: ");
-		exit (1);
+		exit(1);
 	}
 
 	close(fdIn[0]);
 	close(fdOut[1]);
 
-	if (_request.method == "POST") // write the request body in STDIN
+	if (_request.GetMethod() == "POST") // write the request body in STDIN
 	{
-		const std::string& body = _request.body;
+		const std::string &body = _request.GetBody();
 		if (!body.empty())
 			write(fdIn[1], body.c_str(), body.size());
 	}
