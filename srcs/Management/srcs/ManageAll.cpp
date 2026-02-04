@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 09:27:09 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/31 15:05:32 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/04 17:08:51 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,6 @@
 
 std::vector<struct pollfd> ManageAll::_pollfds;
 std::map <int, AManager *> ManageAll::_managers;
-bool ManageAll::error408 = false;
-bool ManageAll::error405 = false;
-bool ManageAll::error400 = false;
 
 
 void ManageAll::pollFdCreation(const int &fd, AManager *manager)
@@ -86,7 +83,6 @@ void	ManageAll::loop()
 			perror("poll error");
 			exit(1);
 		}
-		poll_value == 0 ? error408 = true : error408 = false;
 		i = 0;
 		while(i < _pollfds.size() && poll_value)
 		{

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/31 15:27:27 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/04 19:43:13 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCo
     oss << contentLength;
 
     std::string ContentType = "application/octet-stream";
-    std::string url = _Request.GetPath();
+    std::string url = _Request.GetPath();   
 
     if (!url.empty()) {
         size_t pos = url.rfind('.');
@@ -37,7 +37,7 @@ std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCo
     }
 
     std::string header =
-        "HTTP/1.1 " + StatusCode + " " + StatusText + "\r\n"
+        "HTTP/1.0 " + StatusCode + " " + StatusText + "\r\n"
         "Content-Type: " + ContentType + "; charset=UTF-8\r\n"
         "Content-Length: " + oss.str() + "\r\n"
         "Connection: close\r\n"
@@ -62,7 +62,6 @@ void Client::PollInHandler()
     if(_Request.IsComplete(_request) == true)
     {
         _events = POLLOUT;
-        _Request.Parse(_request);
         std::cout << _request << std::endl;
         std::cout << "===============================" << std::endl;
     }
@@ -90,13 +89,6 @@ std::string Client::CheckUrl()
         path = _config.root + "/" + _config.index;
     else
         path = _config.root + _Request.GetPath();
-
-    if (ManageAll::GetError408() == true)
-        throw Http408Exception();
-    if (ManageAll::GetError405() == true)
-        throw Http405Exception();
-    if (ManageAll::GetError400() == true)
-        throw Http400Exception();
         
     struct stat st;
     if (stat(path.c_str(), &st) != 0)
@@ -137,6 +129,7 @@ void Client::PollOutHandler()
     std::string finalPath;
 
     try {
+        _Request.Parse(_request);
         finalPath = CheckUrl();
         body = readFileClient(finalPath);
     }
@@ -155,10 +148,6 @@ void Client::PollOutHandler()
     _Request.SetPath(finalPath);
     std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
     send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
-    
-    ManageAll::SetError400(false);
-    ManageAll::SetError405(false);
-    ManageAll::SetError408(false);
     _events = 0;
     _closedStatus = true;
     
@@ -174,6 +163,7 @@ void Client::SetMimes()
     mimeTypes[".xml"]  = "application/xml";
     mimeTypes[".txt"]  = "text/plain";
     mimeTypes[".csv"]  = "text/csv";
+    mimeTypes[".cpp"]  = "text/x-c++src";
 
     mimeTypes[".png"]  = "image/png";
     mimeTypes[".jpg"]  = "image/jpeg";
