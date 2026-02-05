@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:00 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/04 18:57:23 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/05 08:58:27 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ private:
 	std::vector<BodyRequest> _bodyRequests;		 // body content
 
 public:
-	Request() { _contentLengthBody = -1; }
+	Request() : _contentLengthBody(-1) {}
 	~Request() {}
 
 	void CheckRequest();
@@ -61,6 +61,7 @@ public:
 	bool IsComplete(const std::string &req);
 	void parseContentLength(const std::string &req);
 	void parseWebKitForm(const std::string &req);
+	void ParsePostMethod(const std::string &request, size_t body_start);
 	void RequestReading(int &fd, bool &closedStatus, std::string &request);
 
 	std::string GetPath() const { return _path; }
@@ -68,7 +69,7 @@ public:
 	std::string GetVersion() const { return _version; }
 	std::string GetHeaders(const std::string toGet) const;
 
-	void SetPath(std::string &str) { _path = str; }
+	void SetPath(const std::string &str) { _path = str; }
 };
 
 std::vector<std::string> split(const std::string &s, const std::string &delim);

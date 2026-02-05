@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpExceptions.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:24:45 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/01/31 11:24:48 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/05 08:34:27 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,18 @@ public:
 
     const std::string& getStatusText() const {
         static std::string text = "Request Timeout";
+        return text;
+    }
+};
+
+class Http500Exception : public HttpException {
+public:
+    virtual ~Http500Exception() throw() {}
+
+    int getStatusCode() const { return 500; }
+
+    const std::string& getStatusText() const {
+        static std::string text = "Internal Error";
         return text;
     }
 };

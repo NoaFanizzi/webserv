@@ -3,22 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/31 11:19:54 by nofanizz         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
 #    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/10/05 17:00:00 by nofanizz          #+#    #+#              #
-#    Updated: 2026/01/30 09:24:17 by mvachon          ###   ########.fr        #
+#    Created: 2026/02/05 07:48:23 by mvachon           #+#    #+#              #
+#    Updated: 2026/02/05 09:06:16 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,15 +29,21 @@ BUILD_DIR   = .build
 OBJS        = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 DEPS        = $(OBJS:.o=.d)
 
+UPLOAD_FILE = upload
+
 GREEN       = \033[0;32m
 RED         = \033[0;31m
 RESET       = \033[0m
 
-all: $(NAME)
+all: $(UPLOAD_FILE) $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) compiled successfully!$(RESET)"
+
+$(UPLOAD_FILE):
+	@mkdir -p $(UPLOAD_FILE)
+	@echo "$(GREEN)✓ upload file created$(RESET)"
 
 $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -58,14 +52,18 @@ $(BUILD_DIR)/%.o: %.cpp
 
 -include $(DEPS)
 
+run: all
+	@echo "$(GREEN)▶ Launching $(NAME) with config.conf$(RESET)"
+	@./$(NAME) config.conf
+
 clean:
 	@$(RM) $(BUILD_DIR)
 	@echo "$(RED)✗ Object files and dependencies removed$(RESET)"
 
 fclean: clean
-	@$(RM) $(NAME)
-	@echo "$(RED)✗ $(NAME) removed$(RESET)"
+	@$(RM) $(NAME) $(UPLOAD_FILE)
+	@echo "$(RED)✗ $(NAME) and upload removed$(RESET)"
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re 

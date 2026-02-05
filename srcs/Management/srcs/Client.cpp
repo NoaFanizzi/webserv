@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/04 19:43:13 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/05 09:29:52 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,12 @@ void Client::PollInHandler()
 {
     _Request.RequestReading(_fd, _closedStatus, _request);
     
-    if(_Request.IsComplete(_request) == true)
-    {
-        _events = POLLOUT;
-        std::cout << _request << std::endl;
-        std::cout << "===============================" << std::endl;
-    }
+        if(_Request.IsComplete(_request) == true)
+        {
+            _events = POLLOUT;
+            std::cout << _request << std::endl;
+            std::cout << "===============================" << std::endl;
+        }
 }
 
 std::string Client::readFileClient(const std::string& path)
@@ -86,7 +86,7 @@ std::string Client::CheckUrl()
     std::string path;
 
     if (_Request.GetPath() == "/")
-        path = _config.root + "/" + _config.index;
+        path = _config.root + "/" + _config.index;      
     else
         path = _config.root + _Request.GetPath();
         
