@@ -20,7 +20,7 @@
         position: relative;
     }
 
-    /* --- EFFETS D'ARRIÈRE-PLAN BRAINROT --- */
+    /* --- EFFETS D'ARRIÈRE-PLAN MEGA FUSION --- */
     .background-effects {
         position: fixed;
         top: 0;
@@ -32,100 +32,213 @@
         overflow: hidden;
     }
 
-    /* Cercles flottants aléatoires */
+    /* Cercles flottants ULTRA CHAOTIQUES */
     .floating-circle {
         position: absolute;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
-        animation: float 20s infinite ease-in-out;
+        animation: chaosFloat 8s infinite ease-in-out;
+    }
+
+    @keyframes chaosFloat {
+        0% { 
+            transform: translate(0, 0) scale(1) rotate(0deg);
+            opacity: 0.4;
+        }
+        20% { 
+            transform: translate(200px, -150px) scale(1.5) rotate(72deg);
+            opacity: 0.7;
+        }
+        40% { 
+            transform: translate(-100px, 200px) scale(0.6) rotate(144deg);
+            opacity: 0.3;
+        }
+        60% { 
+            transform: translate(300px, 100px) scale(1.3) rotate(216deg);
+            opacity: 0.8;
+        }
+        80% { 
+            transform: translate(-200px, -100px) scale(0.8) rotate(288deg);
+            opacity: 0.5;
+        }
+        100% { 
+            transform: translate(0, 0) scale(1) rotate(360deg);
+            opacity: 0.4;
+        }
     }
 
     .circle1 {
-        width: 300px;
-        height: 300px;
-        top: -150px;
-        left: -150px;
+        width: 400px;
+        height: 400px;
+        top: -200px;
+        left: -200px;
+        background: radial-gradient(circle, rgba(255,0,200,0.3), transparent);
         animation-delay: 0s;
-        background: radial-gradient(circle, rgba(255,0,200,0.15), transparent);
+        animation-duration: 6s;
     }
 
     .circle2 {
-        width: 200px;
-        height: 200px;
-        bottom: -100px;
-        right: -100px;
-        animation-delay: 5s;
-        background: radial-gradient(circle, rgba(0,255,200,0.15), transparent);
+        width: 300px;
+        height: 300px;
+        bottom: -150px;
+        right: -150px;
+        background: radial-gradient(circle, rgba(0,255,200,0.3), transparent);
+        animation-delay: 1s;
+        animation-duration: 7s;
     }
 
     .circle3 {
-        width: 400px;
-        height: 400px;
-        top: 50%;
-        left: 50%;
-        animation-delay: 10s;
-        background: radial-gradient(circle, rgba(255,230,0,0.1), transparent);
+        width: 500px;
+        height: 500px;
+        top: 30%;
+        left: 40%;
+        background: radial-gradient(circle, rgba(255,230,0,0.25), transparent);
+        animation-delay: 2s;
+        animation-duration: 8s;
     }
 
-    @keyframes float {
-        0%, 100% { 
-            transform: translate(0, 0) scale(1);
-            opacity: 0.3;
-        }
-        25% { 
-            transform: translate(100px, -100px) scale(1.2);
-            opacity: 0.6;
-        }
-        50% { 
-            transform: translate(-50px, 100px) scale(0.8);
-            opacity: 0.4;
-        }
-        75% { 
-            transform: translate(150px, 50px) scale(1.1);
-            opacity: 0.5;
-        }
+    .circle4 {
+        width: 250px;
+        height: 250px;
+        top: 60%;
+        right: 10%;
+        background: radial-gradient(circle, rgba(0,150,255,0.3), transparent);
+        animation-delay: 1.5s;
+        animation-duration: 5.5s;
     }
 
-    /* Particules scintillantes */
+    .circle5 {
+        width: 350px;
+        height: 350px;
+        bottom: 20%;
+        left: 15%;
+        background: radial-gradient(circle, rgba(255,100,255,0.3), transparent);
+        animation-delay: 3s;
+        animation-duration: 9s;
+    }
+
+    /* Particules scintillantes HARDCORE */
     .particle {
         position: absolute;
-        width: 4px;
-        height: 4px;
         background: white;
         border-radius: 50%;
-        animation: twinkle 3s infinite;
+        animation: megaTwinkle 2s infinite;
     }
 
-    @keyframes twinkle {
-        0%, 100% { opacity: 0; transform: scale(0); }
-        50% { opacity: 1; transform: scale(1); }
+    @keyframes megaTwinkle {
+        0%, 100% { 
+            opacity: 0; 
+            transform: scale(0) rotate(0deg); 
+        }
+        25% {
+            opacity: 0.8;
+            transform: scale(1.5) rotate(90deg);
+        }
+        50% { 
+            opacity: 1; 
+            transform: scale(2) rotate(180deg); 
+        }
+        75% {
+            opacity: 0.6;
+            transform: scale(1.2) rotate(270deg);
+        }
     }
 
-    /* Vagues en arrière-plan */
+    /* Vagues multiples qui tournent */
     .wave {
         position: absolute;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.03) 50%, transparent 70%);
-        animation: wave 15s linear infinite;
+        width: 300%;
+        height: 300%;
+        top: 50%;
+        left: 50%;
+        background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+        animation: megaWave 8s linear infinite;
     }
 
-    @keyframes wave {
-        0% { transform: rotate(0deg) translate(-50%, -50%); }
-        100% { transform: rotate(360deg) translate(-50%, -50%); }
+    .wave:nth-child(2) {
+        animation-duration: 12s;
+        animation-direction: reverse;
+        background: linear-gradient(135deg, transparent 30%, rgba(255,0,200,0.05) 50%, transparent 70%);
     }
 
+    @keyframes megaWave {
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* Rayons laser qui traversent l'écran */
+    .laser {
+        position: absolute;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent, rgba(0,255,255,0.8), transparent);
+        animation: laserSweep 3s linear infinite;
+        box-shadow: 0 0 20px rgba(0,255,255,0.8);
+    }
+
+    @keyframes laserSweep {
+        0% { left: -10%; transform: scaleY(0); }
+        50% { transform: scaleY(1); }
+        100% { left: 110%; transform: scaleY(0); }
+    }
+
+    .laser:nth-child(10) { 
+        animation-delay: 1s; 
+        background: linear-gradient(to bottom, transparent, rgba(255,0,255,0.8), transparent);
+        box-shadow: 0 0 20px rgba(255,0,255,0.8);
+    }
+    .laser:nth-child(11) { 
+        animation-delay: 2s; 
+        background: linear-gradient(to bottom, transparent, rgba(255,255,0,0.8), transparent);
+        box-shadow: 0 0 20px rgba(255,255,0,0.8);
+    }
+
+    /* Étoiles filantes */
+    .shooting-star {
+        position: absolute;
+        width: 100px;
+        height: 2px;
+        background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1));
+        animation: shoot 2s linear infinite;
+        box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    }
+
+    @keyframes shoot {
+        0% {
+            top: 0%;
+            left: 100%;
+            opacity: 1;
+        }
+        100% {
+            top: 100%;
+            left: -10%;
+            opacity: 0;
+        }
+    }
+
+    .shooting-star:nth-child(12) { animation-delay: 0.5s; }
+    .shooting-star:nth-child(13) { animation-delay: 1.5s; }
+    .shooting-star:nth-child(14) { animation-delay: 2.5s; }
+
+    /* CONTAINER avec GLITCH EXTREME de ton fichier */
     .container {
         background: #2b4560; 
         padding: 40px;
         border-radius: 16px;
-        animation: glitch 0.3s infinite;
         width: 380px;
         position: relative;
         z-index: 1;
+        animation: containerGlitch 0.3s infinite;
     }
 
-    /* --- EFFET RGB AVEC RAYON BLANC --- */
+    @keyframes containerGlitch {
+        0%, 100% { transform: translate(0); }
+        20% { transform: translate(-20px, 20px); }
+        40% { transform: translate(20px, -20px); }
+        60% { transform: translate(-20px, -20px); }
+        80% { transform: translate(20px, 20px); }
+    }
+
+    /* --- EFFET RGB ULTRA RAPIDE --- */
     
     @keyframes rotateRGB {
         0% { background-position: 0% 50%; }
@@ -133,7 +246,6 @@
         100% { background-position: 0% 50%; }
     }
 
-    /* Le contour coloré net */
     .container::before {
         content: "";
         position: absolute;
@@ -142,10 +254,14 @@
         background-size: 400%;
         z-index: -1;
         border-radius: 20px;
-        animation: rotateRGB 20s linear infinite;
+        animation: rotateRGB 3s linear infinite, pulse 2s ease-in-out infinite;
     }
 
-    /* Le flou lumineux (Glow) */
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
     .container::after {
         content: "";
         position: absolute;
@@ -155,11 +271,11 @@
         z-index: -1;
         filter: blur(25px);
         border-radius: 20px;
-        animation: rotateRGB 20s linear infinite;
-        opacity: 0.8;
+        animation: rotateRGB 3s linear infinite, pulse 2s ease-in-out infinite;
+        opacity: 0.9;
     }
 
-    /* --- RAYON BLANC QUI GLISSE --- */
+    /* --- RAYON BLANC ULTRA RAPIDE --- */
     .light-ray {
         position: absolute;
         top: -4px;
@@ -175,82 +291,101 @@
     .light-ray::before {
         content: "";
         position: absolute;
-        width: 100px;
-        height: 100px;
-        background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 40%, transparent 70%);
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.6) 30%, transparent 60%);
         border-radius: 50%;
-        filter: blur(10px);
-        animation: slideRay 3s linear infinite;
+        filter: blur(8px);
+        animation: slideRayFast 1.5s linear infinite;
+        box-shadow: 0 0 40px rgba(255,255,255,0.8);
     }
 
-    @keyframes slideRay {
+    @keyframes slideRayFast {
         0% {
-            top: -50px;
-            left: -50px;
+            top: -60px;
+            left: -60px;
         }
         25% {
-            top: -50px;
-            left: calc(100% - 50px);
+            top: -60px;
+            left: calc(100% - 60px);
         }
         50% {
-            top: calc(100% - 50px);
-            left: calc(100% - 50px);
+            top: calc(100% - 60px);
+            left: calc(100% - 60px);
         }
         75% {
-            top: calc(100% - 50px);
-            left: -50px;
+            top: calc(100% - 60px);
+            left: -60px;
         }
         100% {
-            top: -50px;
-            left: -50px;
+            top: -60px;
+            left: -60px;
         }
     }
 
-    /* Effet de glitch sur le titre */
-    @keyframes glitch {
-        0%, 100% { transform: translate(0); }
-        20% { transform: translate(-20px, 20px); }
-        40% { transform: translate(20px, -20px); }
-        60% { transform: translate(-20px, -20px); }
-        80% { transform: translate(20px, 20px); }
-    }
-
-     @keyframes btnglitch {
-        0%, 100% { transform: translate(0); }
-        20% { transform: translate(-200px, 200px); }
-        40% { transform: translate(200px, -200px); }
-        60% { transform: translate(-200px, -200px); }
-        80% { transform: translate(200px, 200px); }
-    }
-    @keyframes rotate {
-        0%{ transform: translate(0); }
-        50% {
-            transform: rotate(180deg) scale(5);
+    /* GLITCH ULTRA HARDCORE sur titre */
+    @keyframes glitchTitle {
+        0%, 100% { 
+            transform: translate(0) skew(0deg); 
+            text-shadow: 0 0 0 transparent;
         }
-       100% { transform: translate(360deg); }
-
+        10% { 
+            transform: translate(-20px, 20px) skew(5deg); 
+            text-shadow: 5px 5px 0 #ff00ff, -5px -5px 0 #00ffff;
+        }
+        20% { 
+            transform: translate(20px, -20px) skew(-3deg); 
+            text-shadow: -5px 5px 0 #ff00ff, 5px -5px 0 #00ffff;
+        }
+        30% { 
+            transform: translate(-20px, -20px) skew(4deg); 
+            text-shadow: 6px 0 0 #ff00ff, -6px 0 0 #00ffff;
+        }
+        40% { 
+            transform: translate(20px, 20px) skew(-5deg); 
+            text-shadow: 0 6px 0 #ff00ff, 0 -6px 0 #00ffff;
+        }
+        50% { 
+            transform: translate(-15px, 15px) skew(3deg); 
+            text-shadow: 7px 7px 0 #ff00ff, -7px -7px 0 #00ffff;
+        }
     }
 
     h1 {
         margin-bottom: 10px;
         font-size: 2.4em;
         font-weight: 600;
-        animation: glitch .1s infinite;
-    }
-
-    button:hover {
-        animation: rotate 1s infinite;
+        animation: glitchTitle 0.1s infinite;
+        cursor: pointer;
     }
 
     h1:hover {
-        animation: glitch 0.3s infinite;
+        animation: glitchTitle 0.05s infinite, rainbow 0.3s linear infinite;
+    }
+
+    @keyframes rainbow {
+        0% { color: #ff0000; }
+        16% { color: #ff7300; }
+        33% { color: #fffb00; }
+        50% { color: #48ff00; }
+        66% { color: #00ffd5; }
+        83% { color: #7a00ff; }
+        100% { color: #ff0000; }
     }
 
     p {
         font-size: 1.1em;
         opacity: 0.9;
+        animation: shake 3s infinite;
     }
 
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+        20%, 40%, 60%, 80% { transform: translateX(2px); }
+    }
+
+    /* BOUTON avec GLITCH EXTREME de ton fichier */
     .btn {
         display: inline-block;
         margin: 20px 0;
@@ -263,11 +398,20 @@
         transition: all 0.2s ease;
         position: relative;
         overflow: hidden;
+        animation: btnFloat 2s ease-in-out infinite;
     }
 
-    .btn:hover {
-        animation: btnglitch 0.3s infinite;
+    @keyframes btnFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+    }
 
+    @keyframes btnGlitch {
+        0%, 100% { transform: translate(0); }
+        20% { transform: translate(-200px, 200px); }
+        40% { transform: translate(200px, -200px); }
+        60% { transform: translate(-200px, -200px); }
+        80% { transform: translate(200px, 200px); }
     }
 
     .btn::before {
@@ -278,7 +422,7 @@
         width: 0;
         height: 0;
         border-radius: 50%;
-        background: rgba(51, 74, 112, 0.1);
+        background: rgba(51, 74, 112, 0.2);
         transform: translate(-50%, -50%);
         transition: width 0.6s, height 0.6s;
     }
@@ -289,8 +433,8 @@
     }
 
     .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        animation: btnGlitch 0.3s infinite;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.4);
     }
 
     form {
@@ -309,12 +453,19 @@
         cursor: pointer;
         font-family: 'Poppins', sans-serif;
         transition: all 0.3s ease;
+        animation: borderPulse 2s infinite;
+    }
+
+    @keyframes borderPulse {
+        0%, 100% { border-color: rgba(255,255,255,0.4); }
+        50% { border-color: rgba(255,0,255,0.8); }
     }
 
     input[type="file"]:hover {
-        background: rgba(255,255,255,0.15);
-        border-color: rgba(255,255,255,0.6);
-        transform: scale(1.02);
+        background: rgba(255,255,255,0.2);
+        border-color: rgba(255,255,0,0.9);
+        transform: scale(1.05) rotate(-1deg);
+        animation: none;
     }
 
     input[type="file"]::-webkit-file-upload-button {
@@ -326,21 +477,31 @@
         font-weight: 600;
         cursor: pointer;
         margin-right: 10px;
-        transition: background 0.2s ease, transform 0.3s ease;
+        transition: all 0.2s ease;
+        animation: wiggle 1s infinite;
+    }
+
+    @keyframes wiggle {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-5deg); }
+        75% { transform: rotate(5deg); }
     }
 
     input[type="file"]::-webkit-file-upload-button:hover {
         background: #e6e6e6;
-        transform: translateY(-1px);
+        transform: scale(1.1) rotate(0deg);
+        animation: none;
     }
 
+    /* BOUTON UPLOAD avec ROTATION EXTREME de ton fichier */
     button {
         margin-top: 15px;
         width: 100%;
         padding: 12px;
         border: none;
         border-radius: 30px;
-        background: #ffffff;
+        background: linear-gradient(45deg, #ffffff, #f0f0f0, #ffffff);
+        background-size: 200%;
         color: #334a70;
         font-weight: 600;
         font-size: 1em;
@@ -348,6 +509,21 @@
         transition: all 0.2s ease;
         position: relative;
         overflow: hidden;
+        animation: btnShine 3s linear infinite;
+    }
+
+    @keyframes btnShine {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes rotateExtreme {
+        0% { transform: translate(0) rotate(0deg) scale(1); }
+        50% {
+            transform: translate(0, 0) rotate(180deg) scale(5);
+        }
+        100% { transform: translate(0) rotate(360deg) scale(1); }
     }
 
     button::after {
@@ -357,27 +533,54 @@
         left: -30px;
         transform: translateY(-50%);
         font-size: 1.2em;
-        transition: left 0.3s ease;
+        transition: all 0.3s ease;
+        animation: lightning 2s infinite;
+    }
+
+    @keyframes lightning {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
     }
 
     button:hover::after {
         left: calc(100% + 10px);
+        animation: none;
     }
 
     button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        animation: rotateExtreme 1s infinite;
+        background: linear-gradient(45deg, #ffff00, #ff00ff, #00ffff, #ffff00);
+        background-size: 400%;
+    }
+
+    /* Explosion de confettis */
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #f0f;
+        opacity: 0;
+        pointer-events: none;
     }
 </style>
 
 </head>
 <body>
-    <!-- Effets d'arrière-plan -->
+    <!-- Effets d'arrière-plan MEGA FUSION -->
     <div class="background-effects">
+        <div class="wave"></div>
         <div class="wave"></div>
         <div class="floating-circle circle1"></div>
         <div class="floating-circle circle2"></div>
         <div class="floating-circle circle3"></div>
+        <div class="floating-circle circle4"></div>
+        <div class="floating-circle circle5"></div>
+        <div class="laser"></div>
+        <div class="laser"></div>
+        <div class="laser"></div>
+        <div class="shooting-star"></div>
+        <div class="shooting-star"></div>
+        <div class="shooting-star"></div>
     </div>
 
     <div class="container">
@@ -394,16 +597,98 @@
     </div>
 
     <script>
-        // Génération de particules scintillantes aléatoires
+        // ========================================
+        // CONFIGURATION DES PARTICULES
+        // ========================================
+        // Mettre l'URL de ton image ici (ou laisser vide pour les particules blanches par défaut)
+        const PARTICLE_IMAGE = 'https://vainkeurz.com/wp-content/uploads/2023/05/6-2.png'; // Exemple: 'https://example.com/doigby.png' ou './doigby.png'
+        const PARTICLE_COUNT = 100; // Nombre de particules
+        const MIN_SIZE = 30; // Taille minimum en pixels
+        const MAX_SIZE = 500; // Taille maximum en pixels
+        // ========================================
+
+        // Génération de particules scintillantes ULTRA RANDOM
         const bgEffects = document.querySelector('.background-effects');
-        for (let i = 0; i < 30; i++) {
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
+            const size = Math.random() * (MAX_SIZE - MIN_SIZE) + MIN_SIZE;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
             particle.style.left = Math.random() * 100 + '%';
             particle.style.top = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 3 + 's';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            particle.style.animationDuration = (Math.random() * 1.5 + 1) + 's';
+            
+            // Si une image est définie, l'utiliser
+            if (PARTICLE_IMAGE) {
+                particle.style.background = 'transparent';
+                particle.style.backgroundImage = `url('${PARTICLE_IMAGE}')`;
+                particle.style.backgroundSize = 'contain';
+                particle.style.backgroundRepeat = 'no-repeat';
+                particle.style.backgroundPosition = 'center';
+            }
+            
             bgEffects.appendChild(particle);
         }
+
+        // Effet confetti au survol
+        const container = document.querySelector('.container');
+        container.addEventListener('mouseenter', () => {
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * container.offsetWidth + 'px';
+                    confetti.style.top = Math.random() * container.offsetHeight + 'px';
+                    confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    container.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.style.transition = 'all 1s ease-out';
+                        confetti.style.opacity = '1';
+                        confetti.style.transform = `translate(${(Math.random() - 0.5) * 200}px, ${Math.random() * 200 + 100}px) rotate(${Math.random() * 720}deg)`;
+                    }, 10);
+                    
+                    setTimeout(() => confetti.remove(), 1000);
+                }, i * 30);
+            }
+        });
+
+        // Glitch random sur le titre
+        const h1 = document.querySelector('h1');
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                h1.style.animation = 'glitchTitle 0.05s';
+                setTimeout(() => {
+                    h1.style.animation = 'glitchTitle 0.1s infinite';
+                }, 100);
+            }
+        }, 2000);
+
+        // Explosions aléatoires de couleurs
+        setInterval(() => {
+            if (Math.random() > 0.85) {
+                const flash = document.createElement('div');
+                flash.style.position = 'fixed';
+                flash.style.top = '0';
+                flash.style.left = '0';
+                flash.style.width = '100%';
+                flash.style.height = '100%';
+                flash.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                flash.style.opacity = '0.1';
+                flash.style.pointerEvents = 'none';
+                flash.style.zIndex = '999';
+                document.body.appendChild(flash);
+                
+                setTimeout(() => {
+                    flash.style.transition = 'opacity 0.5s';
+                    flash.style.opacity = '0';
+                    setTimeout(() => flash.remove(), 500);
+                }, 50);
+            }
+        }, 3000);
     </script>
 </body>
 </html>
