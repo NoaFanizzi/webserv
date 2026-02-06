@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   ManageAll.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 09:27:09 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/04 17:08:51 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/05 16:02:47 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ManageAll.hpp"
+#include "AutoIndex.hpp"
 #include "HttpExceptions.hpp"
 #include "iostream"
 #include <sys/socket.h>

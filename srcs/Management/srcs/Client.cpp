@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/05 09:29:52 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/06 17:20:25 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "AutoIndex.hpp"
 #include "Request.hpp"
 #include "ManageAll.hpp"
 #include "HttpExceptions.hpp"
@@ -131,7 +132,11 @@ void Client::PollOutHandler()
     try {
         _Request.Parse(_request);
         finalPath = CheckUrl();
-        body = readFileClient(finalPath);
+        
+        //body = readFileClient(finalPath);
+        AutoIndex Indexation;
+        body = Indexation.initAutoIndex();
+        
     }
     catch (const HttpException& e)
     {

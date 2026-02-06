@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ManageAll.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 12:37:43 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/04 17:08:36 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/05 15:43:56 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "AManager.hpp"
 #include "Config.hpp"
 #include "Request.hpp"
+#include "AutoIndex.hpp"
 #include <map> 
 
 
