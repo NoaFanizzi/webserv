@@ -1,0 +1,4 @@
+.build/
+upload/
+webserv
+compile_commands.json
