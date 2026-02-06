@@ -64,8 +64,9 @@ public:
 	void ParsePostMethod(const std::string &request, size_t body_start);
 	void RequestReading(int &fd, bool &closedStatus, std::string &request);
 
-	std::string GetPath() const { return _path; }
 	std::string GetMethod() const { return _method; }
+	std::string GetPath() const { return _path; }
+	std::string GetQuery() const { return _query; }
 	std::string GetVersion() const { return _version; }
 	std::string GetHeaders(const std::string toGet) const;
 

@@ -1,5 +1,8 @@
 #include "CgiHandler.hpp"
+#include <iostream>
 #include <cstring>
+#include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -18,12 +21,13 @@ bool CgiHandler::isCgi(std::string path)
 	// TODO add file format that we could manage
 	// 2 file formats is the minimum for bonus
 
-	// TODO find the .py/.php before the `?` if there is one
 	if (path.rfind(".py") != std::string::npos ||
 		path.rfind(".php") != std::string::npos)
 		return true;
 	return false;
 }
+
+
 
 // functions
 void CgiHandler::buildEnv()
@@ -31,7 +35,7 @@ void CgiHandler::buildEnv()
 	_env.push_back("REQUEST_METHOD=" + _request.GetMethod());
 	_env.push_back("SCRIPT_FILENAME=" + _scriptPath);
 	_env.push_back("SCRIPT_NAME=" + _request.GetPath());
-	//_env.push_back("QUERY_STRING=" + _request.query); // TODO: parse for query
+	_env.push_back("QUERY_STRING=" + _request.GetQuery()); // TODO: parse for query
 	_env.push_back("CONTENT_LENGTH=" + _request.GetHeaders("Content-Length"));
 	_env.push_back("CONTENT_TYPE=" + _request.GetHeaders("Content-Ttype"));
 	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
@@ -43,19 +47,23 @@ char **CgiHandler::envToCharArray()
 	char **envp = new char *[_env.size() + 1];
 	if (!envp)
 		return NULL;
-	for (int i = 0; i < _env.size(); i++)
+	int i = 0;
+	for (; i < (int)_env.size(); i++)
 	{
 		envp[i] = strdup(_env[i].c_str());
 		if (!envp[i])
 		{
 			while (--i != -1)
-				delete envp[i];
-			delete envp;
+				free(envp[i]);
+			delete[] envp;
 			return NULL;
 		}
 	}
+	envp[i] = NULL;
 	return envp;
 }
+
+
 
 // execute the cgi script
 // dup STDIN to pass it the request body if method == POST
@@ -100,19 +108,20 @@ bool CgiHandler::execute()
 
 		char *argv[] = {(char *)_scriptPath.c_str(), NULL};
 		execve(_scriptPath.c_str(), argv, envToCharArray());
-		perror("execve failed: ");
+		std::cerr << _scriptPath;
+		perror(": ");
 		exit(1);
 	}
 
 	close(fdIn[0]);
 	close(fdOut[1]);
-
-	if (_request.GetMethod() == "POST") // write the request body in STDIN
-	{
-		const std::string &body = _request.GetBody();
-		if (!body.empty())
-			write(fdIn[1], body.c_str(), body.size());
-	}
+// TODO: manage new request factoring
+	//if (_request.GetMethod() == "POST") // write the request body in STDIN
+	//{
+	//	const std::string &body = _request.getBody();
+	//	if (!body.empty())
+	//		write(fdIn[1], body.c_str(), body.size());
+	//}
 	close(fdIn[1]);
 
 	char buffer[1024];
@@ -124,6 +133,10 @@ bool CgiHandler::execute()
 	}
 
 	close(fdOut[0]);
-	waitpid(pid, NULL, 0);
+	int status;
+	waitpid(pid, &status, 0);
+	if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+		return false;
 	return true;
 }
+
