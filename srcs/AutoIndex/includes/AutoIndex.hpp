@@ -29,8 +29,13 @@ class AutoIndex
 
 		//methods
 		std::string initAutoIndex();
-		std::string replaceTemplate(struct dirent &sdir);
+		std::string replaceTemplate(struct dirent &sdir, const std::string &root);
 		void addNewRow(struct dirent &sdir);
+		void replaceName(std::string &newTemplate, struct dirent &sdir);
+		void replaceLink(std::string &newTemplate, std::string &filepath);
+		void replaceDate(std::string &newTemplate, struct stat &file);
+		void replaceWeight(std::string &newTemplate, struct stat &file);
+
 };
 
 #endif

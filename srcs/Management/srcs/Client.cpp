@@ -133,10 +133,13 @@ void Client::PollOutHandler()
         _Request.Parse(_request);
         finalPath = CheckUrl();
         
-        //body = readFileClient(finalPath);
-        AutoIndex Indexation;
-        body = Indexation.initAutoIndex();
-        
+        if(_config.autoindex == true)
+        {
+            AutoIndex Indexation;
+            body = Indexation.initAutoIndex();
+        }
+        else
+            body = readFileClient(finalPath); 
     }
     catch (const HttpException& e)
     {
