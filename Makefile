@@ -25,6 +25,7 @@ include srcs/ConfigParser/configparser.mk
 include srcs/Management/management.mk
 include srcs/Request/request.mk
 include srcs/AutoIndex/AutoIndex.mk
+include srcs/CGI/cgi.mk
 
 BUILD_DIR   = .build
 OBJS        = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
@@ -67,4 +68,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re 
+.PHONY: all clean fclean re

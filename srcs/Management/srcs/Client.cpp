@@ -15,6 +15,7 @@
 #include "Request.hpp"
 #include "ManageAll.hpp"
 #include "HttpExceptions.hpp"
+#include "CgiHandler.hpp"
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -23,6 +24,7 @@ std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCo
 {
     std::ostringstream oss;
     oss << contentLength;
+
 
     std::string ContentType = "application/octet-stream";
     std::string url = _Request.GetPath();   
@@ -140,6 +142,15 @@ void Client::PollOutHandler()
         }
         else
             body = readFileClient(finalPath); 
+
+		if (CgiHandler::isCgi(finalPath)) // puts the cgi in body if isCgi()
+		{
+			CgiHandler cgi(_Request, finalPath);
+			cgi.execute();
+			body = cgi.getOutput();
+		}
+		else
+        	body = readFileClient(finalPath);
     }
     catch (const HttpException& e)
     {
@@ -154,8 +165,15 @@ void Client::PollOutHandler()
     }
     
     _Request.SetPath(finalPath);
-    std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
-    send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
+	if (CgiHandler::isCgi(finalPath)) // if isCgi() send the output of the script
+	{
+		send(_fd, body.c_str(), body.size(), 0);
+	}
+	else
+	{
+    	std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
+    	send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
+	}
     _events = 0;
     _closedStatus = true;
     
