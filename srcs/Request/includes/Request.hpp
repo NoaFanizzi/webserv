@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:00 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/09 15:06:07 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 19:00:37 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ public:
 	void setCurrentLocations(const ServerConfig &serverConfig);
 };
 
-std::vector<std::string> split(const std::string &s, const std::string &delim);
+std::vector<std::string> split(const std::string &str, std::string delimiters);
+
 
 #endif

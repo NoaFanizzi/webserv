@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/05 09:30:05 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/09 19:00:31 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,20 +137,22 @@ static std::map<std::string, std::string> SeparateHeaders(std::vector<std::strin
 	return headers;
 }
 
-std::vector<std::string> split(const std::string &s, const std::string &delim)
+std::vector<std::string> split(const std::string &str, std::string delimiters)
 {
-	std::vector<std::string> result;
-	size_t start = 0;
-	size_t end;
+    std::vector<std::string> result;
+    size_t             start = 0;
+    size_t             end   = 0;
+    std::string         token;
 
-	while ((end = s.find(delim, start)) != std::string::npos)
-	{
-		result.push_back(s.substr(start, end - start));
-		start = end + delim.length();
-	}
-
-	result.push_back(s.substr(start));
-	return result;
+    while (end != std::string::npos)
+    {
+        end      = str.find_first_of(delimiters, start);
+        token = str.substr(start, end - start);
+        if (!token.empty())
+            result.push_back(token);
+        start = (end == std::string::npos) ? end : end + 1;
+    }
+    return result;
 }
 
 void printSplitDebug(const std::vector<std::string> &v)

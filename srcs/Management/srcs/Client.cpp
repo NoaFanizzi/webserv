@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/09 16:10:38 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 19:19:37 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,30 +19,6 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
-
-
-
-std::vector<std::string> Split(const std::string &str, const std::string &charset)
-{
-    int returnedPos = 0;
-    int savedPos = 0;
-    std::string current;
-    std::vector<std::string>strVector;
-
-    for(int i = 0; str[i]; i++)
-    {
-        for(int j = 0; charset[j]; j++)
-        {
-            returnedPos = str.find(charset[j]);
-            if(returnedPos != std::string::npos)
-            {
-                current = str.substr(savedPos, (returnedPos - savedPos));
-                strVector.push_back(current);
-                returnedPos = savedPos;
-            }
-        }
-    }
-}
 
 std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCode, std::string StatusText)
 {
@@ -150,28 +126,29 @@ std::string Client::getErrorPageContent(int code)
 
 void    Request::setCurrentLocations(const ServerConfig &serverConfig)
 {
-    size_t  i;
+    size_t  i = 0;
+    size_t j = 0;
+    std::vector<std::string> vPath;
+    std::string slashed;
+    std::vector<LocationConfig>serverLocations =  serverConfig.locations;
+    std::string concatened;
     
-    i = 0;
-    std::cout << "--------------------DEBUTTTTTT DE LA FOOOOONCTION SETCURRENTLOCATION" << std::endl;
-    std::vector<LocationConfig>serverLocations =  serverConfig.locations; // je fais juste une copie our que ce soit moins le zbeul en dessous
-    while(i < serverLocations.size())
+    vPath = split(_path, "/");
+    while(i < vPath.size())
     {
-        std::cout << "serverLocations[i].path = " << serverLocations[i].path << std::endl;
-        std::cout << "_path = " << _path << std::endl << std::endl;
-        if(serverLocations[i].path.find(_path) == 0)
-            _currentLocations.push_back(serverLocations[i]);
+        concatened = concatened + '/' + vPath[i];
+        slashed = concatened + '/';
+        j = 0;
+        while(j < serverLocations.size())
+        {
+            if(concatened == serverLocations[j].path)
+                _currentLocations.push_back(serverLocations[j]);
+            else if(slashed == serverLocations[j].path) 
+                _currentLocations.push_back(serverLocations[j]);
+            j++;
+        }
         i++;
     }
-    std::cout << "i = " << i << std::endl;
-    i = 0;
-    while(i < _currentLocations.size())
-    {
-        std::cout << "_CURRENT_LOCATIONS = " << _currentLocations[i].path << std::endl;
-        i++;
-    }
-    std::cout << "--------------------FIN DE LA FONCTIONNNN SETCURRENTLOCATION" << std::endl;
-
 }
 
 void Client::PollOutHandler()
@@ -186,7 +163,26 @@ void Client::PollOutHandler()
         _Request.setCurrentLocations(_config);
         finalPath = CheckUrl();
                 
-        // if(_Request.GetMethod() == "")
+        if(_Request.GetMethod() == "DELETE")
+        {
+            if (std::remove(finalPath.c_str()) != 0)
+            {
+                if (errno == EACCES)
+                    throw Http403Exception();
+                else
+                    throw Http404Exception();
+            }
+            statusCode = "200";
+            statusText = "OK";
+            body = "{\"message\": \"File deleted successfully\"}";
+            _Request.SetPath(".json");
+
+            std::string header = GetHeaderResponse(body.size(), statusCode, statusText);
+            send(_fd, (header + body).c_str(), header.size() + body.size(), 0);
+            _events = 0;
+            _closedStatus = true;
+            return;
+        }
         if(_config.autoindex == true)
         {
             AutoIndex Indexation = AutoIndex(_config.root, _Request.GetPath());
