@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/09 13:52:01 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 15:16:47 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@ std::string AutoIndex::_header =
 								"<head>"
 									"<meta charset='utf-8' />"
 									"<title>Titre de la page</title>"
-									"<link rel='stylesheet' href='style.css' />"
-									"<script src='script.js'></script>"
 								"</head>"
 								"<body>"
 									"<section>"

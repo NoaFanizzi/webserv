@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/09 13:47:49 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 16:10:38 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,30 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+
+
+
+std::vector<std::string> Split(const std::string &str, const std::string &charset)
+{
+    int returnedPos = 0;
+    int savedPos = 0;
+    std::string current;
+    std::vector<std::string>strVector;
+
+    for(int i = 0; str[i]; i++)
+    {
+        for(int j = 0; charset[j]; j++)
+        {
+            returnedPos = str.find(charset[j]);
+            if(returnedPos != std::string::npos)
+            {
+                current = str.substr(savedPos, (returnedPos - savedPos));
+                strVector.push_back(current);
+                returnedPos = savedPos;
+            }
+        }
+    }
+}
 
 std::string Client::GetHeaderResponse(size_t contentLength, std::string StatusCode, std::string StatusText)
 {
@@ -124,6 +148,32 @@ std::string Client::getErrorPageContent(int code)
     return _errorPages[404];
 }
 
+void    Request::setCurrentLocations(const ServerConfig &serverConfig)
+{
+    size_t  i;
+    
+    i = 0;
+    std::cout << "--------------------DEBUTTTTTT DE LA FOOOOONCTION SETCURRENTLOCATION" << std::endl;
+    std::vector<LocationConfig>serverLocations =  serverConfig.locations; // je fais juste une copie our que ce soit moins le zbeul en dessous
+    while(i < serverLocations.size())
+    {
+        std::cout << "serverLocations[i].path = " << serverLocations[i].path << std::endl;
+        std::cout << "_path = " << _path << std::endl << std::endl;
+        if(serverLocations[i].path.find(_path) == 0)
+            _currentLocations.push_back(serverLocations[i]);
+        i++;
+    }
+    std::cout << "i = " << i << std::endl;
+    i = 0;
+    while(i < _currentLocations.size())
+    {
+        std::cout << "_CURRENT_LOCATIONS = " << _currentLocations[i].path << std::endl;
+        i++;
+    }
+    std::cout << "--------------------FIN DE LA FONCTIONNNN SETCURRENTLOCATION" << std::endl;
+
+}
+
 void Client::PollOutHandler()
 {
     std::string body;
@@ -133,8 +183,10 @@ void Client::PollOutHandler()
 
     try {
         _Request.Parse(_request);
+        _Request.setCurrentLocations(_config);
         finalPath = CheckUrl();
-        
+                
+        // if(_Request.GetMethod() == "")
         if(_config.autoindex == true)
         {
             AutoIndex Indexation = AutoIndex(_config.root, _Request.GetPath());

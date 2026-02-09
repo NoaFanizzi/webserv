@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:00 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/05 08:58:27 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/09 15:06:07 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "Config.hpp"
 
 #define BUFFER_SIZE 5
 
@@ -50,6 +51,7 @@ private:
 	std::string _WebKitForm;
 	std::map<std::string, std::string> _headers; // headers
 	std::vector<BodyRequest> _bodyRequests;		 // body content
+	std::vector<LocationConfig>_currentLocations;
 
 public:
 	Request() : _contentLengthBody(-1) {}
@@ -70,7 +72,8 @@ public:
 	std::string GetVersion() const { return _version; }
 	std::string GetHeaders(const std::string toGet) const;
 
-	void SetPath(const std::string &str) { _path = str; }
+	void SetPath(const std::string &str) { _path = str; };
+	void setCurrentLocations(const ServerConfig &serverConfig);
 };
 
 std::vector<std::string> split(const std::string &s, const std::string &delim);

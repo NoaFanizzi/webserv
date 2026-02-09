@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:24:07 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/28 16:21:08 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 15:21:42 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ struct ServerConfig
     std::vector<ErrorPage>      error_page;
     long long                   client_max_body_size;
     bool                        autoindex;
+    LocationConfig              defaultt; // faut faire
     std::vector<LocationConfig> locations;
 };
 
