@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/06 17:20:25 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 13:47:49 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,13 +137,10 @@ void Client::PollOutHandler()
         
         if(_config.autoindex == true)
         {
-            AutoIndex Indexation;
+            AutoIndex Indexation = AutoIndex(_config.root, _Request.GetPath());
             body = Indexation.initAutoIndex();
         }
-        else
-            body = readFileClient(finalPath); 
-
-		if (CgiHandler::isCgi(finalPath)) // puts the cgi in body if isCgi()
+		else if (CgiHandler::isCgi(finalPath)) // puts the cgi in body if isCgi()
 		{
 			CgiHandler cgi(_Request, finalPath);
 			cgi.execute();

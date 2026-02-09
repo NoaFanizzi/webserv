@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/06 17:49:45 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 13:52:01 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,20 @@ std::string AutoIndex::_footer = "</table>"
 									"</html>";
 
 
+AutoIndex::AutoIndex(const std::string &root, const std::string &location) :
+	_root(root), _location(location) {}
+									
 void AutoIndex::replaceName(std::string &newTemplate, struct dirent &sdir)
 {
 	newTemplate.replace(newTemplate.find("{{ NAME }}"), 10, sdir.d_name);
 }
 
-void AutoIndex::replaceLink(std::string &newTemplate, std::string &filepath)
+void AutoIndex::replaceLink(std::string &newTemplate, struct dirent &sdir)
 {
-	newTemplate.replace(newTemplate.find("{{ URL }}"), 9, filepath.c_str());
+	std::string fLocation;
+	
+	fLocation = _location + sdir.d_name;
+	newTemplate.replace(newTemplate.find("{{ URL }}"), 9, fLocation);
 }
 
 void AutoIndex::replaceDate(std::string &newTemplate, struct stat &file)
@@ -90,16 +96,16 @@ void AutoIndex::replaceWeight(std::string &newTemplate, struct stat &file)
 	newTemplate.replace(newTemplate.find("{{ WEIGHT }}"), 12, ssweight.str());
 }
 
-std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &root)
+std::string AutoIndex::replaceTemplate(struct dirent &sdir)
 {
 	std::string newTemplate = _template;
 	struct stat file;
 
-	std::string filepath = root + "/" + sdir.d_name;
+	std::string filepath = _root + "/" + sdir.d_name;
 	if(stat(filepath.c_str(), &file) == -1)
 		exit(-10); //TODO Check les trucs d'erreur
 	replaceName(newTemplate, sdir);
-	replaceLink(newTemplate, filepath);
+	replaceLink(newTemplate, sdir);
 	replaceDate(newTemplate, file);
 	replaceWeight(newTemplate, file);
 
@@ -108,7 +114,7 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &r
 
 void AutoIndex::addNewRow(struct dirent &sdir)
 {
-	std::string newRow = replaceTemplate(sdir, "website");
+	std::string newRow = replaceTemplate(sdir);
 	_content.append(newRow);
 	
 }
@@ -130,11 +136,10 @@ std::string AutoIndex::initAutoIndex()
 	DIR *dr;
 	
 	struct dirent* sdir;
-	std::string root = "website";
 
 	_content = _header;
 	std::cout << "DIRRRRRR" << std::endl;
-	dr = opendir(root.c_str());
+	dr = opendir(_root.c_str());
 	if(dr)
 	{
 		while((sdir = readdir(dr)) != NULL)

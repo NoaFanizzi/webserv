@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:35:57 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/06 17:21:06 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/09 13:51:27 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,20 @@ class AutoIndex
 		static std::string _template;
 		std::string _content;
 		static std::string _footer;
+		const std::string _root;
+		const std::string _location;
 	public:
 
+		//basics
+		AutoIndex(const std::string &root, const std::string &location);
+		
+		
 		//methods
 		std::string initAutoIndex();
-		std::string replaceTemplate(struct dirent &sdir, const std::string &root);
+		std::string replaceTemplate(struct dirent &sdir);
 		void addNewRow(struct dirent &sdir);
 		void replaceName(std::string &newTemplate, struct dirent &sdir);
-		void replaceLink(std::string &newTemplate, std::string &filepath);
+		void replaceLink(std::string &newTemplate, struct dirent &sdir);
 		void replaceDate(std::string &newTemplate, struct stat &file);
 		void replaceWeight(std::string &newTemplate, struct stat &file);
 
