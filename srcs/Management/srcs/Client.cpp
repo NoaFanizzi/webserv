@@ -143,7 +143,8 @@ void Client::PollOutHandler()
 		else if (CgiHandler::isCgi(finalPath)) // puts the cgi in body if isCgi()
 		{
 			CgiHandler cgi(_Request, finalPath);
-			cgi.execute();
+			if (!cgi.execute())
+				throw Http500Exception();
 			body = cgi.getOutput();
 		}
 		else
