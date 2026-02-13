@@ -10,6 +10,6 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS += srcs/Request/srcs/Request.cpp
+SRCS += srcs/RequestResponse/srcs/Request.cpp srcs/RequestResponse/srcs/Response.cpp
 
-INCLUDES += -Isrcs/Request/includes
+INCLUDES += -Isrcs/RequestResponse/includes

@@ -11,19 +11,20 @@
 /* ************************************************************************** */
 
 #include "Request.hpp"
-#include "ManageAll.hpp"
-#include <sstream>
 #include "HttpExceptions.hpp"
-#include <sys/socket.h>
+#include <cstdlib>
+#include <fcntl.h>
 #include <iostream>
+#include <sstream>
+#include <sys/socket.h>
+#include <unistd.h>
 
-void Request::RequestReading(int &fd, bool &closedStatus, std::string &request)
-{
+void Request::readRaw(int &fd, bool &closedStatus,
+                             std::string &request) {
 	char buffer[BUFFER_SIZE];
 	int n = recv(fd, buffer, sizeof(buffer) - 1, 0);
 
-	if (n <= 0)
-	{
+	if (n <= 0) {
 		closedStatus = true;
 		return;
 	}
@@ -31,11 +32,9 @@ void Request::RequestReading(int &fd, bool &closedStatus, std::string &request)
 	request.append(buffer, n);
 }
 
-void Request::parseContentLength(const std::string &req)
-{
+void Request::parseContentLength(const std::string &req) {
 	size_t pos = req.find("Content-Length:");
-	if (pos == std::string::npos)
-	{
+	if (pos == std::string::npos) {
 		_contentLengthBody = 0;
 		return;
 	}
@@ -51,8 +50,7 @@ void Request::parseContentLength(const std::string &req)
 	_contentLengthBody = std::atoi(req.substr(pos, end - pos).c_str());
 }
 
-void Request::parseWebKitForm(const std::string &headers)
-{
+void Request::parseWebKitForm(const std::string &headers) {
 	size_t ct = headers.find("Content-Type:");
 	if (ct == std::string::npos)
 		return;
@@ -67,17 +65,15 @@ void Request::parseWebKitForm(const std::string &headers)
 	if (b == std::string::npos)
 		throw Http400Exception();
 
-	_WebKitForm = line.substr(b + 9);
+	_webKitForm = line.substr(b + 9);
 }
 
-bool Request::IsComplete(const std::string &req)
-{
+bool Request::isValid(const std::string &req) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 		return false;
 
-	if (_method.empty())
-	{
+	if (_method.empty()) {
 		if (req.compare(0, 3, "GET") == 0)
 			_method = "GET";
 		else if (req.compare(0, 4, "POST") == 0)
@@ -86,10 +82,8 @@ bool Request::IsComplete(const std::string &req)
 	if (_method == "GET")
 		return true;
 
-	if (_method == "POST")
-	{
-		if (_contentLengthBody == static_cast<size_t>(-1))
-		{
+	if (_method == "POST") {
+		if (_contentLengthBody == static_cast<size_t>(-1)) {
 			parseContentLength(req);
 			parseWebKitForm(req);
 		}
@@ -100,8 +94,7 @@ bool Request::IsComplete(const std::string &req)
 	return false;
 }
 
-void Request::CheckRequest()
-{
+void Request::checkRequest() {
 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		throw Http405Exception();
 	if (_version != "HTTP/1.1" && _version != "HTTP/1.0")
@@ -109,13 +102,13 @@ void Request::CheckRequest()
 	if (_path.empty())
 		throw Http400Exception();
 }
+
 // helper function for parsing
-static std::map<std::string, std::string> SeparateHeaders(std::vector<std::string> &docRequest)
-{
+static std::map<std::string, std::string>
+separateHeaders(std::vector<std::string> &docRequest) {
 	std::map<std::string, std::string> headers;
 
-	for (size_t i = 1; i < docRequest.size(); ++i)
-	{
+	for (size_t i = 1; i < docRequest.size(); ++i) {
 		std::string &line = docRequest[i];
 
 		if (line.empty())
@@ -137,14 +130,12 @@ static std::map<std::string, std::string> SeparateHeaders(std::vector<std::strin
 	return headers;
 }
 
-std::vector<std::string> split(const std::string &s, const std::string &delim)
-{
+std::vector<std::string> split(const std::string &s, const std::string &delim) {
 	std::vector<std::string> result;
 	size_t start = 0;
 	size_t end;
 
-	while ((end = s.find(delim, start)) != std::string::npos)
-	{
+	while ((end = s.find(delim, start)) != std::string::npos) {
 		result.push_back(s.substr(start, end - start));
 		start = end + delim.length();
 	}
@@ -153,13 +144,10 @@ std::vector<std::string> split(const std::string &s, const std::string &delim)
 	return result;
 }
 
-void printSplitDebug(const std::vector<std::string> &v)
-{
-	for (size_t i = 0; i < v.size(); ++i)
-	{
+void printSplitDebug(const std::vector<std::string> &v) {
+	for (size_t i = 0; i < v.size(); ++i) {
 		std::cout << "[" << i << "] ";
-		for (size_t j = 0; j < v[i].size(); ++j)
-		{
+		for (size_t j = 0; j < v[i].size(); ++j) {
 			if (v[i][j] == '\r')
 				std::cout << "\\r";
 			else
@@ -169,32 +157,27 @@ void printSplitDebug(const std::vector<std::string> &v)
 	}
 }
 
-void Request::PrintDebug() const
-{
+void Request::printDebug() const {
 	std::cout << "===== BODY DEBUG =====" << std::endl;
 	std::cout << "Nb body parts: " << _bodyRequests.size() << std::endl;
 
-	for (size_t i = 0; i < _bodyRequests.size(); ++i)
-	{
+	for (size_t i = 0; i < _bodyRequests.size(); ++i) {
 		std::cout << "\n[Part " << i << "]" << std::endl;
 		std::cout << "Type     : " << _bodyRequests[i].getType() << std::endl;
-		std::cout << "Filename : " << _bodyRequests[i].getFilename() << std::endl;
-		std::cout << "Body :\n"
-				  << std::endl;
+		std::cout << "Filename : " << _bodyRequests[i].getFilename()
+		          << std::endl;
+		std::cout << "Body :\n" << std::endl;
 		std::cout << _bodyRequests[i].getBody() << std::endl;
 	}
 
 	std::cout << "======================" << std::endl;
 }
 
-void Request::ParsePostMethod(const std::string &request, size_t body_start)
-{
-	std::vector<std::string> parts =
-		split(request.substr(body_start, _contentLengthBody),
-			  "--" + _WebKitForm);
+void Request::parsePostMethod(const std::string &request, size_t body_start) {
+	std::vector<std::string> parts = split(
+	    request.substr(body_start, _contentLengthBody), "--" + _webKitForm);
 
-	for (size_t i = 0; i + 1 < parts.size(); ++i)
-	{
+	for (size_t i = 0; i + 1 < parts.size(); ++i) {
 		std::string &part = parts[i];
 
 		std::string type;
@@ -202,18 +185,16 @@ void Request::ParsePostMethod(const std::string &request, size_t body_start)
 		std::string body;
 
 		size_t pos = part.find("Content-Type:");
-		if (pos != std::string::npos)
-		{
+		if (pos != std::string::npos) {
 			size_t end = part.find("\r\n", pos);
 			type = part.substr(pos + 13, end - (pos + 13));
 		}
 		pos = part.find("filename=");
-		if (pos != std::string::npos)
-		{
+		if (pos != std::string::npos) {
 			size_t end = part.find("\r\n", pos);
 			filename = part.substr(pos + 9, end - (pos + 9));
 			if (filename.size() >= 2 && filename[0] == '"' &&
-				filename[filename.size() - 1] == '"')
+			    filename[filename.size() - 1] == '"')
 				filename = filename.substr(1, filename.size() - 2);
 		}
 
@@ -223,7 +204,8 @@ void Request::ParsePostMethod(const std::string &request, size_t body_start)
 		if (filename.empty())
 			continue;
 		_bodyRequests.push_back(BodyRequest(body, filename, type));
-		int fd = open(("upload/" + filename).c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		int fd = open(("upload/" + filename).c_str(),
+		              O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
 			throw Http500Exception();
 		write(fd, body.c_str(), body.size());
@@ -232,8 +214,7 @@ void Request::ParsePostMethod(const std::string &request, size_t body_start)
 }
 
 // parse request
-void Request::Parse(const std::string &request)
-{
+void Request::parse(const std::string &request) {
 	std::string line;
 	std::vector<std::string> docRequest;
 
@@ -243,19 +224,16 @@ void Request::Parse(const std::string &request)
 	body_start += 4; // 4 = \r\n\r\n
 
 	if (_method == "POST" && _contentLengthBody > 0)
-		ParsePostMethod(request, body_start);
+		parsePostMethod(request, body_start);
 	else
 		_bodyRequests.clear();
 
-	for (size_t i = 0; i < request.size(); ++i)
-	{
+	for (size_t i = 0; i < request.size(); ++i) {
 		char c = request[i];
-		if (c == '\n')
-		{
+		if (c == '\n') {
 			docRequest.push_back(line);
 			line.clear();
-		}
-		else if (c != '\r')
+		} else if (c != '\r')
 			line.push_back(c);
 	}
 	if (!line.empty())
@@ -264,25 +242,23 @@ void Request::Parse(const std::string &request)
 	if (docRequest.empty())
 		return;
 
-	_headers = SeparateHeaders(docRequest);
+	_headers = separateHeaders(docRequest);
 
 	std::istringstream iss(docRequest[0]);
 	iss >> _method >> _path >> _version;
 
 	size_t queryCheck = _path.find("?"); // checks for queries
-	if (queryCheck != std::string::npos)
-	{
+	if (queryCheck != std::string::npos) {
 		std::string newPath = _path.substr(0, queryCheck);
 		_query = _path.substr(queryCheck + 1);
 		_path = newPath;
 	}
 
-	CheckRequest();
+	checkRequest();
 	// PrintDebug();
 }
 
-std::string Request::GetHeaders(const std::string toGet) const
-{
+std::string Request::getHeaders(const std::string toGet) const {
 	std::map<std::string, std::string>::const_iterator it;
 	it = _headers.find(toGet);
 	if (it != _headers.end())

@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 SRCS += srcs/Management/srcs/Client.cpp \
-        srcs/Management/srcs/ManageAll.cpp \
+        srcs/Management/srcs/WebServer.cpp \
         srcs/Management/srcs/Server.cpp
 
 INCLUDES += -Isrcs/Management/includes

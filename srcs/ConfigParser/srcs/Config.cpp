@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <iostream>
+#include <sstream>
 
 Config::Config()
 {
@@ -101,3 +103,4 @@ const std::vector<ServerConfig>& Config::getServers() const
 {
     return _servers;
 }
+

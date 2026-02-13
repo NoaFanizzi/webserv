@@ -23,8 +23,7 @@ SRCS        = srcs/main.cpp
 include srcs/Exceptions/exceptions.mk
 include srcs/ConfigParser/configparser.mk
 include srcs/Management/management.mk
-include srcs/Request/request.mk
-include srcs/CGI/cgi.mk
+include srcs/RequestResponse/requestresponse.mk
 
 BUILD_DIR   = .build
 OBJS        = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)

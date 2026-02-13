@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Client.hpp"
+#include "Response.hpp"
 
-void Client::setErrorPages()
+void Response::setErrorPages()
 {
     // 400
     _errorPages[400] =

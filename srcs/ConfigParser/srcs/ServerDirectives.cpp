@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <sstream>
 
 void Config::parseServerDirective(ServerConfig &server, const std::string &key, 
                                    const std::vector<std::string> &line, size_t j)

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Request.hpp"
+#include "AManager.hpp"
 #include <string>
 #include <vector>
 
-class CgiHandler {
+class CgiManager : public AManager {
 private:
   // variables
   std::vector<std::string> _env;
@@ -18,13 +19,15 @@ private:
 
 public:
   // constructor
-  CgiHandler(const Request &req, const std::string &scriptPath);
-  ~CgiHandler();
+  CgiManager();
+  ~CgiManager();
 
   // static function
   static bool isCgi(std::string path);
 
   // function
+  void PollInHandler();
+  void PollOutHandler();
   bool execute();
 
   // getter
