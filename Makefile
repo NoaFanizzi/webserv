@@ -6,7 +6,7 @@
 #    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/05 07:48:23 by mvachon           #+#    #+#              #
-#    Updated: 2026/02/14 14:51:53 by nofanizz         ###   ########.fr        #
+#    Updated: 2026/02/14 15:31:43 by nofanizz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,7 +19,8 @@ INCLUDES    = -I includes
 
 SRCS        = srcs/main.cpp
 
-#include srcs/CGI/cgi.mk
+include srcs/CGI/cgi.mk
+include srcs/AutoIndex/AutoIndex.mk
 include srcs/Exceptions/exceptions.mk
 include srcs/ConfigParser/configparser.mk
 include srcs/Management/management.mk

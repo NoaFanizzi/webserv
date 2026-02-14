@@ -2,11 +2,16 @@
 #include "Config.hpp"
 #include "HttpExceptions.hpp"
 #include "Request.hpp"
+#include "AutoIndex.hpp"
+#include "CgiManager.hpp"
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
+#include <cstdio>
+#include <cerrno>
 
 Response::Response(Request &request) : _request(request) {
+	_isCgi = false;
 	setMimes();
 	setErrorPages();
 }
@@ -91,15 +96,53 @@ std::string Response::buildHeader(size_t contentLength,
 	return header;
 }
 
-void Response::generate(const ServerConfig &config) {
+void Response::generate(const ServerConfig &config)
+{
 	std::string finalPath;
 
 	_statusCode = "200";
 	_statusText = "OK";
+	_isCgi = false;
 
-	try {
+	try
+	{
+		_request.setCurrentLocations(config);
 		finalPath = checkUrl(config);
-		_body = readFile(finalPath);
+		
+		// Handle DELETE method
+		if (_request.getMethod() == "DELETE")
+		{
+			if (std::remove(finalPath.c_str()) != 0) {
+				if (errno == EACCES)
+					throw Http403Exception();
+				else
+					throw Http404Exception();
+			}
+			_statusCode = "200";
+			_statusText = "OK";
+			_body = "{\"message\": \"File deleted successfully\"}";
+			_request.setPath(".json");
+			_header = buildHeader(_body.size(), _statusCode, _statusText);
+			return;
+		}
+		
+		// Handle AutoIndex
+		if (config.autoindex == true)
+		{
+			AutoIndex indexation(config.root, _request.getPath());
+			_body = indexation.initAutoIndex();
+		}
+		// Handle CGI
+		else if (CgiManager::isCgi(finalPath))
+		{
+			CgiManager cgi(_request, finalPath);
+			if (!cgi.execute())
+				throw Http500Exception();
+			_body = cgi.getOutput();
+			_isCgi = true; // CGI outputs already include headers
+		}
+		else
+			_body = readFile(finalPath);
 	} catch (const HttpException &e) {
 		int errorCode = e.getStatusCode();
 		std::ostringstream oss;
@@ -108,10 +151,13 @@ void Response::generate(const ServerConfig &config) {
 		_statusCode = oss.str();
 		_statusText = e.getStatusText();
 		_body = getErrorPageContent(errorCode, config);
+		finalPath = ".html";
+		_isCgi = false;
 	}
 
 	_request.setPath(finalPath);
-	_header = buildHeader(_body.size(), _statusCode, _statusText);
+	if (!_isCgi)
+		_header = buildHeader(_body.size(), _statusCode, _statusText);
 }
 
 void Response::setMimes() {

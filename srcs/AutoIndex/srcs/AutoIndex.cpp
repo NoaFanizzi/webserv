@@ -6,17 +6,17 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/09 15:16:47 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/14 14:54:10 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "AutoIndex.hpp"
-#include "ManageAll.hpp"
 #include <sys/types.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sstream>
 #include <ctime>
+#include <stdlib.h>
 
 
 std::string AutoIndex::_header =

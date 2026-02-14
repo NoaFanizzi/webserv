@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "Config.hpp"
 
 #define BUFFER_SIZE 5
 
@@ -37,6 +38,7 @@ class Request {
 	std::string _webKitForm;
 	std::map<std::string, std::string> _headers; // headers
 	std::vector<BodyRequest> _bodyRequests;      // body content
+	std::vector<LocationConfig> _currentLocations; // matching locations
 
   public:
 	Request() : _contentLengthBody(-1) {}
@@ -50,16 +52,18 @@ class Request {
 	void parseContentLength(const std::string &req);
 	void parseWebKitForm(const std::string &req);
 	void parsePostMethod(const std::string &request, size_t body_start);
+	void setCurrentLocations(const ServerConfig &serverConfig);
 
 	std::string getMethod() const { return _method; }
 	std::string getPath() const { return _path; }
 	std::string getQuery() const { return _query; }
 	std::string getVersion() const { return _version; }
 	std::string getHeaders(const std::string toGet) const;
+	const std::vector<LocationConfig> &getCurrentLocations() const { return _currentLocations; }
 
 	void setPath(const std::string &str) { _path = str; }
 };
 
-std::vector<std::string> split(const std::string &s, const std::string &delim);
+std::vector<std::string> split(const std::string &str, std::string delimiters);
 
 #endif

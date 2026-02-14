@@ -1,4 +1,4 @@
-#include "CgiHandler.hpp"
+#include "CgiManager.hpp"
 #include <cstring>
 #include <iostream>
 #include <stdio.h>
@@ -7,16 +7,16 @@
 #include <unistd.h>
 
 // constructor
-CgiHandler::CgiHandler(const Request &req, const std::string &scriptPath)
+CgiManager::CgiManager(const Request &req, const std::string &scriptPath)
     : _request(req), _scriptPath(scriptPath) {}
 
-CgiHandler::~CgiHandler() {}
+CgiManager::~CgiManager() {}
 
 // getter
-std::string CgiHandler::getOutput() const { return _output; }
+std::string CgiManager::getOutput() const { return _output; }
 
 // static function
-bool CgiHandler::isCgi(std::string path) {
+bool CgiManager::isCgi(std::string path) {
   // TODO add file format that we could manage
   // 2 file formats is the minimum for bonus
 
@@ -27,18 +27,18 @@ bool CgiHandler::isCgi(std::string path) {
 }
 
 // functions
-void CgiHandler::buildEnv() {
-  _env.push_back("REQUEST_METHOD=" + _request.GetMethod());
+void CgiManager::buildEnv() {
+  _env.push_back("REQUEST_METHOD=" + _request.getMethod());
   _env.push_back("SCRIPT_FILENAME=" + _scriptPath);
-  _env.push_back("SCRIPT_NAME=" + _request.GetPath());
-  _env.push_back("QUERY_STRING=" + _request.GetQuery());
-  _env.push_back("CONTENT_LENGTH=" + _request.GetHeaders("Content-Length"));
-  _env.push_back("CONTENT_TYPE=" + _request.GetHeaders("Content-Ttype"));
+  _env.push_back("SCRIPT_NAME=" + _request.getPath());
+  _env.push_back("QUERY_STRING=" + _request.getQuery());
+  _env.push_back("CONTENT_LENGTH=" + _request.getHeaders("Content-Length"));
+  _env.push_back("CONTENT_TYPE=" + _request.getHeaders("Content-Ttype"));
   _env.push_back("SERVER_PROTOCOL=HTTP/1.1");
   _env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 }
 
-char **CgiHandler::envToCharArray() {
+char **CgiManager::envToCharArray() {
   char **envp = new char *[_env.size() + 1];
   if (!envp)
     return NULL;
@@ -59,7 +59,7 @@ char **CgiHandler::envToCharArray() {
 // execute the cgi script
 // dup STDIN to pass it the request body if method == POST
 // return the output of the executed script
-bool CgiHandler::execute() {
+bool CgiManager::execute() {
   buildEnv();
 
   int fdIn[2];

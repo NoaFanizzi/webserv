@@ -6,13 +6,11 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/14 14:51:09 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/14 15:31:43 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
-#include "AutoIndex.hpp"
-//#include "CgiManager.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
 #include "WebServer.hpp"

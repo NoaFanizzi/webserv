@@ -13,6 +13,7 @@ class Response {
 	Request &_request;
 	std::map<int, std::string> _errorPages;
 	std::map<std::string, std::string> _mimeTypes;
+	bool _isCgi;
 
 	// functions
 	std::string checkUrl(const ServerConfig &config);
@@ -30,5 +31,9 @@ class Response {
 
 	// functions
 	void generate(const ServerConfig &config);
-	std::string getFullResponse() { return _header + _body; }
+	std::string getFullResponse() { 
+		if (_isCgi)
+			return _body;
+		return _header + _body; 
+	}
 };

@@ -25,4 +25,3 @@ int main(int ac, char **av)
 		std::cerr << e.what() << '\n';
 	}
 }
-

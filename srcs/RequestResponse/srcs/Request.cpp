@@ -6,12 +6,13 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/09 19:00:31 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/14 15:31:43 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 #include "HttpExceptions.hpp"
+#include "Config.hpp"
 #include <cstdlib>
 #include <fcntl.h>
 #include <iostream>
@@ -130,7 +131,6 @@ separateHeaders(std::vector<std::string> &docRequest) {
 	return headers;
 }
 
-<<<<<<< HEAD:srcs/Request/srcs/Request.cpp
 std::vector<std::string> split(const std::string &str, std::string delimiters)
 {
     std::vector<std::string> result;
@@ -140,30 +140,17 @@ std::vector<std::string> split(const std::string &str, std::string delimiters)
 
     while (end != std::string::npos)
     {
-        end      = str.find_first_of(delimiters, start);
+        end = str.find_first_of(delimiters, start);
         token = str.substr(start, end - start);
         if (!token.empty())
             result.push_back(token);
         start = (end == std::string::npos) ? end : end + 1;
     }
     return result;
-=======
-std::vector<std::string> split(const std::string &s, const std::string &delim) {
-	std::vector<std::string> result;
-	size_t start = 0;
-	size_t end;
-
-	while ((end = s.find(delim, start)) != std::string::npos) {
-		result.push_back(s.substr(start, end - start));
-		start = end + delim.length();
-	}
-
-	result.push_back(s.substr(start));
-	return result;
->>>>>>> origin:srcs/RequestResponse/srcs/Request.cpp
 }
 
-void printSplitDebug(const std::vector<std::string> &v) {
+void printSplitDebug(const std::vector<std::string> &v)
+{
 	for (size_t i = 0; i < v.size(); ++i) {
 		std::cout << "[" << i << "] ";
 		for (size_t j = 0; j < v[i].size(); ++j) {
@@ -176,7 +163,8 @@ void printSplitDebug(const std::vector<std::string> &v) {
 	}
 }
 
-void Request::printDebug() const {
+void Request::printDebug() const
+{
 	std::cout << "===== BODY DEBUG =====" << std::endl;
 	std::cout << "Nb body parts: " << _bodyRequests.size() << std::endl;
 
@@ -192,9 +180,9 @@ void Request::printDebug() const {
 	std::cout << "======================" << std::endl;
 }
 
-void Request::parsePostMethod(const std::string &request, size_t body_start) {
-	std::vector<std::string> parts = split(
-	    request.substr(body_start, _contentLengthBody), "--" + _webKitForm);
+void Request::parsePostMethod(const std::string &request, size_t body_start)
+{
+	std::vector<std::string> parts = split(request.substr(body_start, _contentLengthBody), "--" + _webKitForm);
 
 	for (size_t i = 0; i + 1 < parts.size(); ++i) {
 		std::string &part = parts[i];
@@ -233,7 +221,8 @@ void Request::parsePostMethod(const std::string &request, size_t body_start) {
 }
 
 // parse request
-void Request::parse(const std::string &request) {
+void Request::parse(const std::string &request)
+{
 	std::string line;
 	std::vector<std::string> docRequest;
 
@@ -277,10 +266,36 @@ void Request::parse(const std::string &request) {
 	// PrintDebug();
 }
 
-std::string Request::getHeaders(const std::string toGet) const {
+std::string Request::getHeaders(const std::string toGet) const
+{
 	std::map<std::string, std::string>::const_iterator it;
 	it = _headers.find(toGet);
 	if (it != _headers.end())
 		return it->second;
 	return "";
+}
+
+void Request::setCurrentLocations(const ServerConfig &serverConfig)
+{
+	size_t i = 0;
+	size_t j = 0;
+	std::vector<std::string> vPath;
+	std::string slashed;
+	std::vector<LocationConfig> serverLocations = serverConfig.locations;
+	std::string concatened;
+	
+	vPath = split(_path, "/");
+	while (i < vPath.size()) {
+		concatened = concatened + '/' + vPath[i];
+		slashed = concatened + '/';
+		j = 0;
+		while (j < serverLocations.size()) {
+			if (concatened == serverLocations[j].path)
+				_currentLocations.push_back(serverLocations[j]);
+			else if (slashed == serverLocations[j].path) 
+				_currentLocations.push_back(serverLocations[j]);
+			j++;
+		}
+		i++;
+	}
 }
