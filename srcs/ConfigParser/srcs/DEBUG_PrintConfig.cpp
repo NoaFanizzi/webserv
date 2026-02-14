@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <iostream>
 
 void Config::printServers()
 {

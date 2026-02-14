@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <sstream>
+#include <fstream>
 
 std::vector<std::vector<std::string> > splitLinesWords(const std::string &content)
 {

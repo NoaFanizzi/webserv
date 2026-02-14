@@ -13,44 +13,33 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "iostream"
-#include <sys/socket.h>
-#include <vector>
 #include <netinet/in.h>
-#include <iostream>
-#include <poll.h>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 
-#include <map>
 #include "AManager.hpp"
 #include "Config.hpp"
 
-class	Server : public AManager
-{
-	private:
-		struct sockaddr_in _servaddr;
-		int createSocket();
-		void createSocketAdress(const ServerConfig &serverconfig);
-		void 			bindClient(int fd);
-		const ServerConfig	&_serverconfig;
+class Server : public AManager {
+  private:
+	// variables
+	struct sockaddr_in _servAddr;
+	const ServerConfig &_serverConfig;
 
-	public:
-		//constructor
-		Server(const ServerConfig &servconfig);
-		~Server();
-		//getters
-		int 			getListen_fd() const;
-		sockaddr_in 	getSockddr_in() const;
-		const ServerConfig getConfig() const {return _serverconfig;}
+	// functions
+	int createSocket();
+	void createSocketAdress(const ServerConfig &serverconfig);
+	void bindClient(int fd);
 
-		void PollInHandler();
-		
-		
+  public:
+	// constructor
+	Server(const ServerConfig &servconfig);
+	~Server();
+
+	// functions
+	void PollInHandler();
+
+	// getters
+	sockaddr_in getSockddr_in() const { return _servAddr; }
+	const ServerConfig getConfig() const { return _serverConfig; }
 };
 
 #endif

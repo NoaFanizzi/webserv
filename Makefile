@@ -6,7 +6,7 @@
 #    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/05 07:48:23 by mvachon           #+#    #+#              #
-#    Updated: 2026/02/05 15:44:24 by nofanizz         ###   ########.fr        #
+#    Updated: 2026/02/14 14:51:53 by nofanizz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,9 +23,7 @@ SRCS        = srcs/main.cpp
 include srcs/Exceptions/exceptions.mk
 include srcs/ConfigParser/configparser.mk
 include srcs/Management/management.mk
-include srcs/Request/request.mk
-include srcs/AutoIndex/AutoIndex.mk
-include srcs/CGI/cgi.mk
+include srcs/RequestResponse/requestresponse.mk
 
 BUILD_DIR   = .build
 OBJS        = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)

@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 # Ajout des sources CGI
-SRCS += srcs/CGI/srcs/CgiHandler.cpp
+SRCS += srcs/CGI/srcs/CgiManager.cpp
 
 # Ajout des includes CGI
 INCLUDES += -Isrcs/CGI/includes
