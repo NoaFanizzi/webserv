@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:35:57 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/09 13:51:27 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/21 15:24:02 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@ class AutoIndex
 		
 		
 		//methods
-		std::string initAutoIndex();
-		std::string replaceTemplate(struct dirent &sdir);
-		void addNewRow(struct dirent &sdir);
+		std::string initAutoIndex(const std::string &rPath);
+		std::string replaceTemplate(struct dirent &sdir, const std::string &rPath);
+		void addNewRow(struct dirent &sdir, const std::string &rPath);
 		void replaceName(std::string &newTemplate, struct dirent &sdir);
 		void replaceLink(std::string &newTemplate, struct dirent &sdir);
 		void replaceDate(std::string &newTemplate, struct stat &file);

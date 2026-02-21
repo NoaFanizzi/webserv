@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/14 14:54:10 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/21 16:07:24 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,10 +66,14 @@ void AutoIndex::replaceName(std::string &newTemplate, struct dirent &sdir)
 
 void AutoIndex::replaceLink(std::string &newTemplate, struct dirent &sdir)
 {
-	std::string fLocation;
-	
-	fLocation = _location + sdir.d_name;
-	newTemplate.replace(newTemplate.find("{{ URL }}"), 9, fLocation);
+    std::string fLocation = _location;
+    
+    // Ajoute un '/' à la fin si ce n'est pas déjà le cas
+    if (!fLocation.empty() && fLocation[fLocation.length() - 1] != '/')
+        fLocation += "/";
+        
+    fLocation += sdir.d_name;
+    newTemplate.replace(newTemplate.find("{{ URL }}"), 9, fLocation);
 }
 
 void AutoIndex::replaceDate(std::string &newTemplate, struct stat &file)
@@ -94,12 +98,12 @@ void AutoIndex::replaceWeight(std::string &newTemplate, struct stat &file)
 	newTemplate.replace(newTemplate.find("{{ WEIGHT }}"), 12, ssweight.str());
 }
 
-std::string AutoIndex::replaceTemplate(struct dirent &sdir)
+std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &rPath)
 {
 	std::string newTemplate = _template;
 	struct stat file;
 
-	std::string filepath = _root + "/" + sdir.d_name;
+	std::string filepath = rPath + "/" + sdir.d_name;
 	if(stat(filepath.c_str(), &file) == -1)
 		exit(-10); //TODO Check les trucs d'erreur
 	replaceName(newTemplate, sdir);
@@ -110,14 +114,14 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir)
 	return(newTemplate);
 }
 
-void AutoIndex::addNewRow(struct dirent &sdir)
+void AutoIndex::addNewRow(struct dirent &sdir, const std::string &rPath)
 {
-	std::string newRow = replaceTemplate(sdir);
+	std::string newRow = replaceTemplate(sdir, rPath);
 	_content.append(newRow);
 	
 }
 
-std::string AutoIndex::initAutoIndex()
+std::string AutoIndex::initAutoIndex(const std::string &rPath)
 {
 
 // Begin
@@ -136,14 +140,13 @@ std::string AutoIndex::initAutoIndex()
 	struct dirent* sdir;
 
 	_content = _header;
-	std::cout << "DIRRRRRR" << std::endl;
-	dr = opendir(_root.c_str());
+	dr = opendir(rPath.c_str());
 	if(dr)
 	{
 		while((sdir = readdir(dr)) != NULL)
 		{
 			std::cout << sdir->d_name << std::endl;
-			addNewRow(*sdir);
+			addNewRow(*sdir, rPath);
 		}
 	}
 	_content.append(_footer);

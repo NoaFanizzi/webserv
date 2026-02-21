@@ -99,6 +99,7 @@ std::string Response::buildHeader(size_t contentLength,
 int	check_dir(const std::string &full_path)
 {
 	struct stat path_stat;
+	std::cout << "FULLLLLPATH = " << full_path.c_str() << std::endl;
 	stat(full_path.c_str(), &path_stat);
 	if (S_ISDIR(path_stat.st_mode))
 		return(1);
@@ -135,10 +136,11 @@ void Response::generate(const ServerConfig &config)
 		}
 		
 		// Handle AutoIndex
-		if (config.autoindex == true && check_dir(_request.getPath()) == 1)
+		if (config.autoindex == true && check_dir(config.root + _request.getPath()) == 1)
 		{
 			AutoIndex indexation(config.root, _request.getPath());
-			_body = indexation.initAutoIndex();
+			_body = indexation.initAutoIndex(config.root + _request.getPath());
+			finalPath = ".html";
 		}
 		// Handle CGI
 		else if (CgiManager::isCgi(finalPath))
@@ -162,7 +164,6 @@ void Response::generate(const ServerConfig &config)
 		finalPath = ".html";
 		_isCgi = false;
 	}
-
 	_request.setPath(finalPath);
 	if (!_isCgi)
 		_header = buildHeader(_body.size(), _statusCode, _statusText);
