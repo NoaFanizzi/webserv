@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/14 15:31:43 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/21 12:56:26 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,6 +284,7 @@ void Request::setCurrentLocations(const ServerConfig &serverConfig)
 	std::vector<LocationConfig> serverLocations = serverConfig.locations;
 	std::string concatened;
 	
+	std::cout << "JE SUIS DANS SETCURRENTLOCATIONS" << std::endl;
 	vPath = split(_path, "/");
 	while (i < vPath.size()) {
 		concatened = concatened + '/' + vPath[i];
@@ -291,9 +292,16 @@ void Request::setCurrentLocations(const ServerConfig &serverConfig)
 		j = 0;
 		while (j < serverLocations.size()) {
 			if (concatened == serverLocations[j].path)
+			{
 				_currentLocations.push_back(serverLocations[j]);
-			else if (slashed == serverLocations[j].path) 
+				std::cout << "AAAAAAAAAAAAAAAAA_currentLocations = " << concatened << std::endl;
+			}
+			else if (slashed == serverLocations[j].path)
+			{
 				_currentLocations.push_back(serverLocations[j]);
+				std::cout << "AAAAAAAAAAAAAAAAAAAAAAAA_currentLocations = " << slashed << std::endl;
+				
+			}
 			j++;
 		}
 		i++;

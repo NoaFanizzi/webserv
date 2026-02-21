@@ -96,6 +96,15 @@ std::string Response::buildHeader(size_t contentLength,
 	return header;
 }
 
+int	check_dir(const std::string &full_path)
+{
+	struct stat path_stat;
+	stat(full_path.c_str(), &path_stat);
+	if (S_ISDIR(path_stat.st_mode))
+		return(1);
+	return(0);
+}
+
 void Response::generate(const ServerConfig &config)
 {
 	std::string finalPath;
@@ -108,7 +117,6 @@ void Response::generate(const ServerConfig &config)
 	{
 		_request.setCurrentLocations(config);
 		finalPath = checkUrl(config);
-		
 		// Handle DELETE method
 		if (_request.getMethod() == "DELETE")
 		{
@@ -127,7 +135,7 @@ void Response::generate(const ServerConfig &config)
 		}
 		
 		// Handle AutoIndex
-		if (config.autoindex == true)
+		if (config.autoindex == true && check_dir(_request.getPath()) == 1)
 		{
 			AutoIndex indexation(config.root, _request.getPath());
 			_body = indexation.initAutoIndex();
