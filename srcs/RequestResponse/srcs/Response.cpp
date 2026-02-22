@@ -99,7 +99,6 @@ std::string Response::buildHeader(size_t contentLength,
 int	check_dir(const std::string &full_path)
 {
 	struct stat path_stat;
-	std::cout << "FULLLLLPATH = " << full_path.c_str() << std::endl;
 	stat(full_path.c_str(), &path_stat);
 	if (S_ISDIR(path_stat.st_mode))
 		return(1);

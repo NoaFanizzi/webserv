@@ -64,6 +64,6 @@ class Request {
 	void setPath(const std::string &str) { _path = str; }
 };
 
-std::vector<std::string> split(const std::string &str, std::string delimiters);
+std::vector<std::string> split(const std::string &str, const std::string &delimiter);
 
 #endif

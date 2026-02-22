@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/21 12:56:26 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/22 10:14:22 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,21 +131,22 @@ separateHeaders(std::vector<std::string> &docRequest) {
 	return headers;
 }
 
-std::vector<std::string> split(const std::string &str, std::string delimiters)
+std::vector<std::string> split(const std::string &str, const std::string &delimiter)
 {
     std::vector<std::string> result;
-    size_t             start = 0;
-    size_t             end   = 0;
-    std::string         token;
+    size_t start = 0;
+    size_t end = 0;
 
-    while (end != std::string::npos)
+    while ((end = str.find(delimiter, start)) != std::string::npos)
     {
-        end = str.find_first_of(delimiters, start);
-        token = str.substr(start, end - start);
+        std::string token = str.substr(start, end - start);
         if (!token.empty())
             result.push_back(token);
-        start = (end == std::string::npos) ? end : end + 1;
+        start = end + delimiter.size();
     }
+    std::string last = str.substr(start);
+    if (!last.empty())
+        result.push_back(last);
     return result;
 }
 
@@ -183,10 +184,9 @@ void Request::printDebug() const
 void Request::parsePostMethod(const std::string &request, size_t body_start)
 {
 	std::vector<std::string> parts = split(request.substr(body_start, _contentLengthBody), "--" + _webKitForm);
-
 	for (size_t i = 0; i + 1 < parts.size(); ++i) {
 		std::string &part = parts[i];
-
+		std::cout << parts[i] << "HELLO" << std::endl;
 		std::string type;
 		std::string filename;
 		std::string body;
@@ -204,17 +204,18 @@ void Request::parsePostMethod(const std::string &request, size_t body_start)
 			    filename[filename.size() - 1] == '"')
 				filename = filename.substr(1, filename.size() - 2);
 		}
-
 		pos = part.find("\r\n\r\n");
 		if (pos != std::string::npos)
-			body = part.substr(pos + 4);
+		body = part.substr(pos + 4);
 		if (filename.empty())
-			continue;
+		continue;
 		_bodyRequests.push_back(BodyRequest(body, filename, type));
 		int fd = open(("upload/" + filename).c_str(),
-		              O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
 			throw Http500Exception();
+		
+		std::cout << part << "HELLO"<<std::endl;
 		write(fd, body.c_str(), body.size());
 		close(fd);
 	}
@@ -284,7 +285,6 @@ void Request::setCurrentLocations(const ServerConfig &serverConfig)
 	std::vector<LocationConfig> serverLocations = serverConfig.locations;
 	std::string concatened;
 	
-	std::cout << "JE SUIS DANS SETCURRENTLOCATIONS" << std::endl;
 	vPath = split(_path, "/");
 	while (i < vPath.size()) {
 		concatened = concatened + '/' + vPath[i];
@@ -294,12 +294,10 @@ void Request::setCurrentLocations(const ServerConfig &serverConfig)
 			if (concatened == serverLocations[j].path)
 			{
 				_currentLocations.push_back(serverLocations[j]);
-				std::cout << "AAAAAAAAAAAAAAAAA_currentLocations = " << concatened << std::endl;
 			}
 			else if (slashed == serverLocations[j].path)
 			{
 				_currentLocations.push_back(serverLocations[j]);
-				std::cout << "AAAAAAAAAAAAAAAAAAAAAAAA_currentLocations = " << slashed << std::endl;
 				
 			}
 			j++;

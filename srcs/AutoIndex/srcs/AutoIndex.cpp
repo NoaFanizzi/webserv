@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   AutoIndex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/21 16:07:24 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/22 10:12:51 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,43 +18,88 @@
 #include <ctime>
 #include <stdlib.h>
 
-
 std::string AutoIndex::_header =
-								"<!doctype html>"
-								"<html lang='fr'>"
-								"<style>"
-									"table {"
-									"margin: auto;"
-									"}"
-									"td {"
-									"border: solid;"
-									"}"
-								"</style>"
+	"<!DOCTYPE html>"
+	"<html lang='en'>"
+	"<head>"
+	"<meta charset='UTF-8'/>"
+	"<title>Index</title>"
+	"<style>"
+	"body {"
+	"  font-family: monospace;"
+	"  background: #1a1a1a;"
+	"  color: #ccc;"
+	"  margin: 0;"
+	"  height: 100vh;"
+	"  display: flex;"
+	"  justify-content: center;"
+	"  align-items: center;"
+	"}"
+	".container {"
+	"  background: #222;"
+	"  padding: 40px;"
+	"  border-radius: 8px;"
+	"  box-shadow: 0 0 25px rgba(0,0,0,0.6);"
+	"  width: 700px;"
+	"  max-width: 90%;"
+	"}"
+	"h1 {"
+	"  color: #fff;"
+	"  font-size: 24px;"
+	"  margin-bottom: 30px;"
+	"  border-bottom: 1px solid #333;"
+	"  padding-bottom: 15px;"
+	"  text-align: center;"
+	"}"
+	"table {"
+	"  width: 100%;"
+	"  border-collapse: collapse;"
+	"}"
+	"th {"
+	"  color: #777;"
+	"  font-size: 13px;"
+	"  text-transform: uppercase;"
+	"  letter-spacing: .1em;"
+	"  padding: 12px 16px;"
+	"  text-align: left;"
+	"}"
+	"td {"
+	"  padding: 14px 16px;"
+	"  border-top: 1px solid #2a2a2a;"
+	"  font-size: 15px;"
+	"}"
+	"a {"
+	"  color: #6af;"
+	"  text-decoration: none;"
+	"}"
+	"a:hover {"
+	"  text-decoration: underline;"
+	"}"
+	".size {"
+	"  color: #777;"
+	"}"
+	".dir a { color: #b8d839ff; font-weight: bold; }"
+	".file a { color: #6af; }"
+	"</style>"
+	"</head>"
+	"<body>"
+	"<div class='container'>"
+	"<h1>Index</h1>"
+	"<table>"
+	"<thead><tr><th>Name</th><th>Date</th><th>Size</th></tr></thead>"
+	"<tbody>";
 
-								"<head>"
-									"<meta charset='utf-8' />"
-									"<title>Titre de la page</title>"
-								"</head>"
-								"<body>"
-									"<section>"
-										"<table>"
-										"<tr>"
-											"<td>Name</td>"
-											"<td>Date</td>"
-											"<td>Size</td>"
-										"</tr>";
+std::string AutoIndex::_template =
+	"<tr class='{{ TYPE }}'>"
+	"<td><a href={{ URL }}>{{ NAME }}</a></td>"
+	"<td class='size'>{{ DATE }}</td>"
+	"<td class='size'>{{ WEIGHT }}</td>"
+	"</tr>";
 
-std::string AutoIndex::_template = "<tr>"
-									"<td><a href={{ URL }}>{{ NAME }}</td>"
-									"<td>{{ DATE }}</td>"
-									"<td>{{ WEIGHT }}</td>"
-									"</tr>";
-
-std::string AutoIndex::_footer = "</table>"
-									"</section>"
-									"</body>"
-									"</html>";
-
+std::string AutoIndex::_footer =
+	"</tbody></table>"
+	"</div>"
+	"</body></html>";
 
 AutoIndex::AutoIndex(const std::string &root, const std::string &location) :
 	_root(root), _location(location) {}
@@ -105,13 +150,24 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &r
 
 	std::string filepath = rPath + "/" + sdir.d_name;
 	if(stat(filepath.c_str(), &file) == -1)
-		exit(-10); //TODO Check les trucs d'erreur
+		exit(-10); // TODO check error
+
 	replaceName(newTemplate, sdir);
 	replaceLink(newTemplate, sdir);
 	replaceDate(newTemplate, file);
 	replaceWeight(newTemplate, file);
 
-	return(newTemplate);
+	// 👇 AJOUT ICI
+	if (S_ISDIR(file.st_mode))
+	{
+		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "dir");
+	}
+	else
+	{
+		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "file");
+	}
+
+	return newTemplate;
 }
 
 void AutoIndex::addNewRow(struct dirent &sdir, const std::string &rPath)
