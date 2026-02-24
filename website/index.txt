@@ -1,0 +1,259 @@
+ <!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Mon Web Server</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body {
+
+margin: 0;
+
+font-family: 'Poppins', sans-serif;
+
+background: linear-gradient(135deg, #265868, #334a70);
+
+color: white;
+
+display: flex;
+
+justify-content: center;
+
+align-items: center;
+
+height: 100vh;
+
+text-align: center;
+
+}
+
+
+.container {
+
+background: rgba(0, 0, 0, 0.3);
+
+padding: 40px;
+
+border-radius: 16px;
+
+box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+
+width: 380px;
+
+}
+
+
+h1 {
+
+margin-bottom: 10px;
+
+font-size: 2.4em;
+
+font-weight: 600;
+
+}
+
+
+p {
+
+font-size: 1.1em;
+
+opacity: 0.9;
+
+}
+
+.btn {
+
+display: inline-block;
+
+margin: 20px 0;
+
+padding: 12px 28px;
+
+background: #ffffff;
+
+color: #334a70;
+
+text-decoration: none;
+
+border-radius: 30px;
+
+font-weight: 600;
+
+transition: all 0.2s ease;
+
+}
+
+
+.btn:hover {
+
+transform: translateY(-2px);
+
+box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+
+}
+
+
+form {
+
+display: grid;
+
+gap: 10px;
+
+flex-direction: column;
+
+margin-top: 20px;
+
+}
+
+
+input[type="file"] {
+
+/* margin: 10px 0; */
+
+padding: 10px;
+
+background: rgba(255,255,255,0.1);
+
+border: 2px dashed rgba(255,255,255,0.4);
+
+border-radius: 12px;
+
+color: white;
+
+cursor: pointer;
+
+font-family: 'Poppins', sans-serif;
+
+}
+
+
+input[type="file"]::-webkit-file-upload-button {
+
+background: white;
+
+color: #334a70;
+
+border: none;
+
+padding: 8px 16px;
+
+border-radius: 20px;
+
+font-weight: 600;
+
+cursor: pointer;
+
+margin-right: 10px;
+
+transition: background 0.2s ease;
+
+transition: all 0.3s ease;
+
+}
+
+
+input[type="file"]::-webkit-file-upload-button:hover {
+
+background: #e6e6e6;
+
+}
+
+
+input[type="file"]::-webkit-file-upload-button:hover{
+
+transform: translateY(-1px);
+
+
+}
+
+button {
+
+margin-top: 15px;
+
+width: 100%;
+
+padding: 12px;
+
+border: none;
+
+border-radius: 30px;
+
+background: #ffffff;
+
+color: #334a70;
+
+font-weight: 600;
+
+font-size: 1em;
+
+cursor: pointer;
+
+transition: all 0.2s ease;
+
+}
+
+
+button:hover {
+
+transform: translateY(-2px);
+
+box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚀 Webserv OK</h1>
+
+<p>Votre serveur web fonctionne correctement.</p>
+
+
+<a href="index2.html" class="btn">Accéder a index2</a>
+
+<form action="" method="post" enctype="multipart/form-data">
+
+<input type="file" name="file1">
+
+<input type="file" name="file2">
+
+<button type="submit">Upload</button>
+
+</form>
+
+<textarea id="userInput" placeholder="Tapez quelque chose pour les CGI..." rows="3" style="width:100%; margin-top:15px; padding:10px; border-radius:12px; border: 1px solid #ccc;"></textarea>
+<a href="cgi/hello.py" class="btn" id="cgiLink">cgi test<a/>
+<a href="cgi/error.py" class="btn">cgi error<a/>
+
+<script>
+  const cgiLink = document.getElementById('cgiLink');
+  const userInput = document.getElementById('userInput');
+
+  cgiLink.addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent default link behavior
+    const text = encodeURIComponent(userInput.value); // Encode for URL safety
+    const url = `cgi/hello.py?input=${text}`; // Append as query parameter
+    window.location.href = url; // Navigate to the CGI script with input
+  });
+</script>
+</div>
+
+</body>
+
+</html> 
