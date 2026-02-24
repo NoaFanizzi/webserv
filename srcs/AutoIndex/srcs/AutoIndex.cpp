@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   AutoIndex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/22 10:12:51 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/24 15:21:03 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,9 +78,40 @@ std::string AutoIndex::_header =
 	".size {"
 	"  color: #777;"
 	"}"
+	".delete-button {"
+	"background-color: red;"
+	"border: none;"
+	"color: white;"
+	"padding: 15px 32px;"
+	"text-align: center;"
+	"text-decoration: none;"
+	"display: inline-block;"
+	"font-size: 16px;"
+	"cursor: pointer;"
+	"}"
 	".dir a { color: #b8d839ff; font-weight: bold; }"
 	".file a { color: #6af; }"
 	"</style>"
+	"<script>"
+		"document.addEventListener('DOMContentLoaded', () => {"
+		"  const deleteButtons = document.querySelectorAll('.delete-button');"
+		"  deleteButtons.forEach(button => {"
+		"    button.addEventListener('click', handleDeleteClick);"
+		"  });"
+		"});"
+		"async function handleDeleteClick(event) {"
+		"  const button = event.currentTarget;"
+		"  const id = button.dataset.id;"
+		"  const response = await fetch(`${id}`, {"
+		"    method: 'DELETE'"
+		"  });"
+		"  if (response.ok) {"
+		"    button.closest('.item').remove();"
+		"  }"
+		"}"
+	"</script>"
+
+
 	"</head>"
 	"<body>"
 	"<div class='container'>"
@@ -94,6 +125,7 @@ std::string AutoIndex::_template =
 	"<td><a href={{ URL }}>{{ NAME }}</a></td>"
 	"<td class='size'>{{ DATE }}</td>"
 	"<td class='size'>{{ WEIGHT }}</td>"
+	"<td class='delete-button' data-id={{ DELETE }}>DELETE</td>"
 	"</tr>";
 
 std::string AutoIndex::_footer =
@@ -113,12 +145,12 @@ void AutoIndex::replaceLink(std::string &newTemplate, struct dirent &sdir)
 {
     std::string fLocation = _location;
     
-    // Ajoute un '/' à la fin si ce n'est pas déjà le cas
     if (!fLocation.empty() && fLocation[fLocation.length() - 1] != '/')
         fLocation += "/";
         
     fLocation += sdir.d_name;
     newTemplate.replace(newTemplate.find("{{ URL }}"), 9, fLocation);
+    newTemplate.replace(newTemplate.find("{{ DELETE }}"), 9, fLocation);
 }
 
 void AutoIndex::replaceDate(std::string &newTemplate, struct stat &file)

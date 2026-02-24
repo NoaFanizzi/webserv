@@ -113,6 +113,7 @@ void Response::generate(const ServerConfig &config)
 	_statusText = "OK";
 	_isCgi = false;
 
+	std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
 	try
 	{
 		_request.setCurrentLocations(config);
@@ -120,6 +121,9 @@ void Response::generate(const ServerConfig &config)
 		// Handle DELETE method
 		if (_request.getMethod() == "DELETE")
 		{
+			//_exit(0);
+			std::cout << finalPath.c_str() << std::endl;
+			//_content.
 			if (std::remove(finalPath.c_str()) != 0) {
 				if (errno == EACCES)
 					throw Http403Exception();
@@ -131,6 +135,7 @@ void Response::generate(const ServerConfig &config)
 			_body = "{\"message\": \"File deleted successfully\"}";
 			_request.setPath(".json");
 			_header = buildHeader(_body.size(), _statusCode, _statusText);
+			std::cout << "HEADERRRRRR = " <<_header << std::endl;
 			return;
 		}
 		

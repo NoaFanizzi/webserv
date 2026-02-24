@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/22 10:14:22 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/24 13:51:13 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,10 @@ bool Request::isValid(const std::string &req) {
 			_method = "GET";
 		else if (req.compare(0, 4, "POST") == 0)
 			_method = "POST";
+		else if (req.compare(0, 6, "DELETE") == 0)
+			_method = "DELETE";
 	}
-	if (_method == "GET")
+	if (_method == "GET" || _method == "DELETE")
 		return true;
 
 	if (_method == "POST") {
