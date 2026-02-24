@@ -6,12 +6,13 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/28 11:14:18 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/24 12:24:55 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 #include <sstream>
+#include <ostream>
 
 void Config::parseServerDirective(ServerConfig &server, const std::string &key, 
                                    const std::vector<std::string> &line, size_t j)
@@ -42,7 +43,6 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
 {
     bool semicolon = false;
     std::string value = line[j + line.size() - 1];
-
     if (_keysServer->find(key) && key != "error_page")
     {
         if (line.size() > 2)

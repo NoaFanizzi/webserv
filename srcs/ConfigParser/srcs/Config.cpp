@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:22:15 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/29 16:22:01 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/24 14:22:39 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,9 @@ void Config::initLocationKeys()
     _keysLocation[4] = "allow_methods";
 }
 
-int Config::setFile(std::string doc)
+bool Config::setFile(std::string doc)
 {
+    
     try
     {
         std::string content = readFile(doc);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:24:07 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/09 15:21:42 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/24 14:36:48 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ class Config
 
     public:
         Config();
-        int setFile(std::string doc);
+        bool setFile(std::string doc);
         const std::vector<ServerConfig>& getServers() const;
         void printServers();
 };

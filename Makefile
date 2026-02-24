@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+         #
+#    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/05 07:48:23 by mvachon           #+#    #+#              #
-#    Updated: 2026/02/14 15:31:43 by nofanizz         ###   ########.fr        #
+#    Updated: 2026/02/24 14:16:20 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -64,6 +64,10 @@ clean:
 fclean: clean
 	@$(RM) $(NAME) $(UPLOAD_FILE)
 	@echo "$(RED)✗ $(NAME) and upload removed$(RESET)"
+
+val:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -s ./$(NAME) config.conf
+
 
 re: fclean all
 

@@ -49,7 +49,7 @@ void Server::createSocketAdress(const ServerConfig &serverconfig) {
 		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
 		throw std::runtime_error("Failed to resolve host IP");
 	}
-
+	
 	_servAddr.sin_family = AF_INET;
 	_servAddr.sin_addr = ((struct sockaddr_in *)res->ai_addr)->sin_addr;
 	_servAddr.sin_port = htons(serverconfig.port);

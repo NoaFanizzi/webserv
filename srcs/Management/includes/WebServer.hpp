@@ -21,6 +21,7 @@ class WebServer
 		//functions
 		static void pollFdCreation(const int &fd, AManager *manager);
 		static void	run();
+		static void destroy();
 
 };
 

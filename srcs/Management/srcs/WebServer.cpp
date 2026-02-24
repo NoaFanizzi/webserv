@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <vector>
+#include <csignal>
 
 std::vector <struct pollfd> WebServer::_pollfds;
 std::map <int, AManager *> WebServer::_managers;
@@ -35,6 +36,18 @@ AManager *WebServer::getManager(int fd) {
 	if (it != _managers.end())
 		return (it->second);
 	return (NULL);
+}
+
+void WebServer::destroy()
+{
+	for(size_t i = 0; i < _pollfds.size(); i++)
+	{
+		const int fd =_pollfds[i].fd;
+		AManager *current = getManager(fd);
+		_managers.erase(fd);
+		close(fd);
+		delete current;
+	}
 }
 
 void WebServer::run() {

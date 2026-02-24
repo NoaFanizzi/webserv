@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/22 10:12:51 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/24 15:20:45 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,10 @@ AutoIndex::AutoIndex(const std::string &root, const std::string &location) :
 									
 void AutoIndex::replaceName(std::string &newTemplate, struct dirent &sdir)
 {
-	newTemplate.replace(newTemplate.find("{{ NAME }}"), 10, sdir.d_name);
+	const std::string name = sdir.d_name;
+	std::string test;
+	newTemplate.find("dir") != std::string::npos ? test = "📁 " : test = "";
+	newTemplate.replace(newTemplate.find("{{ NAME }}"), 10, test +  name);
 }
 
 void AutoIndex::replaceLink(std::string &newTemplate, struct dirent &sdir)
@@ -151,21 +154,16 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &r
 	std::string filepath = rPath + "/" + sdir.d_name;
 	if(stat(filepath.c_str(), &file) == -1)
 		exit(-10); // TODO check error
+		
+	if (S_ISDIR(file.st_mode))
+		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "dir");
+	else
+		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "file");
 
 	replaceName(newTemplate, sdir);
 	replaceLink(newTemplate, sdir);
 	replaceDate(newTemplate, file);
 	replaceWeight(newTemplate, file);
-
-	// 👇 AJOUT ICI
-	if (S_ISDIR(file.st_mode))
-	{
-		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "dir");
-	}
-	else
-	{
-		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "file");
-	}
 
 	return newTemplate;
 }
@@ -206,5 +204,6 @@ std::string AutoIndex::initAutoIndex(const std::string &rPath)
 		}
 	}
 	_content.append(_footer);
+	closedir(dr);
 	return(_content);
 }
