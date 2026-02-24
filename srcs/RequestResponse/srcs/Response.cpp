@@ -113,7 +113,6 @@ void Response::generate(const ServerConfig &config)
 	_statusText = "OK";
 	_isCgi = false;
 
-	std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
 	try
 	{
 		_request.setCurrentLocations(config);

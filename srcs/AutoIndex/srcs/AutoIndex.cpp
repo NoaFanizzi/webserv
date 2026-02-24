@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   AutoIndex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/24 15:28:32 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/24 16:53:51 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,8 @@ std::string AutoIndex::_header =
 		"    method: 'DELETE'"
 		"  });"
 		"  if (response.ok) {"
-		"    button.closest('.item').remove();"
+		"    button.closest('tr')?.remove();"
+		"    alert(\"File deleted\");"
 		"  }"
 		"}"
 	"</script>"
@@ -144,16 +145,17 @@ void AutoIndex::replaceName(std::string &newTemplate, struct dirent &sdir)
 	newTemplate.replace(newTemplate.find("{{ NAME }}"), 10, test +  name);
 }
 
+
 void AutoIndex::replaceLink(std::string &newTemplate, struct dirent &sdir)
 {
     std::string fLocation = _location;
     
     if (!fLocation.empty() && fLocation[fLocation.length() - 1] != '/')
         fLocation += "/";
-        
+    
     fLocation += sdir.d_name;
     newTemplate.replace(newTemplate.find("{{ URL }}"), 9, fLocation);
-    newTemplate.replace(newTemplate.find("{{ DELETE }}"), 9, fLocation);
+    newTemplate.replace(newTemplate.find("{{ DELETE }}"), 12, fLocation);
 }
 
 void AutoIndex::replaceDate(std::string &newTemplate, struct stat &file)
@@ -231,7 +233,7 @@ std::string AutoIndex::initAutoIndex(const std::string &rPath)
 	{
 		while((sdir = readdir(dr)) != NULL)
 		{
-			std::cout << sdir->d_name << std::endl;
+			// std::cout << sdir->d_name << std::endl;
 			addNewRow(*sdir, rPath);
 		}
 	}
