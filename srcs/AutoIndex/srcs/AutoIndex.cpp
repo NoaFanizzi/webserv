@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   AutoIndex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/24 16:53:51 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/24 17:25:14 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,10 @@ std::string AutoIndex::_header =
 		"async function handleDeleteClick(event) {"
 		"  const button = event.currentTarget;"
 		"  const id = button.dataset.id;"
+		"const ok = confirm('Are you sure that you want to delete this file ?');"
+		"if (!ok) {"
+			"return;"
+		"}"
 		"  const response = await fetch(`${id}`, {"
 		"    method: 'DELETE'"
 		"  });"
