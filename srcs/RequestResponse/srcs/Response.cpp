@@ -2,13 +2,18 @@
 #include "Config.hpp"
 #include "HttpExceptions.hpp"
 #include "Request.hpp"
+#include "AManager.hpp"
+#include "WebServer.hpp"
 #include "AutoIndex.hpp"
 #include "CgiManager.hpp"
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
 #include <cstdio>
+#include <iostream>
 #include <cerrno>
+
+static bool _finalAutoIndex;
 
 Response::Response(Request &request) : _request(request) {
 	_isCgi = false;
@@ -51,19 +56,22 @@ std::string Response::readFile(const std::string &path) {
 
 std::string Response::checkUrl(const ServerConfig &config) {
 	std::string path;
-
 	if (_request.getPath() == "/")
 		path = config.root + "/" + config.index;
 	else
 		path = config.root + _request.getPath();
-
-	struct stat st;
-	if (stat(path.c_str(), &st) != 0)
-		throw Http404Exception();
-
-	if (!(st.st_mode & S_IRUSR))
-		throw Http403Exception();
-
+	_finalAutoIndex = false;
+	if (access(path.c_str(),F_OK) == -1)
+	{
+		path = config.root + "/index.html";
+		if (access(path.c_str(), F_OK) == -1)
+		{
+			if (config.autoindex == false)
+				throw Http404Exception();
+			else
+				_finalAutoIndex = true;
+		}
+	}
 	return path;
 }
 
@@ -105,6 +113,7 @@ int	check_dir(const std::string &full_path)
 	return(0);
 }
 
+
 void Response::generate(const ServerConfig &config)
 {
 	std::string finalPath;
@@ -139,7 +148,7 @@ void Response::generate(const ServerConfig &config)
 		}
 		
 		// Handle AutoIndex
-		if (config.autoindex == true && check_dir(config.root + _request.getPath()) == 1)
+		if (_finalAutoIndex == true && check_dir(config.root + _request.getPath()) == 1)
 		{
 			AutoIndex indexation(config.root, _request.getPath());
 			_body = indexation.initAutoIndex(config.root + _request.getPath());
