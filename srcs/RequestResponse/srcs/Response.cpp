@@ -44,7 +44,7 @@ std::string Response::getErrorPageContent(int code,
 
 std::string Response::readFile(const std::string &path) {
 	if (access(path.c_str(), R_OK))
-		return _errorPages[403];
+		throw Http403Exception();
 
 	std::ifstream file(path.c_str());
 	if (!file.is_open())
@@ -185,6 +185,7 @@ void Response::generate(const ServerConfig &config)
 		finalPath = ".html";
 		_isCgi = false;
 	}
+
 	_request.setPath(finalPath);
 	if (!_isCgi)
 		_header = buildHeader(_body.size(), _statusCode, _statusText);
