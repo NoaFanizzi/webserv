@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/14 15:31:43 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/25 19:21:06 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "Request.hpp"
 #include "Response.hpp"
 #include "WebServer.hpp"
+#include "HttpExceptions.hpp"
 #include <iostream>
 #include <poll.h>
 #include <sys/stat.h>
@@ -25,12 +26,12 @@ Client::Client(int fd, const ServerConfig &config) : _config(config) {
 	WebServer::pollFdCreation(_fd, this);
 }
 
-void Client::PollInHandler() {
+void Client::PollInHandler()
+{	
 	_request.readRaw(_fd, _closedStatus, _rawRequest);
 	
-	
 	if (_request.isValid(_rawRequest) == true) {
-		_request.parse(_rawRequest);
+		_request.parse(_rawRequest, _config);
 		_events = POLLOUT;
 		std::cout << _rawRequest << std::endl;
 		std::cout << "===============================" << std::endl;
@@ -41,7 +42,6 @@ void Client::PollOutHandler() {
 	Response response(_request);
 
 	response.generate(_config);
-
 	std::string full = response.getFullResponse();
 	send(_fd, full.c_str(), full.size(), 0);
 
