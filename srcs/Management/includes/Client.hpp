@@ -4,6 +4,7 @@
 #include "AManager.hpp"
 #include "Config.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 #include <string>
 
 class Client : public AManager {
@@ -14,6 +15,7 @@ class Client : public AManager {
 	Request _request;
 
 	// functions
+	Response _response;
 	bool _requestcomplete;
 
   public:

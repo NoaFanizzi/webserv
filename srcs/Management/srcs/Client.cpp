@@ -6,13 +6,12 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/25 19:21:06 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/26 11:26:12 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 #include "Request.hpp"
-#include "Response.hpp"
 #include "WebServer.hpp"
 #include "HttpExceptions.hpp"
 #include <iostream>
@@ -29,20 +28,45 @@ Client::Client(int fd, const ServerConfig &config) : _config(config) {
 void Client::PollInHandler()
 {	
 	_request.readRaw(_fd, _closedStatus, _rawRequest);
-	
-	if (_request.isValid(_rawRequest) == true) {
-		_request.parse(_rawRequest, _config);
-		_events = POLLOUT;
-		std::cout << _rawRequest << std::endl;
-		std::cout << "===============================" << std::endl;
+	try
+	{
+		if (_request.isValid(_rawRequest) == true) {
+			_request.parse(_rawRequest, _config);
+			_response.setRequest(_request);
+
+			_response.generate(_config);
+			_events = POLLOUT;
+			std::cout << _rawRequest << std::endl;
+			std::cout << "===============================" << std::endl;
+		}
+		/* code */
 	}
+	catch(const HttpException& e)
+	{
+		int errorCode = e.getStatusCode();
+		std::ostringstream oss;
+		oss << errorCode;
+		_request.setPath(".html");
+    	_response.setRequest(_request);
+		_response.setStatusCode(oss.str());
+		_response.setStatusText(e.getStatusText());
+		_response.setBody(_response.getErrorPageContent(errorCode, _config));
+		_response.setFinalPath(".html");
+		 _response.buildErrorHeader();
+		_events = POLLOUT;
+		// _isCgi = false;
+	}
+	catch(const std::exception &e)
+	{
+		std::cerr << "Wesh error non HTTP" << e.what() << std::endl; 
+	}
+	
 }
 
 void Client::PollOutHandler() {
-	Response response(_request);
-
-	response.generate(_config);
-	std::string full = response.getFullResponse();
+	
+	std::string full = _response.getFullResponse();
+	std::cout << "full : " << full << std::endl;
 	send(_fd, full.c_str(), full.size(), 0);
 
 	_events = 0;

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/25 19:01:05 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/26 14:37:30 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,13 +73,13 @@ bool Request::isValid(const std::string &req) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 		return false;
-
+	std::cout << req << std::endl;
 	if (_method.empty()) {
-		if (req.compare(0, 3, "GET") == 0)
+		if (req.compare(0, 4, "GET ") == 0)
 			_method = "GET";
-		else if (req.compare(0, 4, "POST") == 0)
+		else if (req.compare(0, 5, "POST ") == 0)
 			_method = "POST";
-		else if (req.compare(0, 6, "DELETE") == 0)
+		else if (req.compare(0, 7, "DELETE ") == 0)
 			_method = "DELETE";
 	}
 	if (_method == "GET" || _method == "DELETE")
@@ -100,7 +100,7 @@ bool Request::isValid(const std::string &req) {
 void Request::checkRequest() {
 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		throw Http405Exception();
-	if (_version != "HTTP/1.1" && _version != "HTTP/1.0")
+	if (_version != "HTTP/1.1")
 		throw Http400Exception();
 	if (_path.empty())
 		throw Http400Exception();

@@ -1,4 +1,3 @@
-#include "Response.hpp"
 #include "Config.hpp"
 #include "HttpExceptions.hpp"
 #include "Request.hpp"
@@ -6,6 +5,7 @@
 #include "WebServer.hpp"
 #include "AutoIndex.hpp"
 #include "CgiManager.hpp"
+#include "Client.hpp"
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -16,10 +16,15 @@
 
 static bool _finalAutoIndex;
 
-Response::Response(Request &request) : _request(request) {
+void Response::setRequest(Request &req) {
+	_request = &req;
 	_isCgi = false;
 	setMimes();
 	setErrorPages();
+}
+
+void Response::buildErrorHeader() {
+    _header = buildHeader(_body.size(), _statusCode, _statusText);
 }
 
 std::string Response::getErrorPageContent(int code,
@@ -66,10 +71,11 @@ int	check_dir(const std::string &full_path)
 
 std::string Response::checkUrl(const ServerConfig &config)
 {
-    std::string path = config.root + _request.getPath();
+
+    std::string path = config.root + _request->getPath();
     _finalAutoIndex = false;
 
-    if (_request.getPath() == "/")
+    if (_request->getPath() == "/")
         path = config.root + "/" + config.index;
 
     if (access(path.c_str(), F_OK) == -1)
@@ -103,7 +109,7 @@ std::string Response::buildHeader(size_t contentLength,
 	oss << contentLength;
 	
 	std::string ContentType = "application/octet-stream";
-	std::string url = _request.getPath();
+	std::string url = _request->getPath();
 
 	if (!url.empty()) {
 		size_t pos = url.rfind('.');
@@ -115,13 +121,13 @@ std::string Response::buildHeader(size_t contentLength,
 				ContentType = it->second;
 		}
 	}
-	std::cout << _request.getPath() << std::endl;
+	std::cout << _request->getPath() << std::endl;
 	// const std::string rescode = statusCode != "301"  ? "301"  : statusCode;
 	std::string header;
 	header = "HTTP/1.0 " + statusCode + " " + statusText + "\r\n" +
 	         "Content-Type: " + ContentType + "; charset=UTF-8\r\n" +
 	         "Content-Length: " + oss.str() + "\r\n" +
-			//  "Location:" + _request.getPath()+"\r\n" +
+			//  "Location:" + _request->getPath()+"\r\n" +
 	         "Connection: close\r\n" +
 	         "\r\n";
 
@@ -130,28 +136,27 @@ std::string Response::buildHeader(size_t contentLength,
 
 void Response::generate(const ServerConfig &config)
 {
-	std::string finalPath;
 
 	_statusCode = "200";
 	_statusText = "OK";
 	_isCgi = false;
 	
-	try
-	{
-		_request.setCurrentLocations(config);
-		finalPath = checkUrl(config);
-		if (CgiManager::isCgi(finalPath))
+	// try
+	// {
+		_request->setCurrentLocations(config);
+		_finalPath = checkUrl(config);
+		if (CgiManager::isCgi(_finalPath))
 		{
-			CgiManager cgi(_request, finalPath);
+			CgiManager cgi(*_request, _finalPath);
 			if (!cgi.execute())
 				throw Http500Exception();
 			_body = cgi.getOutput();
 			_isCgi = true; // CGI outputs already include headers
 		}
-		else if (_request.getMethod() == "DELETE")
+		else if (_request->getMethod() == "DELETE")
 		{
-			std::cout << finalPath.c_str() << std::endl;
-			if (std::remove(finalPath.c_str()) != 0) {
+			std::cout << _finalPath.c_str() << std::endl;
+			if (std::remove(_finalPath.c_str()) != 0) {
 				if (errno == EACCES)
 					throw Http403Exception();
 				else
@@ -160,33 +165,33 @@ void Response::generate(const ServerConfig &config)
 			_statusCode = "200";
 			_statusText = "OK";
 			_body = "{\"message\": \"File deleted successfully\"}";
-			_request.setPath(".json");
+			_request->setPath(".json");
 			_header = buildHeader(_body.size(), _statusCode, _statusText);
 			std::cout << "HEADERRRRRR = " <<_header << std::endl;
 			return;
 		}
-		else if (_finalAutoIndex == true && check_dir(config.root + _request.getPath()) == 1)
+		else if (_finalAutoIndex == true && check_dir(config.root + _request->getPath()) == 1)
 		{
-			AutoIndex indexation(config.root, _request.getPath());
-			_body = indexation.initAutoIndex(config.root + _request.getPath());
-			finalPath = ".html";
+			AutoIndex indexation(config.root, _request->getPath());
+			_body = indexation.initAutoIndex(config.root + _request->getPath());
+			_finalPath = ".html";
 		}
 		else
-			_body = readFile(finalPath);
-	} catch (const HttpException &e)
-	{
-		int errorCode = e.getStatusCode();
-		std::ostringstream oss;
-		oss << errorCode;
+			_body = readFile(_finalPath);
+	// } catch (const HttpException &e)
+	// {
+	// 	int errorCode = e.getStatusCode();
+	// 	std::ostringstream oss;
+	// 	oss << errorCode;
 
-		_statusCode = oss.str();
-		_statusText = e.getStatusText();
-		_body = getErrorPageContent(errorCode, config);
-		finalPath = ".html";
-		_isCgi = false;
-	}
+	// 	_statusCode = oss.str();
+	// 	_statusText = e.getStatusText();
+	// 	_body = getErrorPageContent(errorCode, config);
+	// 	_finalPath = ".html";
+	// 	_isCgi = false;
+	// }
 
-	_request.setPath(finalPath);
+	_request->setPath(_finalPath);
 	if (!_isCgi)
 		_header = buildHeader(_body.size(), _statusCode, _statusText);
 }
