@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:24:07 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/24 14:36:48 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/26 09:30:54 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ struct LocationConfig
     std::string index;
     bool autoindex;     
     std::vector<std::string> allowed_methods;
+    // TODO put the "return"
     LocationConfig() : autoindex(false){}
 };
 

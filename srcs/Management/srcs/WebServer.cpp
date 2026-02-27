@@ -29,6 +29,7 @@ void WebServer::updateStatus() {
 		_pollfds[i].events = manager->getEvents();
 		_pollfds[i].revents = 0;
 	}
+	//ajouter un check pour le timeout
 }
 
 AManager *WebServer::getManager(int fd) {

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 11:58:11 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/24 15:16:56 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/25 17:21:55 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void signalHandler(int signal) {
     if (signal == SIGINT) {
 		std::cout << std::endl;
 		WebServer::destroy();
-        throw std::runtime_error("Ctrl + C detected");
+        throw Exception("Ctrl + C detected");
     }
 }
 
@@ -47,6 +47,6 @@ int main(int ac, char **av)
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << e.what() << std::endl;
 	}
 }

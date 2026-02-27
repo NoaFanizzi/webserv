@@ -47,7 +47,7 @@ class Request {
 	void readRaw(int &fd, bool &closedStatus, std::string &request);
 	bool isValid(const std::string &req);
 	void checkRequest();
-	void parse(const std::string &raw);
+	void parse(const std::string &request, const ServerConfig &config);
 	void printDebug() const;
 	void parseContentLength(const std::string &req);
 	void parseWebKitForm(const std::string &req);

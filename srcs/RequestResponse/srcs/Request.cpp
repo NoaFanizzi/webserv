@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/24 13:51:13 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/26 14:37:30 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,34 +52,34 @@ void Request::parseContentLength(const std::string &req) {
 }
 
 void Request::parseWebKitForm(const std::string &headers) {
-	size_t ct = headers.find("Content-Type:");
-	if (ct == std::string::npos)
-		return;
+    size_t ct = headers.find("Content-Type:");
+    if (ct == std::string::npos)
+        return;
 
-	size_t lineEnd = headers.find("\r\n", ct);
-	if (lineEnd == std::string::npos)
-		throw Http400Exception();
+    size_t lineEnd = headers.find("\r\n", ct);
+    if (lineEnd == std::string::npos)
+        return;
 
-	std::string line = headers.substr(ct, lineEnd - ct);
+    std::string line = headers.substr(ct, lineEnd - ct);
 
-	size_t b = line.find("boundary=");
-	if (b == std::string::npos)
-		throw Http400Exception();
+    size_t b = line.find("boundary=");
+    if (b == std::string::npos)
+        return;
 
-	_webKitForm = line.substr(b + 9);
+    _webKitForm = line.substr(b + 9);
 }
 
 bool Request::isValid(const std::string &req) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 		return false;
-
+	std::cout << req << std::endl;
 	if (_method.empty()) {
-		if (req.compare(0, 3, "GET") == 0)
+		if (req.compare(0, 4, "GET ") == 0)
 			_method = "GET";
-		else if (req.compare(0, 4, "POST") == 0)
+		else if (req.compare(0, 5, "POST ") == 0)
 			_method = "POST";
-		else if (req.compare(0, 6, "DELETE") == 0)
+		else if (req.compare(0, 7, "DELETE ") == 0)
 			_method = "DELETE";
 	}
 	if (_method == "GET" || _method == "DELETE")
@@ -100,7 +100,7 @@ bool Request::isValid(const std::string &req) {
 void Request::checkRequest() {
 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		throw Http405Exception();
-	if (_version != "HTTP/1.1" && _version != "HTTP/1.0")
+	if (_version != "HTTP/1.1")
 		throw Http400Exception();
 	if (_path.empty())
 		throw Http400Exception();
@@ -188,7 +188,6 @@ void Request::parsePostMethod(const std::string &request, size_t body_start)
 	std::vector<std::string> parts = split(request.substr(body_start, _contentLengthBody), "--" + _webKitForm);
 	for (size_t i = 0; i + 1 < parts.size(); ++i) {
 		std::string &part = parts[i];
-		std::cout << parts[i] << "HELLO" << std::endl;
 		std::string type;
 		std::string filename;
 		std::string body;
@@ -216,15 +215,13 @@ void Request::parsePostMethod(const std::string &request, size_t body_start)
 			O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (fd < 0)
 			throw Http500Exception();
-		
-		std::cout << part << "HELLO"<<std::endl;
 		write(fd, body.c_str(), body.size());
 		close(fd);
 	}
 }
 
 // parse request
-void Request::parse(const std::string &request)
+void Request::parse(const std::string &request, const ServerConfig &config)
 {
 	std::string line;
 	std::vector<std::string> docRequest;
@@ -233,8 +230,7 @@ void Request::parse(const std::string &request)
 	if (body_start == std::string::npos)
 		return;
 	body_start += 4; // 4 = \r\n\r\n
-
-	if (_method == "POST" && _contentLengthBody > 0)
+	if (_method == "POST" && static_cast<long long>(_contentLengthBody) < config.client_max_body_size )
 		parsePostMethod(request, body_start);
 	else
 		_bodyRequests.clear();

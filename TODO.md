@@ -70,3 +70,11 @@ IMPORTANT (probablement testé) :
 BONUS si temps :
 10. Chunked transfer encoding
 11. CGI path relatif correct
+
+
+Faire les redirection dans le config.conf (return 301 {option})
+check le "Accept" dans le GET pour savoir ce que l'on a le droit de renvoyer (Error 406)
+Faire les locations
+Mettre une redirection de "/" si jamais on est dans un dossier
+faire le timeout
+faire un meilleur parser de requete
