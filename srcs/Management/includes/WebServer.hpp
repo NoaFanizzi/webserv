@@ -1,8 +1,9 @@
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
-#include <stdio.h> // for size_t
+#include <stdio.h>
 #include <map>
+#include <ctime>
 #include <vector>
 
 class AManager;
@@ -17,6 +18,8 @@ class WebServer
 		static size_t	getPollFdSize();
 		static AManager* getManager(int fd);
 		static bool _finalAutoIndex;
+		static bool _firstLoopRequest;
+		static bool _requestEnded;
 		
 	public:
 		//functions

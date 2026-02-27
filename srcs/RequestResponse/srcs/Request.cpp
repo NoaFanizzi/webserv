@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/26 14:37:30 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/27 15:21:44 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ void Request::readRaw(int &fd, bool &closedStatus,
                              std::string &request) {
 	char buffer[BUFFER_SIZE];
 	int n = recv(fd, buffer, sizeof(buffer) - 1, 0);
-
 	if (n <= 0) {
 		closedStatus = true;
 		return;
@@ -73,7 +72,6 @@ bool Request::isValid(const std::string &req) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 		return false;
-	std::cout << req << std::endl;
 	if (_method.empty()) {
 		if (req.compare(0, 4, "GET ") == 0)
 			_method = "GET";

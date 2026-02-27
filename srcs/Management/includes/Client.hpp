@@ -13,10 +13,10 @@ class Client : public AManager {
 	const ServerConfig _config;
 	std::string _rawRequest;
 	Request _request;
-
+	bool _firstLoopRequets;
 	// functions
+
 	Response _response;
-	bool _requestcomplete;
 
   public:
 	// constructor
