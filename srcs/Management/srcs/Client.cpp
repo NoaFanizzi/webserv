@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/26 11:26:12 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/27 14:31:09 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ void Client::PollInHandler()
 void Client::PollOutHandler() {
 	
 	std::string full = _response.getFullResponse();
-	std::cout << "full : " << full << std::endl;
 	send(_fd, full.c_str(), full.size(), 0);
 
 	_events = 0;

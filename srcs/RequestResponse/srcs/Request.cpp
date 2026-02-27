@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/26 14:37:30 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/02/27 15:13:02 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ bool Request::isValid(const std::string &req) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 		return false;
-	std::cout << req << std::endl;
 	if (_method.empty()) {
 		if (req.compare(0, 4, "GET ") == 0)
 			_method = "GET";
@@ -84,7 +83,6 @@ bool Request::isValid(const std::string &req) {
 	}
 	if (_method == "GET" || _method == "DELETE")
 		return true;
-
 	if (_method == "POST") {
 		if (_contentLengthBody == static_cast<size_t>(-1)) {
 			parseContentLength(req);
@@ -106,6 +104,15 @@ void Request::checkRequest() {
 		throw Http400Exception();
 }
 
+size_t	findSpaceLength(size_t pos, std::string line)
+{
+	size_t count = pos;
+	while(isspace(line[pos]))
+		pos++;
+	count = pos - count;
+	return(count);
+}
+
 // helper function for parsing
 static std::map<std::string, std::string>
 separateHeaders(std::vector<std::string> &docRequest) {
@@ -122,7 +129,8 @@ separateHeaders(std::vector<std::string> &docRequest) {
 			continue;
 
 		std::string key = line.substr(0, colonPos);
-		std::string value = line.substr(colonPos + 1);
+		size_t space_length = findSpaceLength(colonPos + 1, line);
+		std::string value = line.substr(colonPos + space_length + 1);
 
 		size_t start = value.find_first_not_of(" \t");
 		if (start != std::string::npos)
