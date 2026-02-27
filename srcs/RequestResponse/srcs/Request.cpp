@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/27 15:13:02 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/02/27 16:31:34 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,16 @@ void Request::checkRequest() {
 size_t	findSpaceLength(size_t pos, std::string line)
 {
 	size_t count = pos;
-	while(isspace(line[pos]))
+	while(line[pos] && isspace(line[pos]))
+		pos++;
+	count = pos - count;
+	return(count);
+}
+
+size_t	findValueLength(size_t pos, std::string line)
+{
+	size_t count = pos;
+	while(line[pos] && !(isspace(line[pos])))
 		pos++;
 	count = pos - count;
 	return(count);
@@ -116,29 +125,39 @@ size_t	findSpaceLength(size_t pos, std::string line)
 // helper function for parsing
 static std::map<std::string, std::string>
 separateHeaders(std::vector<std::string> &docRequest) {
-	std::map<std::string, std::string> headers;
+    std::map<std::string, std::string> headers;
 
-	for (size_t i = 1; i < docRequest.size(); ++i) {
-		std::string &line = docRequest[i];
+    for (size_t i = 1; i < docRequest.size(); ++i) {
+        std::string line = docRequest[i];
 
-		if (line.empty())
-			break;
+        // 1. Nettoyage rapide du \r final s'il existe
+        if (!line.empty() && line[line.size() - 1] == '\r')
+            line.erase(line.size() - 1);
 
-		size_t colonPos = line.find(':');
-		if (colonPos == std::string::npos)
-			continue;
+        if (line.empty())
+            break;
 
-		std::string key = line.substr(0, colonPos);
-		size_t space_length = findSpaceLength(colonPos + 1, line);
-		std::string value = line.substr(colonPos + space_length + 1);
+        size_t colonPos = line.find(':');
+        if (colonPos == std::string::npos)
+            continue;
 
-		size_t start = value.find_first_not_of(" \t");
-		if (start != std::string::npos)
-			value = value.substr(start);
-		headers[key] = value;
-	}
+        // 2. Extraire la clé
+        std::string key = line.substr(0, colonPos);
 
-	return headers;
+        // 3. Extraire la valeur et trimmer les espaces au début et à la fin
+        std::string value = line.substr(colonPos + 1);
+        
+        size_t first = value.find_first_not_of(" \t");
+        if (first == std::string::npos) {
+            value = "";
+        } else {
+            size_t last = value.find_last_not_of(" \t");
+            value = value.substr(first, (last - first + 1));
+        }
+
+        headers[key] = value;
+    }
+    return headers;
 }
 
 std::vector<std::string> split(const std::string &str, const std::string &delimiter)
