@@ -6,12 +6,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <iostream>
 #include <unistd.h>
 #include <vector>
 #include <csignal>
+#include <ctime>
 
 std::vector <struct pollfd> WebServer::_pollfds;
 std::map <int, AManager *> WebServer::_managers;
+bool WebServer::_firstLoopRequest = true;
 
 void WebServer::pollFdCreation(const int &fd, AManager *manager) {
 	struct pollfd pollfd;
@@ -24,12 +27,19 @@ void WebServer::pollFdCreation(const int &fd, AManager *manager) {
 }
 
 void WebServer::updateStatus() {
+
+	time_t now = std::time(NULL);
 	for (size_t i = 0; i < _pollfds.size(); ++i) {
 		AManager *manager = getManager(_pollfds[i].fd);
 		_pollfds[i].events = manager->getEvents();
 		_pollfds[i].revents = 0;
+		if (manager->isTimeout(now))
+		{
+			// manager->onTimeout();
+			manager->setEvents(POLLOUT);
+			std::cout << "5s has been passed" <<std::time(NULL) - manager->getStartTime() <<std::endl;
+		}
 	}
-	//ajouter un check pour le timeout
 }
 
 AManager *WebServer::getManager(int fd) {
@@ -52,18 +62,22 @@ void WebServer::destroy()
 }
 
 void WebServer::run() {
+	_firstLoopRequest = true;
 	while (true) {
 		updateStatus();
+		
 		int poll_value = poll(&_pollfds[0], _pollfds.size(), 1000);
 		if (poll_value < 0) {
 			perror("poll error");
 			exit(1);
 		}
 		for (size_t i = 0; i < _pollfds.size() && poll_value; i++) {
+			AManager *current = getManager(_pollfds[i].fd);
+			if (!current)
+        		continue;
 			if (!_pollfds[i].revents)
 				continue;
 			poll_value--;
-			AManager *current = getManager(_pollfds[i].fd);
 			if (!current)
 				continue;
 			if (_pollfds[i].revents & POLLIN)

@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/27 16:31:34 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/01 12:39:38 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ void Request::readRaw(int &fd, bool &closedStatus,
                              std::string &request) {
 	char buffer[BUFFER_SIZE];
 	int n = recv(fd, buffer, sizeof(buffer) - 1, 0);
-
 	if (n <= 0) {
 		closedStatus = true;
 		return;

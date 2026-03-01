@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/27 14:31:09 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/01 12:39:17 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,24 @@
 #include <poll.h>
 #include <sys/stat.h>
 
+bool _requestEnded = false;
+
 Client::Client(int fd, const ServerConfig &config) : _config(config) {
 	_fd = fd;
 	_closedStatus = false;
 	_events = POLLIN;
+	_startTime = std::time(NULL);
 	WebServer::pollFdCreation(_fd, this);
 }
 
 void Client::PollInHandler()
 {	
-	_request.readRaw(_fd, _closedStatus, _rawRequest);
+	_request.readRaw(_fd, _closedStatus, _rawRequest);\
+	_startTime = std::time(NULL);
 	try
 	{
 		if (_request.isValid(_rawRequest) == true) {
+			_requestEnded = true;
 			_request.parse(_rawRequest, _config);
 			_response.setRequest(_request);
 
@@ -39,7 +44,6 @@ void Client::PollInHandler()
 			std::cout << _rawRequest << std::endl;
 			std::cout << "===============================" << std::endl;
 		}
-		/* code */
 	}
 	catch(const HttpException& e)
 	{
