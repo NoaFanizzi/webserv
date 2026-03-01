@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/01 12:39:38 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/01 14:35:39 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,19 @@ void Request::parseContentLength(const std::string &req) {
 	size_t end = req.find("\r\n", pos);
 	if (end == std::string::npos)
 		return;
-
-	_contentLengthBody = std::atoi(req.substr(pos, end - pos).c_str());
+	std::string value = req.substr(pos, end - pos);
+	if(value.empty())
+		throw Http400Exception();
+	for(size_t i = 0; i < value.size(); i++)
+	{
+		if(!std::isdigit(value[i]))
+		{
+			std::cout << "C PAS BONNN" << std::endl;
+			exit(1);
+			throw Http400Exception();
+		}
+	}
+	_contentLengthBody = std::atoi(req.substr(pos, end - pos).c_str()); //TODO je fais quoi si ca overflow ? On limite la size ?
 }
 
 void Request::parseWebKitForm(const std::string &headers) {
@@ -99,6 +110,8 @@ void Request::checkRequest() {
 		throw Http405Exception();
 	if (_version != "HTTP/1.1")
 		throw Http400Exception();
+	if (_headers.find("Host") == _headers.end())
+		throw Http400Exception();
 	if (_path.empty())
 		throw Http400Exception();
 }
@@ -119,6 +132,16 @@ size_t	findValueLength(size_t pos, std::string line)
 		pos++;
 	count = pos - count;
 	return(count);
+}
+
+int	keyCheck(const std::string &key)
+{
+	size_t	i = 0;
+	while(key[i])
+		i++;
+	if(i != key.size())
+		return(1);
+	return(0);
 }
 
 // helper function for parsing
@@ -142,18 +165,21 @@ separateHeaders(std::vector<std::string> &docRequest) {
 
         // 2. Extraire la clé
         std::string key = line.substr(0, colonPos);
-
+		if(isspace(key[key.size() - 1]))
+			throw (Http400Exception());
         // 3. Extraire la valeur et trimmer les espaces au début et à la fin
         std::string value = line.substr(colonPos + 1);
-        
         size_t first = value.find_first_not_of(" \t");
-        if (first == std::string::npos) {
-            value = "";
-        } else {
+        if (first == std::string::npos)
+		{
+			throw (Http400Exception());
+            //value = "";
+        }
+		else
+		{
             size_t last = value.find_last_not_of(" \t");
             value = value.substr(first, (last - first + 1));
         }
-
         headers[key] = value;
     }
     return headers;
@@ -276,7 +302,6 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 		return;
 
 	_headers = separateHeaders(docRequest);
-
 	std::istringstream iss(docRequest[0]);
 	iss >> _method >> _path >> _version;
 
