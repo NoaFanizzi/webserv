@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/03 14:08:11 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/03 15:41:10 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -288,8 +288,10 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 		parsePostMethod(request, body_start);
 	else
 	{
+		std::cout << "CHOCKBAR DE BZ" << std::endl;
 		_bodyRequests.clear();
-		throw Http413Exception();
+		if(static_cast<long long>(_contentLengthBody) > config.client_max_body_size)
+			throw Http413Exception();
 	}
 
 	for (size_t i = 0; i < request.size(); ++i) {
