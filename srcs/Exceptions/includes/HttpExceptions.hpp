@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:24:45 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/03 13:24:58 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/03 14:07:52 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,19 @@ public:
     int getStatusCode() const { return 411; }
 
     const std::string& getStatusText() const {
-        static std::string text = "Request Timeout";
+        static std::string text = "Request: Length not specified";
+        return text;
+    }
+};
+
+class Http413Exception : public HttpException {
+public:
+    virtual ~Http413Exception() throw() {}
+
+    int getStatusCode() const { return 413; }
+
+    const std::string& getStatusText() const {
+        static std::string text = "Request: Body to large";
         return text;
     }
 };
