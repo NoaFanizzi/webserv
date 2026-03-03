@@ -14,6 +14,7 @@ class Client : public AManager {
 	std::string _rawRequest;
 	Request _request;
 	bool _firstLoopRequets;
+	bool _requestEnded;
 	// functions
 
 	Response _response;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpExceptions.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:24:45 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/05 08:34:27 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/03 13:24:58 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,18 @@ public:
     virtual ~Http408Exception() throw() {}
 
     int getStatusCode() const { return 408; }
+
+    const std::string& getStatusText() const {
+        static std::string text = "Request Timeout";
+        return text;
+    }
+};
+
+class Http411Exception : public HttpException {
+public:
+    virtual ~Http411Exception() throw() {}
+
+    int getStatusCode() const { return 411; }
 
     const std::string& getStatusText() const {
         static std::string text = "Request Timeout";

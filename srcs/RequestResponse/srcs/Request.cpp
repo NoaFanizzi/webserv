@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/01 14:35:39 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/03 12:58:12 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,8 @@ void Request::checkRequest() {
 		throw Http400Exception();
 	if (_headers.find("Host") == _headers.end())
 		throw Http400Exception();
+	if(_method == "POST" && _headers.find("Content-Length") == _headers.end())
+		throw Http411Exception(); // TODO c'est une exception 411 qu'i lfaut faire
 	if (_path.empty())
 		throw Http400Exception();
 }
