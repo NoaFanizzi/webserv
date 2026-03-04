@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/03 15:41:10 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/04 13:03:35 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,11 +52,7 @@ void Request::parseContentLength(const std::string &req) {
 	for(size_t i = 0; i < value.size(); i++)
 	{
 		if(!std::isdigit(value[i]))
-		{
-			std::cout << "C PAS BONNN" << std::endl;
-			exit(1);
 			throw Http400Exception();
-		}
 	}
 	_contentLengthBody = std::atoi(req.substr(pos, end - pos).c_str()); //TODO je fais quoi si ca overflow ? On limite la size ?
 }
@@ -284,7 +280,7 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 	if (body_start == std::string::npos)
 		return;
 	body_start += 4; // 4 = \r\n\r\n
-	if (_method == "POST" && static_cast<long long>(_contentLengthBody) < config.client_max_body_size )
+	if (_method == "POST" && static_cast<long long>(_contentLengthBody) <= config.client_max_body_size )
 		parsePostMethod(request, body_start);
 	else
 	{
