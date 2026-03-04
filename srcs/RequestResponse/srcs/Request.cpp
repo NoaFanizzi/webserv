@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/04 13:03:35 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/04 13:44:35 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "Config.hpp"
 #include <cstdlib>
 #include <fcntl.h>
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <sys/socket.h>
@@ -261,12 +262,12 @@ void Request::parsePostMethod(const std::string &request, size_t body_start)
 		if (filename.empty())
 		continue;
 		_bodyRequests.push_back(BodyRequest(body, filename, type));
-		int fd = open(("upload/" + filename).c_str(),
-			O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (fd < 0)
+		std::ofstream ofs(("upload/" + filename).c_str(), std::ios::binary | std::ios::trunc);
+		if (!ofs.is_open())
 			throw Http500Exception();
-		write(fd, body.c_str(), body.size());
-		close(fd);
+		ofs.write(body.c_str(), body.size());
+		if (ofs.fail())
+			throw Http500Exception();
 	}
 }
 
