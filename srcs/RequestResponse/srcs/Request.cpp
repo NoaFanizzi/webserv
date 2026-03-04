@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/04 13:44:35 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/04 14:03:58 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,11 @@ void Request::parseContentLength(const std::string &req) {
 		if(!std::isdigit(value[i]))
 			throw Http400Exception();
 	}
-	_contentLengthBody = std::atoi(req.substr(pos, end - pos).c_str()); //TODO je fais quoi si ca overflow ? On limite la size ?
+	char *lastchar;
+	long length = strtol(value.c_str(), &lastchar, 10);
+	if(*lastchar != '\0' || length < 0)
+		throw Http400Exception();
+	_contentLengthBody = static_cast<size_t>(length); //TODO je fais quoi si ca overflow ? On limite la size ?
 }
 
 void Request::parseWebKitForm(const std::string &headers) {

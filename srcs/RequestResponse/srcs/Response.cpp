@@ -80,7 +80,8 @@ std::string Response::checkUrl(const ServerConfig &config)
 	{
 		if(tempPath[i] == "..")
 			tempPath.erase(tempPath.begin() + i);
-		i++;
+		else
+			i++;
 	}
 	i = 0;
 	while(i < tempPath.size())
