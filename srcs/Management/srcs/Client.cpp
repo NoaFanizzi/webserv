@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/03 13:27:00 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/25 08:00:24 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Client::Client(int fd, const ServerConfig &config) : _config(config) {
 	_requestEnded = false;
 	_closedStatus = false;
 	_events = POLLIN;
+	_timedOut = false;
 	_startTime = std::time(NULL);
 	WebServer::pollFdCreation(_fd, this);
 }
@@ -69,6 +70,27 @@ void Client::PollInHandler()
 		std::cerr << e.what() << std::endl; 
 	}
 	
+}
+
+void Client::onTimeout()
+{
+	if (_timedOut)
+		return;
+	_timedOut = true;
+    std::string body = _response.getErrorPageContent(408, _config);
+
+    std::ostringstream header;
+    header << "HTTP/1.0 408 Request Timeout\r\n"
+           << "Content-Type: text/html; charset=UTF-8\r\n"
+           << "Content-Length: " << body.size() << "\r\n"
+           << "Connection: close\r\n"
+           << "\r\n";
+
+    std::string full = header.str() + body;
+    send(_fd, full.c_str(), full.size(), 0);
+
+    _events = 0;
+    _closedStatus = true;
 }
 
 void Client::PollOutHandler() {

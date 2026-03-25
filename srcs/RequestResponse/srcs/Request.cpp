@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/04 14:03:58 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/25 12:38:38 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,10 @@
 #include "HttpExceptions.hpp"
 #include "Config.hpp"
 #include <cstdlib>
-#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <sys/socket.h>
-#include <unistd.h>
 
 void Request::readRaw(int &fd, bool &closedStatus,
                              std::string &request) {
@@ -59,7 +57,7 @@ void Request::parseContentLength(const std::string &req) {
 	long length = strtol(value.c_str(), &lastchar, 10);
 	if(*lastchar != '\0' || length < 0)
 		throw Http400Exception();
-	_contentLengthBody = static_cast<size_t>(length); //TODO je fais quoi si ca overflow ? On limite la size ?
+	_contentLengthBody = static_cast<size_t>(length);
 }
 
 void Request::parseWebKitForm(const std::string &headers) {
@@ -102,7 +100,9 @@ bool Request::isValid(const std::string &req) {
 		size_t body_size = req.size() - (header_end + 4);
 		return body_size >= static_cast<size_t>(_contentLengthBody);
 	}
-
+	//TODO
+	// if (_path.size() > 2048)
+    // 	throw Http414Exception();
 	return false;
 }
 
@@ -284,12 +284,11 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 	size_t body_start = request.find("\r\n\r\n");
 	if (body_start == std::string::npos)
 		return;
-	body_start += 4; // 4 = \r\n\r\n
+	body_start += 4; // \r\n\r\n
 	if (_method == "POST" && static_cast<long long>(_contentLengthBody) <= config.client_max_body_size )
 		parsePostMethod(request, body_start);
 	else
 	{
-		std::cout << "CHOCKBAR DE BZ" << std::endl;
 		_bodyRequests.clear();
 		if(static_cast<long long>(_contentLengthBody) > config.client_max_body_size)
 			throw Http413Exception();
@@ -349,14 +348,9 @@ void Request::setCurrentLocations(const ServerConfig &serverConfig)
 		j = 0;
 		while (j < serverLocations.size()) {
 			if (concatened == serverLocations[j].path)
-			{
 				_currentLocations.push_back(serverLocations[j]);
-			}
 			else if (slashed == serverLocations[j].path)
-			{
 				_currentLocations.push_back(serverLocations[j]);
-				
-			}
 			j++;
 		}
 		i++;

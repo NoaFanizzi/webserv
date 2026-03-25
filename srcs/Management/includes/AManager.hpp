@@ -29,6 +29,9 @@ class AManager {
 
 	// setter
 	void setEvents(short events) { _events = events; }
+	virtual void onTimeout() {
+		_closedStatus = true;
+	}
 };
 
 #endif

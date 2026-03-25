@@ -1,16 +1,7 @@
 #include "WebServer.hpp"
 #include "AManager.hpp"
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include <poll.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/socket.h>
-#include <iostream>
-#include <unistd.h>
-#include <vector>
-#include <csignal>
-#include <ctime>
 
 std::vector <struct pollfd> WebServer::_pollfds;
 std::map <int, AManager *> WebServer::_managers;
@@ -35,9 +26,8 @@ void WebServer::updateStatus() {
 		_pollfds[i].revents = 0;
 		if (manager->isTimeout(now))
 		{
-			// manager->onTimeout();
+			manager->onTimeout();
 			manager->setEvents(POLLOUT);
-			std::cout << "5s has been passed" <<std::time(NULL) - manager->getStartTime() <<std::endl;
 		}
 	}
 }
@@ -73,10 +63,8 @@ void WebServer::run() {
 		}
 		for (size_t i = 0; i < _pollfds.size() && poll_value; i++) {
 			AManager *current = getManager(_pollfds[i].fd);
-			if (!current)
+			if (!current || !_pollfds[i].revents)
         		continue;
-			if (!_pollfds[i].revents)
-				continue;
 			poll_value--;
 			if (!current)
 				continue;

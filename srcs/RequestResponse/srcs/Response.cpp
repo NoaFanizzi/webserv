@@ -1,19 +1,9 @@
-#include "Config.hpp"
 #include "HttpExceptions.hpp"
-#include "Request.hpp"
-#include "AManager.hpp"
-#include "WebServer.hpp"
 #include "AutoIndex.hpp"
 #include "CgiManager.hpp"
 #include "Client.hpp"
 #include <fstream>
-#include <sstream>
 #include <sys/stat.h>
-#include <cstdio>
-#include <iostream>
-#include <sys/stat.h>
-#include <cerrno>
-#include "vector"
 
 static bool _finalAutoIndex;
 

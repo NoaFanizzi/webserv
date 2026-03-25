@@ -1,14 +1,10 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include "WebServer.hpp"
-#include "fcntl.h"
 #include <cstring> // Pour memset
 #include <iostream>
 #include <netdb.h> // Obligatoire pour getaddrinfo
 #include <poll.h>
-#include <stdexcept> // Pour std::runtime_error (optionnel, pour gérer l'erreur)
-#include <sys/socket.h>
-#include <sys/types.h>
 
 Server::Server(const ServerConfig &serverconfig) : _serverConfig(serverconfig) {
 	_closedStatus = false;
@@ -52,7 +48,6 @@ void Server::createSocketAdress(const ServerConfig &serverconfig) {
 	_servAddr.sin_family = AF_INET;
 	_servAddr.sin_addr = ((struct sockaddr_in *)res->ai_addr)->sin_addr;
 	_servAddr.sin_port = htons(serverconfig.port);
-
 	freeaddrinfo(res);
 }
 

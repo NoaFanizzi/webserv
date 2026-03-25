@@ -15,6 +15,7 @@ class Client : public AManager {
 	Request _request;
 	bool _firstLoopRequets;
 	bool _requestEnded;
+	bool _timedOut;
 	// functions
 
 	Response _response;
@@ -26,6 +27,7 @@ class Client : public AManager {
 	~Client() {};
 
 	// functions
+	void onTimeout();
 	void updateRequest(std::string &buffer, int n);
 	void handleRequestReception();
 	void PollInHandler();
