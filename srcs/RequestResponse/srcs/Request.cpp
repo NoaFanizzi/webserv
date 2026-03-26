@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/26 08:54:28 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 09:40:44 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,19 @@ void Request::parseWebKitForm(const std::string &headers) {
     _webKitForm = line.substr(b + 9);
 }
 
+std::string toLower(const std::string &s) {
+    std::string result = s;
+    for (size_t i = 0; i < result.size(); ++i) {
+        result[i] = std::tolower(result[i]);
+    }
+    return result;
+}
+
 bool Request::isValid(const std::string &req) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 		return false;
+	std::string lower_req = toLower(req);
 	if (_method.empty()) {
 		if (req.compare(0, 4, "GET ") == 0)
 			_method = "GET";
@@ -89,6 +98,12 @@ bool Request::isValid(const std::string &req) {
 			_method = "POST";
 		else if (req.compare(0, 7, "DELETE ") == 0)
 			_method = "DELETE";
+		else if (lower_req.compare(0, 4, "get ") == 0
+				|| lower_req.compare(0, 5, "post ") == 0
+				|| lower_req.compare(0, 7, "delete ") == 0)
+			throw Http400Exception();
+		else
+			throw Http405Exception();
 	}
 	if (_method == "GET" || _method == "DELETE")
 		return true;
