@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/26 09:40:44 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 10:27:37 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,9 +115,6 @@ bool Request::isValid(const std::string &req) {
 		size_t body_size = req.size() - (header_end + 4);
 		return body_size >= static_cast<size_t>(_contentLengthBody);
 	}
-	//TODO
-	// if (_path.size() > 2048)
-    // 	throw Http414Exception();
 	return false;
 }
 
@@ -132,6 +129,8 @@ void Request::checkRequest() {
 		throw Http411Exception(); // TODO c'est une exception 411 qu'i lfaut faire
 	if (_path.empty())
 		throw Http400Exception();
+	if (_path.size() > 2048)
+		throw Http414Exception();
 }
 
 size_t	findSpaceLength(size_t pos, std::string line)

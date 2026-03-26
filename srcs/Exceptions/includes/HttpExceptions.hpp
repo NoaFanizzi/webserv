@@ -108,6 +108,18 @@ public:
     }
 };
 
+class Http414Exception : public HttpException {
+public:
+    virtual ~Http414Exception() throw() {}
+
+    int getStatusCode() const { return 414; }
+
+    const std::string& getStatusText() const {
+        static std::string text = "URI Too Long";
+        return text;
+    }
+};
+
 class Http500Exception : public HttpException {
 public:
     virtual ~Http500Exception() throw() {}
