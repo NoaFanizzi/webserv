@@ -82,12 +82,11 @@ std::string Response::checkUrl(const ServerConfig &config)
 	}
 
 	std::cout << "------------------------------------------------" << std::endl;
-	std::cout << "PATH = " << path << std::endl << std::endl;
     _finalAutoIndex = false;
     _redirectLocation = "";
 
     if (_request->getPath() == "/")
-        path = config.root + "/" + config.index;
+        path = config.root;
 
     if (access(path.c_str(), F_OK) == -1)
         throw Http404Exception();
@@ -108,7 +107,9 @@ std::string Response::checkUrl(const ServerConfig &config)
         if (access(indexPath.c_str(), F_OK) != -1)
             return indexPath;
 
-        if (config.autoindex)
+        const std::vector<LocationConfig> &autoLocs = _request->getCurrentLocations();
+        bool autoindex = (!autoLocs.empty()) ? autoLocs.back().autoindex : config.autoindex;
+        if (autoindex)
         {
             _finalAutoIndex = true;
             return path;
@@ -160,11 +161,15 @@ void Response::generate(const ServerConfig &config)
 	// try
 	// {
 		const std::vector<LocationConfig> &locs = _request->getCurrentLocations();
-		if (!locs.empty() && !locs.back().allowed_methods.empty()) {
-			const std::vector<std::string> &methods = locs.back().allowed_methods;
+		const std::vector<std::string> *methods = NULL;
+		if (!locs.empty() && !locs.back().allowed_methods.empty())
+			methods = &locs.back().allowed_methods;
+		else if (!config.allowed_methods.empty())
+			methods = &config.allowed_methods;
+		if (methods) {
 			bool allowed = false;
-			for (size_t i = 0; i < methods.size(); i++) {
-				if (methods[i] == _request->getMethod()) {
+			for (size_t i = 0; i < methods->size(); i++) {
+				if ((*methods)[i] == _request->getMethod()) {
 					allowed = true;
 					break;
 				}
@@ -196,7 +201,6 @@ void Response::generate(const ServerConfig &config)
 		}
 		else if (_request->getMethod() == "DELETE")
 		{
-			std::cout << "coucuo" << _finalPath.c_str() << std::endl;
 			if (std::remove(_finalPath.c_str()) != 0) {
 				if (errno == EACCES)
 					throw Http403Exception();

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/24 12:11:22 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 12:23:43 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
     else if (key == "autoindex")
         parseLocationAutoindex(location, value);
     else if (key == "allow_methods")
-        parseAllowMethods(location, line, j);
+        parseAllowMethods(location.allowed_methods, line, j);
 }
 
 void Config::parseLocationAutoindex(LocationConfig &location, const std::string &value)
@@ -106,7 +106,7 @@ void Config::parseLocationAutoindex(LocationConfig &location, const std::string 
         throw Exception("Invalid value for autoindex -> " + value);
 }
 
-void Config::parseAllowMethods(LocationConfig &location, const std::vector<std::string> &line, size_t j)
+void Config::parseAllowMethods(std::vector<std::string> &allowed_methods, const std::vector<std::string> &line, size_t j)
 {
     for (size_t x = j + 1; x < line.size(); x++)
     {
@@ -122,6 +122,6 @@ void Config::parseAllowMethods(LocationConfig &location, const std::vector<std::
             throw Exception("The method is not valid [GET-POST-DELETE] -> " + method);
             
         if (!method.empty())
-            location.allowed_methods.push_back(method);
+            allowed_methods.push_back(method);
     }
 }

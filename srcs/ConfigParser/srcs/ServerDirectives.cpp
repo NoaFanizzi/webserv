@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerDirectives.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/01 13:55:59 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/26 12:30:45 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void Config::parseServerDirective(ServerConfig &server, const std::string &key,
         parseClientMaxBodySize(server, value);
     else if (key == "autoindex")
         parseAutoindex(server, value);
+    else if (key == "allow_methods")
+        parseAllowMethods(server.allowed_methods, line, j);
     else if (key == "error_page")
         parseErrorPage(server, line, j);
 }
@@ -43,7 +45,7 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
 {
     bool semicolon = false;
     std::string value = line[j + line.size() - 1];
-    if (_keysServer->find(key) && key != "error_page")
+    if (_keysServer->find(key) && key != "error_page" && key != "allow_methods")
     {
         if (line.size() > 2)
         {

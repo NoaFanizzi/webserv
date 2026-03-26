@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:24:07 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/26 09:30:54 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 13:05:46 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,8 @@ struct ServerConfig
     std::vector<ErrorPage>      error_page;
     long long                   client_max_body_size;
     bool                        autoindex;
-    LocationConfig              defaultt; // faut faire
+    std::vector<std::string>    allowed_methods;
+    LocationConfig              defaults; // faut faire
     std::vector<LocationConfig> locations;
 };
 
@@ -65,7 +66,7 @@ class Config
     private:
         std::vector<std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
-        std::string _keysServer[7];
+        std::string _keysServer[8];
         std::string _keysLocation[5];
 
         void initServerKeys();
@@ -86,7 +87,7 @@ class Config
         void parseLocationDirective(LocationConfig &location, const std::string &key, 
                                     const std::vector<std::string> &line, size_t j);
         void parseLocationAutoindex(LocationConfig &location, const std::string &value);
-        void parseAllowMethods(LocationConfig &location, const std::vector<std::string> &line, size_t j);
+        void parseAllowMethods(std::vector<std::string> &allowed_method, const std::vector<std::string> &line, size_t j);
 
         void validateDuplicatePorts();
         

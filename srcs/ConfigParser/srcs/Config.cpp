@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:22:15 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/24 14:22:39 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 12:12:37 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void Config::initServerKeys()
     _keysServer[4] = "error_page";
     _keysServer[5] = "client_max_body_size";
     _keysServer[6] = "autoindex";
+    _keysServer[7] = "allow_methods";
 }
 
 void Config::initLocationKeys()

@@ -6,13 +6,13 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/28 10:50:30 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 12:29:44 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-static const size_t SERVER_KEYS_COUNT = 7;
+static const size_t SERVER_KEYS_COUNT = 8;
 
 void Config::parseServerBlock(size_t *i)
 {
@@ -87,6 +87,8 @@ void validateServerConfig(const ServerConfig& server)
         throw Exception("index is not set");
     if (server.client_max_body_size == -1)
         throw Exception("client_max_body_size is not set");
+    if (server.allowed_methods.empty())
+        throw Exception("allowd_methods is not set");
 }
 
 ServerConfig::ServerConfig()

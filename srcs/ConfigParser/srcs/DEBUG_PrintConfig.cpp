@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 05:38:20 by mvachon           #+#    #+#             */
-/*   Updated: 2026/01/23 05:38:30 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 12:33:50 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,13 @@ void Config::printServers()
         std::cout << "├── 📂 Autoindex: " << (srv.autoindex ? "✓ on" : "✗ off") << std::endl;
         std::cout << "├── 📦 Max body size: " << srv.client_max_body_size << " bytes" << std::endl;
         
-        // Error pages
+        if (!srv.allowed_methods.empty())
+        {
+            std::cout << "├── 🔌  Methods:";
+            for (size_t j = 0; j < srv.allowed_methods.size(); ++j)
+                std::cout << " " << srv.allowed_methods[j];
+            std::cout << std::endl;
+        }
         if (!srv.error_page.empty())
         {
             std::cout << "├── ⚠️  Error pages:" << std::endl;
