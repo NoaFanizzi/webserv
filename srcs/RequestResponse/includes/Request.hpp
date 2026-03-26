@@ -6,7 +6,7 @@
 #include <vector>
 #include "Config.hpp"
 
-#define BUFFER_SIZE 5
+#define BUFFER_SIZE 1000
 
 class BodyRequest {
   private:
@@ -45,7 +45,7 @@ class Request {
 	~Request() {}
 
 	void readRaw(int &fd, bool &closedStatus, std::string &request);
-	bool isValid(const std::string &req);
+	bool isValid(const std::string &req, const ServerConfig &config);
 	void checkRequest();
 	void parse(const std::string &request, const ServerConfig &config);
 	void printDebug() const;

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/26 10:27:37 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 11:24:50 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,10 +86,17 @@ std::string toLower(const std::string &s) {
     return result;
 }
 
-bool Request::isValid(const std::string &req) {
+bool Request::isValid(const std::string &req, const ServerConfig &config) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
+	{
+		for (size_t i = 0; i < req.size(); i++) {
+    		if (i == req.size() - 1) {
+				throw Http400Exception();
+    		}
+		}
 		return false;
+	}
 	std::string lower_req = toLower(req);
 	if (_method.empty()) {
 		if (req.compare(0, 4, "GET ") == 0)
@@ -112,6 +119,8 @@ bool Request::isValid(const std::string &req) {
 			parseContentLength(req);
 			parseWebKitForm(req);
 		}
+		if (static_cast<long long>(_contentLengthBody) > config.client_max_body_size)                
+        	throw Http413Exception();
 		size_t body_size = req.size() - (header_end + 4);
 		return body_size >= static_cast<size_t>(_contentLengthBody);
 	}
@@ -126,7 +135,7 @@ void Request::checkRequest() {
 	if (_headers.find("Host") == _headers.end())
 		throw Http400Exception();
 	if(_method == "POST" && _headers.find("Content-Length") == _headers.end())
-		throw Http411Exception(); // TODO c'est une exception 411 qu'i lfaut faire
+		throw Http411Exception();
 	if (_path.empty())
 		throw Http400Exception();
 	if (_path.size() > 2048)

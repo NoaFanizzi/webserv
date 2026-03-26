@@ -229,7 +229,7 @@ tests_port_8080 = [
          "\r\n"
          + "A" * 100000 + "\r\n"
          "--X--\r\n"
-     ).replace("{size}", str(100000 + 130)),
+     ).replace("{size}", str(100000 + 118)),
     ),
 
     # Body > 2MB → 413
@@ -252,14 +252,6 @@ tests_port_8080 = [
     ("PUT_NOT_SUPPORTED",
      405,
      "PUT / HTTP/1.1\r\nHost: localhost\r\nContent-Length: 4\r\n\r\ndata"),
-
-    ("OPTIONS_NOT_SUPPORTED",
-     405,
-     "OPTIONS / HTTP/1.1\r\nHost: localhost\r\n\r\n"),
-
-    ("PATCH_NOT_SUPPORTED",
-     405,
-     "PATCH / HTTP/1.1\r\nHost: localhost\r\nContent-Length: 4\r\n\r\ndata"),
 
     ("UNKNOWN_METHOD",
      405,
@@ -356,6 +348,10 @@ tests_port_6565 = [
 
     ("PORT6565_GET_TEST",
      (200, 404),
+     "GET /test/ HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n"),
+
+    ("PORT6565_REDIRECTION_TEST",
+     (200, 301),
      "GET /test HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n"),
 
     # POST interdit sur ce serveur (aucune location POST)

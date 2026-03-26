@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/25 08:00:24 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 11:21:00 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void Client::PollInHandler()
 	_startTime = std::time(NULL);
 	try
 	{
-		if (_request.isValid(_rawRequest) == true) {
+		if (_request.isValid(_rawRequest, _config) == true) {
 			//_requestEnded = true;
 			_request.parse(_rawRequest, _config);
 			_response.setRequest(_request);
