@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/25 12:38:38 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/26 08:54:28 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,6 +207,23 @@ std::vector<std::string> split(const std::string &str, const std::string &delimi
     return result;
 }
 
+static std::string urlDecode(const std::string &str)
+{
+	std::string result;
+	for (size_t i = 0; i < str.size(); ++i) {
+		if (str[i] == '%' && i + 2 < str.size()
+			&& std::isxdigit(str[i + 1]) && std::isxdigit(str[i + 2])) {
+			char hex[3] = { str[i + 1], str[i + 2], '\0' };
+			result += static_cast<char>(std::strtol(hex, NULL, 16));
+			i += 2;
+		} else if (str[i] == '+')
+			result += ' ';
+		else
+			result += str[i];
+	}
+	return result;
+}
+
 void printSplitDebug(const std::vector<std::string> &v)
 {
 	for (size_t i = 0; i < v.size(); ++i) {
@@ -238,7 +255,7 @@ void Request::printDebug() const
 	std::cout << "======================" << std::endl;
 }
 
-void Request::parsePostMethod(const std::string &request, size_t body_start)
+void Request::parsePostMethod(const std::string &request, size_t body_start, const std::string &uploadDir)
 {
 	std::vector<std::string> parts = split(request.substr(body_start, _contentLengthBody), "--" + _webKitForm);
 	for (size_t i = 0; i + 1 < parts.size(); ++i) {
@@ -262,11 +279,11 @@ void Request::parsePostMethod(const std::string &request, size_t body_start)
 		}
 		pos = part.find("\r\n\r\n");
 		if (pos != std::string::npos)
-		body = part.substr(pos + 4);
+			body = part.substr(pos + 4);
 		if (filename.empty())
-		continue;
+			continue;
 		_bodyRequests.push_back(BodyRequest(body, filename, type));
-		std::ofstream ofs(("upload/" + filename).c_str(), std::ios::binary | std::ios::trunc);
+		std::ofstream ofs((uploadDir + filename).c_str(), std::ios::binary | std::ios::trunc);
 		if (!ofs.is_open())
 			throw Http500Exception();
 		ofs.write(body.c_str(), body.size());
@@ -285,14 +302,6 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 	if (body_start == std::string::npos)
 		return;
 	body_start += 4; // \r\n\r\n
-	if (_method == "POST" && static_cast<long long>(_contentLengthBody) <= config.client_max_body_size )
-		parsePostMethod(request, body_start);
-	else
-	{
-		_bodyRequests.clear();
-		if(static_cast<long long>(_contentLengthBody) > config.client_max_body_size)
-			throw Http413Exception();
-	}
 
 	for (size_t i = 0; i < request.size(); ++i) {
 		char c = request[i];
@@ -309,8 +318,18 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 		return;
 
 	_headers = separateHeaders(docRequest);
-	std::istringstream iss(docRequest[0]);
-	iss >> _method >> _path >> _version;
+	{
+		const std::string &reqLine = docRequest[0];
+		size_t p1 = reqLine.find(' ');
+		if (p1 == std::string::npos)
+			throw Http400Exception();
+		_method = reqLine.substr(0, p1);
+		size_t p2 = reqLine.rfind(' ');
+		if (p2 == std::string::npos || p2 <= p1)
+			throw Http400Exception();
+		_path    = reqLine.substr(p1 + 1, p2 - p1 - 1);
+		_version = reqLine.substr(p2 + 1);
+	}
 
 	size_t queryCheck = _path.find("?"); // checks for queries
 	if (queryCheck != std::string::npos) {
@@ -318,9 +337,24 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 		_query = _path.substr(queryCheck + 1);
 		_path = newPath;
 	}
+	_path = urlDecode(_path);
 
 	checkRequest();
-	// PrintDebug();
+	setCurrentLocations(config);
+
+	if (_method == "POST" && static_cast<long long>(_contentLengthBody) <= config.client_max_body_size)
+	{
+		std::string uploadDir = config.root + _path;
+		if (!uploadDir.empty() && uploadDir[uploadDir.size() - 1] != '/')
+			uploadDir += '/';
+		parsePostMethod(request, body_start, uploadDir);
+	}
+	else
+	{
+		_bodyRequests.clear();
+		if (static_cast<long long>(_contentLengthBody) > config.client_max_body_size)
+			throw Http413Exception();
+	}
 }
 
 std::string Request::getHeaders(const std::string toGet) const
@@ -334,13 +368,14 @@ std::string Request::getHeaders(const std::string toGet) const
 
 void Request::setCurrentLocations(const ServerConfig &serverConfig)
 {
+	_currentLocations.clear();
 	size_t i = 0;
 	size_t j = 0;
 	std::vector<std::string> vPath;
 	std::string slashed;
 	std::vector<LocationConfig> serverLocations = serverConfig.locations;
 	std::string concatened;
-	
+
 	vPath = split(_path, "/");
 	while (i < vPath.size()) {
 		concatened = concatened + '/' + vPath[i];

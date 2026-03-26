@@ -51,7 +51,7 @@ class Request {
 	void printDebug() const;
 	void parseContentLength(const std::string &req);
 	void parseWebKitForm(const std::string &req);
-	void parsePostMethod(const std::string &request, size_t body_start);
+	void parsePostMethod(const std::string &request, size_t body_start, const std::string &uploadDir);
 	void setCurrentLocations(const ServerConfig &serverConfig);
 
 	std::string getMethod() const { return _method; }

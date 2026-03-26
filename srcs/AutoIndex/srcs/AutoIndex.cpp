@@ -127,10 +127,10 @@ std::string AutoIndex::_header =
 
 std::string AutoIndex::_template =
 	"<tr class='{{ TYPE }}'>"
-	"<td><a href={{ URL }}>{{ NAME }}</a></td>"
+	"<td><a href='{{ URL }}'>{{ NAME }}</a></td>"
 	"<td class='size'>{{ DATE }}</td>"
 	"<td class='size'>{{ WEIGHT }}</td>"
-	"<td class='delete-button' data-id={{ DELETE }}>DELETE</td>"
+	"<td class='delete-button' data-id='{{ DELETE }}'>DELETE</td>"
 	"</tr>";
 
 std::string AutoIndex::_footer =

@@ -6,7 +6,7 @@
 #    By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/05 07:48:23 by mvachon           #+#    #+#              #
-#    Updated: 2026/02/24 14:16:20 by mvachon          ###   ########.fr        #
+#    Updated: 2026/03/26 07:57:56 by mvachon          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ BUILD_DIR   = .build
 OBJS        = $(SRCS:%.cpp=$(BUILD_DIR)/%.o)
 DEPS        = $(OBJS:.o=.d)
 
-UPLOAD_FILE = upload
+UPLOAD_FILE = website/upload
 
 GREEN       = \033[0;32m
 RED         = \033[0;31m

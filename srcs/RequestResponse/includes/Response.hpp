@@ -15,6 +15,7 @@ class Response {
 	std::map<int, std::string> _errorPages;
 	std::map<std::string, std::string> _mimeTypes;
 	bool _isCgi;
+	std::string _redirectLocation;
 
 	// functions
 	std::string checkUrl(const ServerConfig &config);
@@ -27,7 +28,7 @@ class Response {
 	
   public:
 	// constructor
-	Response() : _isCgi(false) {};
+	Response() : _isCgi(false), _redirectLocation("") {};
 	void setRequest(Request &request);
 	std::string getErrorPageContent(int code, const ServerConfig &config);
 	void setStatusCode(const std::string &code) { _statusCode = code; }

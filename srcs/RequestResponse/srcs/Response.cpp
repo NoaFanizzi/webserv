@@ -62,7 +62,7 @@ int	check_dir(const std::string &full_path)
 
 std::string Response::checkUrl(const ServerConfig &config)
 {
-
+	std::cout << _request->getPath() << std::endl;
 	std::vector<std::string> tempPath = split(_request->getPath(), "/");
 	std::string path = config.root;
 	size_t	i = 0;
@@ -82,8 +82,9 @@ std::string Response::checkUrl(const ServerConfig &config)
 	}
 
 	std::cout << "------------------------------------------------" << std::endl;
-	std::cout << "PAFF = " << path << std::endl;
+	std::cout << "PATH = " << path << std::endl << std::endl;
     _finalAutoIndex = false;
+    _redirectLocation = "";
 
     if (_request->getPath() == "/")
         path = config.root + "/" + config.index;
@@ -93,6 +94,12 @@ std::string Response::checkUrl(const ServerConfig &config)
 
     if (check_dir(path))
     {
+        const std::string &reqPath = _request->getPath();
+        if (reqPath[reqPath.size() - 1] != '/')
+        {
+            _redirectLocation = reqPath + "/";
+            return "";
+        }
         if (path[path.size() - 1] != '/')
             path += "/";
 
@@ -131,7 +138,6 @@ std::string Response::buildHeader(size_t contentLength,
 				ContentType = it->second;
 		}
 	}
-	std::cout << _request->getPath() << std::endl;
 	// const std::string rescode = statusCode != "301"  ? "301"  : statusCode;
 	std::string header;
 	header = "HTTP/1.0 " + statusCode + " " + statusText + "\r\n" +
@@ -153,9 +159,33 @@ void Response::generate(const ServerConfig &config)
 	
 	// try
 	// {
-	std::cout << "JE SUIS DANS RESPONSE GENERATEEEEE" << std::endl;
-		_request->setCurrentLocations(config);
+		const std::vector<LocationConfig> &locs = _request->getCurrentLocations();
+		if (!locs.empty() && !locs.back().allowed_methods.empty()) {
+			const std::vector<std::string> &methods = locs.back().allowed_methods;
+			bool allowed = false;
+			for (size_t i = 0; i < methods.size(); i++) {
+				if (methods[i] == _request->getMethod()) {
+					allowed = true;
+					break;
+				}
+			}
+			if (!allowed)
+				throw Http405Exception();
+		}
 		_finalPath = checkUrl(config);
+		if (!_redirectLocation.empty())
+		{
+			_statusCode = "301";
+			_statusText = "Moved Permanently";
+			_body = "";
+			_header = "HTTP/1.1 301 Moved Permanently\r\n"
+			          "Location: " + _redirectLocation + "\r\n"
+			          "Content-Length: 0\r\n"
+			          "Connection: close\r\n"
+			          "\r\n";
+			return;
+		}
+
 		if (CgiManager::isCgi(_finalPath))
 		{
 			CgiManager cgi(*_request, _finalPath);
@@ -166,7 +196,7 @@ void Response::generate(const ServerConfig &config)
 		}
 		else if (_request->getMethod() == "DELETE")
 		{
-			std::cout << _finalPath.c_str() << std::endl;
+			std::cout << "coucuo" << _finalPath.c_str() << std::endl;
 			if (std::remove(_finalPath.c_str()) != 0) {
 				if (errno == EACCES)
 					throw Http403Exception();
@@ -178,7 +208,6 @@ void Response::generate(const ServerConfig &config)
 			_body = "{\"message\": \"File deleted successfully\"}";
 			_request->setPath(".json");
 			_header = buildHeader(_body.size(), _statusCode, _statusText);
-			std::cout << "HEADERRRRRR = " <<_header << std::endl;
 			return;
 		}
 		else if (_finalAutoIndex == true && check_dir(config.root + _request->getPath()) == 1)

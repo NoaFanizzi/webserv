@@ -1,80 +1,53 @@
-Analyse basée sur le sujet officiel
-✅ Ce qui est OBLIGATOIRE et déjà fait :
-✅ Server non-bloquant avec poll()
-✅ Configuration file parsing
-✅ Multiple ports
-✅ GET method
-✅ POST method (upload files)
-✅ CGI support (Python, PHP)
-✅ Static website serving
-✅ Default error pages
-🔴 Ce qui est OBLIGATOIRE et manque :
-1. DELETE method - CRITIQUE
-Le sujet dit explicitement : "You need at least the GET, POST, and DELETE methods."
+# TODO — webserv
 
-Actuellement reconnu mais non implémenté dans Client.cpp
-2. Location routing - CRITIQUE
-Le sujet demande "Specify rules or configurations on a URL/route" :
+## ✅ Fait
 
-✅ Parsé dans config
-❌ Pas utilisé dans le code - CheckUrl() ignore complètement _config.locations
-Doit gérer :
+- Server non-bloquant avec poll()
+- Configuration file parsing
+- Multiple ports / virtual servers
+- GET, POST, DELETE methods
+- Upload de fichiers (POST multipart)
+- Serving de fichiers statiques
+- Pages d'erreur par défaut + configurables
+- allowed_methods par location (vérifié dans generate())
+- client_max_body_size (parsé + validé, throw 413)
+- Request timeout (isTimeout + onTimeout → 408)
+- autoindex (AutoIndex généré)
+- Redirection 301 automatique quand dossier sans `/` final
 
-✅ allowed_methods (parsé, pas vérifié)
-❌ HTTP redirection
-✅ root pour la location (parsé, pas appliqué)
-✅ Directory listing (autoindex, implémenté mais pas par location)
-✅ Default file (index, implémenté mais pas par location)
-✅ Upload location (POST fonctionne mais chemin hardcodé upload)
-3. client_max_body_size validation - CRITIQUE
-Le sujet demande "Set the maximum allowed size for client request bodies"
+---
 
-✅ Parsé
-❌ Jamais vérifié - un client peut envoyer 10GB sans erreur
-4. HTTP redirections - OBLIGATOIRE
-Le sujet liste explicitement : "HTTP redirection" dans les configurations de route
+## 🔴 Ce qui manque
 
-❌ Pas implémenté du tout
-Doit supporter 301/302
-5. CGI - Upload path configuration - IMPORTANT
-Le sujet : "Uploading files from the clients to the server is authorized, and storage location is provided"
+### 1. HTTP redirections depuis le config — `return 301/302`
+Le sujet demande de pouvoir écrire dans une location :
+```
+return 301 https://example.com;
+```
+- Le champ n'existe pas encore dans `LocationConfig` (`// TODO put the "return"`)
+- À faire : ajouter `redirect_code` + `redirect_url` dans `LocationConfig`, parser dans `LocationParser`, appliquer dans `generate()` avant `checkUrl`
 
-Actuellement hardcodé upload dans Request.cpp:232
-Doit être configurable via la location
-6. CGI - POST body - IMPORTANT
-Le sujet : "The full request and arguments provided by the client must be available to the CGI"
+### 2. Location routing — `root` / `index` / `autoindex` ignorés
+`checkUrl` utilise toujours `config.root` et `config.index` du serveur global.
+Les champs `root`, `index`, `autoindex` sont parsés dans `LocationConfig` mais jamais appliqués.
+- Si une location a son propre `root`, il faut l'utiliser à la place de `config.root`
+- Même chose pour `index` et `autoindex`
 
-TODO ligne 118 de CgiHandler.cpp:118 non résolu
-7. CGI - Chunked requests - IMPORTANT
-Le sujet : "for chunked requests, your server needs to un-chunk them"
+### 3. Upload path par location
+Dans `Request.cpp`, le chemin d'upload est calculé avec `config.root + _path`.
+Il devrait utiliser le `root` de la location active si elle en a un.
 
-❌ Pas géré actuellement
-8. Request timeout - CRITIQUE
-Le sujet : "A request to your server should never hang indefinitely"
+---
 
-❌ Aucun timeout implémenté
-📋 Priorités par ordre d'importance :
-BLOQUANT (sans ça le projet échoue) :
+## 📋 Ordre de priorité
 
-Location routing + application des règles
-DELETE method
-allowed_methods validation
-client_max_body_size validation
-HTTP redirections
-Request timeouts
-IMPORTANT (probablement testé) :
-7. CGI POST body
-8. Upload path configurable
-9. Stress tests / robustesse
+| # | Tâche | Impact |
+|---|-------|--------|
+| 1 | `return 301/302` dans les locations | Critique — testé à l'éval |
+| 2 | `root`/`index`/`autoindex` par location | Critique |
+| 3 | Upload path par location | Moyen |
+| 4 | Retirer les logs de debug | Propreté / éval |
 
-BONUS si temps :
-10. Chunked transfer encoding
-11. CGI path relatif correct
+---
 
-
-Faire les redirection dans le config.conf (return 301 {option})
-check le "Accept" dans le GET pour savoir ce que l'on a le droit de renvoyer (Error 406)
-Faire les locations
-Mettre une redirection de "/" si jamais on est dans un dossier
-faire le timeout
-faire un meilleur parser de requete
+## CGI (non traité ici)
