@@ -39,6 +39,7 @@ void Config::initLocationKeys()
     _keysLocation[2] = "index";
     _keysLocation[3] = "autoindex";
     _keysLocation[4] = "allow_methods";
+    _keysLocation[5] = "return";
 }
 
 bool Config::setFile(std::string doc)

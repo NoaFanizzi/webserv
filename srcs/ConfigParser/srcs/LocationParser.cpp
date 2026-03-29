@@ -11,8 +11,9 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <cstdlib>
 
-static const size_t LOCATION_KEYS_COUNT = 5;
+static const size_t LOCATION_KEYS_COUNT = 6;
 
 void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
 {
@@ -75,6 +76,22 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
     if (key == "allow_methods")
     {
         parseAllowMethods(location.allowed_methods, line, j);
+        return;
+    }
+
+    if (key == "return")
+    {
+        if (j + 2 >= line.size())
+            throw Exception("return directive requires a code and a url");
+        std::string codeStr = line[j + 1];
+        std::string url = line[j + 2];
+        if (!url.empty() && url[url.size() - 1] == ';')
+            url = url.substr(0, url.size() - 1);
+        for (size_t k = 0; k < codeStr.size(); k++)
+            if (!std::isdigit(codeStr[k]))
+                throw Exception("return directive: invalid code -> " + codeStr);
+        location.redirectCode = std::atoi(codeStr.c_str());
+        location.redirectUrl = url;
         return;
     }
 

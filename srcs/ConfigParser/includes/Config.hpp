@@ -36,8 +36,9 @@ struct LocationConfig
     std::string index;
     bool autoindex;     
     std::vector<std::string> allowed_methods;
-    // TODO put the "return"
-    LocationConfig() : autoindex(false){}
+    int         redirectCode;
+    std::string redirectUrl;
+    LocationConfig() : autoindex(false), redirectCode(0){}
 };
 
 struct ErrorPage
@@ -67,7 +68,7 @@ class Config
         std::vector<std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
         std::string _keysServer[8];
-        std::string _keysLocation[5];
+        std::string _keysLocation[6];
 
         void initServerKeys();
         void initLocationKeys();

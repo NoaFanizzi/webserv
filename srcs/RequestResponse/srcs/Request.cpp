@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/28 08:07:40 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/29 14:43:04 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 #include "HttpExceptions.hpp"
 #include "Config.hpp"
+#include <cerrno>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -43,9 +44,11 @@ void Request::parseContentLength(const std::string &req) {
 		pos++;
 
 	size_t end = req.find("\r\n", pos);
+	std::string value;
 	if (end == std::string::npos)
-		return;
-	std::string value = req.substr(pos, end - pos);
+		value = req.substr(pos);
+	else
+		value = req.substr(pos, end - pos);
 	if(value.empty())
 		throw Http400Exception();
 	for(size_t i = 0; i < value.size(); i++)
@@ -53,9 +56,10 @@ void Request::parseContentLength(const std::string &req) {
 		if(!std::isdigit(value[i]))
 			throw Http400Exception();
 	}
+	errno = 0;
 	char *lastchar;
 	long length = strtol(value.c_str(), &lastchar, 10);
-	if(*lastchar != '\0' || length < 0)
+	if (errno == ERANGE || *lastchar != '\0' || length < 0)
 		throw Http400Exception();
 	_contentLengthBody = static_cast<size_t>(length);
 }
@@ -90,10 +94,11 @@ bool Request::isValid(const std::string &req, const ServerConfig &config) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
 	{
-		for (size_t i = 0; i < req.size(); i++) {
-    		if (i == req.size() - 1) {
+		for (size_t i = 0; i < req.size(); i++)
+		{
+			if (i == req.size() - 1) {
 				throw Http400Exception();
-    		}
+			}
 		}
 		return false;
 	}
@@ -116,8 +121,9 @@ bool Request::isValid(const std::string &req, const ServerConfig &config) {
 		return true;
 	if (_method == "POST") {
 		if (_contentLengthBody == static_cast<size_t>(-1)) {
-			parseContentLength(req);
-			parseWebKitForm(req);
+			std::string headers_only = req.substr(0, header_end);
+			parseContentLength(headers_only);
+			parseWebKitForm(headers_only);
 		}
 		if (static_cast<long long>(_contentLengthBody) > config.client_max_body_size)                
         	throw Http413Exception();
@@ -191,8 +197,11 @@ separateHeaders(std::vector<std::string> &docRequest) {
 
         // 2. Extraire la clé
         std::string key = line.substr(0, colonPos);
-		if(isspace(key[key.size() - 1]))
-			throw (Http400Exception());
+        if (key.empty())
+            throw Http400Exception();
+        for (size_t k = 0; k < key.size(); k++)
+            if (isspace((unsigned char)key[k]))
+                throw Http400Exception();
         // 3. Extraire la valeur et trimmer les espaces au début et à la fin
         std::string value = line.substr(colonPos + 1);
         size_t first = value.find_first_not_of(" \t");
@@ -206,6 +215,8 @@ separateHeaders(std::vector<std::string> &docRequest) {
             size_t last = value.find_last_not_of(" \t");
             value = value.substr(first, (last - first + 1));
         }
+        if (headers.find(key) != headers.end())
+            throw Http400Exception();
         headers[key] = value;
     }
     return headers;

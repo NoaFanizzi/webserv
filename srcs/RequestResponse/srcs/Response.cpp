@@ -63,22 +63,41 @@ int	check_dir(const std::string &full_path)
 std::string Response::checkUrl(const ServerConfig &config)
 {
 	std::cout << _request->getPath() << std::endl;
-	std::vector<std::string> tempPath = split(_request->getPath(), "/");
-	std::string path = config.root;
-	size_t	i = 0;
-	while(i < tempPath.size())
+	const std::vector<LocationConfig> &locs = _request->getCurrentLocations();
+	std::string reqPath = _request->getPath();
+	std::string path;
+
+	if (!locs.empty() && !locs.back().root.empty())
 	{
-		if(tempPath[i] == "..")
-			tempPath.erase(tempPath.begin() + i);
-		else
-			i++;
+		const LocationConfig &loc = locs.back();
+		std::string subPath = reqPath.substr(loc.path.size());
+		path = loc.root;
+		if (!subPath.empty())
+		{
+			if (path[path.size() - 1] != '/' && subPath[0] != '/')
+				path += '/';
+			path += subPath;
+		}
 	}
-	i = 0;
-	while(i < tempPath.size())
+	else
 	{
-		path = path + '/';
-		path = path + tempPath[i];
-		i++;
+		std::vector<std::string> tempPath = split(reqPath, "/");
+		path = config.root;
+		size_t i = 0;
+		while (i < tempPath.size())
+		{
+			if (tempPath[i] == "..")
+				tempPath.erase(tempPath.begin() + i);
+			else
+				i++;
+		}
+		i = 0;
+		while (i < tempPath.size())
+		{
+			path = path + '/';
+			path = path + tempPath[i];
+			i++;
+		}
 	}
 
 	std::cout << "------------------------------------------------" << std::endl;
@@ -161,6 +180,24 @@ void Response::generate(const ServerConfig &config)
 	// try
 	// {
 		const std::vector<LocationConfig> &locs = _request->getCurrentLocations();
+
+		if (!locs.empty() && locs.back().redirectCode != 0
+			&& _request->getMethod() == "GET")
+		{
+			const LocationConfig &loc = locs.back();
+			std::ostringstream code;
+			code << loc.redirectCode;
+			_statusCode = code.str();
+			_statusText = "Moved Permanently";
+			_body = "";
+			_header = "HTTP/1.1 " + _statusCode + " " + _statusText + "\r\n"
+			          "Location: " + loc.redirectUrl + "\r\n"
+			          "Content-Length: 0\r\n"
+			          "Connection: close\r\n"
+			          "\r\n";
+			return;
+		}
+
 		const std::vector<std::string> *methods = NULL;
 		if (!locs.empty() && !locs.back().allowed_methods.empty())
 			methods = &locs.back().allowed_methods;
