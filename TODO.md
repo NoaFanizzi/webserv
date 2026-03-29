@@ -51,3 +51,4 @@ Il devrait utiliser le `root` de la location active si elle en a un.
 ---
 
 Ne pas avoir de doublons dans la requette
+est ce que les locations sont obligatoirement des dossier ?
