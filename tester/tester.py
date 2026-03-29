@@ -359,6 +359,10 @@ tests_port_6565 = [
      405,
      "POST / HTTP/1.1\r\nHost: 127.0.0.1\r\nContent-Length: 5\r\n\r\nhello"),
 
+    ("PORT6565_POST_TEST",
+     200,
+     "POST /test/test.html HTTP/1.1\r\nHost: 127.0.0.1\r\nContent-Length: 5\r\n\r\nhello"),
+
     ("PORT6565_GET_INEXISTANT",
      404,
      "GET /this_does_not_exist.html HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n"),
@@ -646,3 +650,13 @@ bar = f"{GREEN}{'█'*p_fill}{RED}{'█'*f_fill}{YELLOW}{'█'*e_fill}{RESET}"
 print(f"\n{BOLD}{'='*68}{RESET}")
 print(f"  {bar}  {BOLD}{GREEN}{passed} passed{RESET} / {RED}{failed} failed{RESET} / {YELLOW}{errors} errors{RESET} / {total} total")
 print(f"{BOLD}{'='*68}{RESET}\n")
+
+# ── Nettoyage fichiers uploadés par les tests
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+_cleanup = [
+    os.path.join(_script_dir, "..", "website", "test_upload.txt"),
+]
+for _f in _cleanup:
+    _f = os.path.normpath(_f)
+    if os.path.isfile(_f):
+        os.remove(_f)

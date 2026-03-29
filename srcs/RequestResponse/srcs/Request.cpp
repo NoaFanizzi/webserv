@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/26 11:24:50 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/28 08:07:40 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void Request::checkRequest() {
 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		throw Http405Exception();
 	if (_version != "HTTP/1.1")
-		throw Http400Exception();
+		throw Http400Exception(); //http505exception
 	if (_headers.find("Host") == _headers.end())
 		throw Http400Exception();
 	if(_method == "POST" && _headers.find("Content-Length") == _headers.end())

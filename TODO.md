@@ -49,3 +49,5 @@ Il devrait utiliser le `root` de la location active si elle en a un.
 | 4 | Retirer les logs de debug | Propreté / éval |
 
 ---
+
+Ne pas avoir de doublons dans la requette

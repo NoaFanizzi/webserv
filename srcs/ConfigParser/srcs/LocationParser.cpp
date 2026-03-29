@@ -66,26 +66,38 @@ void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
     throw Exception("Bad closing brace");
 }
 
-void Config::parseLocationDirective(LocationConfig &location, const std::string &key, 
+void Config::parseLocationDirective(LocationConfig &location, const std::string &key,
                                      const std::vector<std::string> &line, size_t j)
 {
     if (j + 1 >= line.size())
         throw Exception("No argument found for -> " + key);
 
-    std::string value = line[j + 1];
-    
-    if (key == "root" || key == "autoindex")
-    {      
-        if (line.size() > 2)
-        {
-            if (line[2] != ";" || line.size() > 3)
-                throw Exception("Too much value for -> " + key);
-        }
+    if (key == "allow_methods")
+    {
+        parseAllowMethods(location.allowed_methods, line, j);
+        return;
     }
-    
+
+    bool semicolon = false;
+    std::string value = line[j + 1];
+
+    if (line.size() > 2)
+    {
+        if (line[2] != ";" || line.size() > 3)
+            throw Exception("Too much value for -> " + key);
+        else
+            semicolon = true;
+    }
+
     if (!value.empty() && value[value.size() - 1] == ';')
+    {
         value = value.substr(0, value.size() - 1);
-    
+        semicolon = true;
+    }
+
+    if (!semicolon)
+        throw Exception("No semicolon on the line -> " + key);
+
     if (key == "path")
         location.path = value;
     else if (key == "root")
@@ -94,8 +106,6 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
         location.index = value;
     else if (key == "autoindex")
         parseLocationAutoindex(location, value);
-    else if (key == "allow_methods")
-        parseAllowMethods(location.allowed_methods, line, j);
 }
 
 void Config::parseLocationAutoindex(LocationConfig &location, const std::string &value)
@@ -108,20 +118,34 @@ void Config::parseLocationAutoindex(LocationConfig &location, const std::string 
 
 void Config::parseAllowMethods(std::vector<std::string> &allowed_methods, const std::vector<std::string> &line, size_t j)
 {
+    bool semicolon = false;
+
     for (size_t x = j + 1; x < line.size(); x++)
     {
         std::string method = line[x];
-        
+
         if (method == ";")
+        {
+            semicolon = true;
             break;
-            
+        }
+
         if (!method.empty() && method[method.size() - 1] == ';')
+        {
             method = method.substr(0, method.size() - 1);
-            
+            semicolon = true;
+        }
+
         if (method != "GET" && method != "POST" && method != "DELETE")
             throw Exception("The method is not valid [GET-POST-DELETE] -> " + method);
-            
+
         if (!method.empty())
             allowed_methods.push_back(method);
+
+        if (semicolon)
+            break;
     }
+
+    if (!semicolon)
+        throw Exception("No semicolon on the line -> allow_methods");
 }
