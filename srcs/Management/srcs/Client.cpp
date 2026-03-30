@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/26 11:21:00 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/30 19:20:57 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,14 @@ void Client::PollInHandler()
 	}
 	catch(const std::exception &e)
 	{
-		//_requestEnded = true;
-		std::cerr << e.what() << std::endl; 
+		_request.setPath(".html");                            
+		_response.setRequest(_request);                       
+		_response.setStatusCode("500");                       
+		_response.setStatusText("Internal Server Error");     
+		_response.setBody(_response.getErrorPageContent(500,_config));                                                 
+		_response.setFinalPath(".html");                      
+		_response.buildErrorHeader();                         
+		_events = POLLOUT;
 	}
 	
 }
@@ -78,9 +84,8 @@ void Client::onTimeout()
 		return;
 	_timedOut = true;
     std::string body = _response.getErrorPageContent(408, _config);
-
     std::ostringstream header;
-    header << "HTTP/1.0 408 Request Timeout\r\n"
+    header << "HTTP/1.1 408 Request Timeout\r\n"
            << "Content-Type: text/html; charset=UTF-8\r\n"
            << "Content-Length: " << body.size() << "\r\n"
            << "Connection: close\r\n"

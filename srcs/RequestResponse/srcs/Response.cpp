@@ -71,7 +71,10 @@ std::string Response::checkUrl(const ServerConfig &config)
 	{
 		const LocationConfig &loc = locs.back();
 		std::string subPath = reqPath.substr(loc.path.size());
-		path = loc.root;
+		std::string locRoot = loc.root;
+		if (!locRoot.empty() && locRoot[0] == '/')
+			locRoot = "." + locRoot;
+		path = locRoot;
 		if (!subPath.empty())
 		{
 			if (path[path.size() - 1] != '/' && subPath[0] != '/')
@@ -121,7 +124,10 @@ std::string Response::checkUrl(const ServerConfig &config)
         if (path[path.size() - 1] != '/')
             path += "/";
 
-        std::string indexPath = path + config.index;
+        const std::vector<LocationConfig> &idxLocs = _request->getCurrentLocations();
+        const std::string &indexFile = (!idxLocs.empty() && !idxLocs.back().index.empty())
+            ? idxLocs.back().index : config.index;
+        std::string indexPath = path + indexFile;
 
         if (access(indexPath.c_str(), F_OK) != -1)
             return indexPath;
@@ -160,7 +166,7 @@ std::string Response::buildHeader(size_t contentLength,
 	}
 	// const std::string rescode = statusCode != "301"  ? "301"  : statusCode;
 	std::string header;
-	header = "HTTP/1.0 " + statusCode + " " + statusText + "\r\n" +
+	header = "HTTP/1.1 " + statusCode + " " + statusText + "\r\n" +
 	         "Content-Type: " + ContentType + "; charset=UTF-8\r\n" +
 	         "Content-Length: " + oss.str() + "\r\n" +
 			//  "Location:" + _request->getPath()+"\r\n" +
@@ -251,10 +257,10 @@ void Response::generate(const ServerConfig &config)
 			_header = buildHeader(_body.size(), _statusCode, _statusText);
 			return;
 		}
-		else if (_finalAutoIndex == true && check_dir(config.root + _request->getPath()) == 1)
+		else if (_finalAutoIndex == true && check_dir(_finalPath) == 1)
 		{
-			AutoIndex indexation(config.root, _request->getPath());
-			_body = indexation.initAutoIndex(config.root + _request->getPath());
+			AutoIndex indexation(_finalPath, _request->getPath());
+			_body = indexation.initAutoIndex(_finalPath);
 			_finalPath = ".html";
 		}
 		else

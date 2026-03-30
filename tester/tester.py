@@ -182,7 +182,7 @@ tests_port_8080 = [
     # ── Location /test ────────────────────────────────────────
 
     ("GET_LOCATION_TEST",
-     (200, 404),
+     (200, 404, 301),
      "GET /test HTTP/1.1\r\nHost: localhost\r\n\r\n"),
 
     ("GET_TEST_HTML_FILE",

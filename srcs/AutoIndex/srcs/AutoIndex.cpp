@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   AutoIndex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/02/24 17:25:14 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/30 15:07:40 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "AutoIndex.hpp"
+#include "HttpExceptions.hpp"
 #include <sys/types.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -191,7 +192,7 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &r
 
 	std::string filepath = rPath + "/" + sdir.d_name;
 	if(stat(filepath.c_str(), &file) == -1)
-		exit(-10); // TODO check error
+		throw Http403Exception();
 		
 	if (S_ISDIR(file.st_mode))
 		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "dir");

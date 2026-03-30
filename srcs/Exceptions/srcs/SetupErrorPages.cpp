@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/29 19:00:51 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/05 08:35:46 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/30 16:11:05 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,102 @@ void Response::setErrorPages()
         "</body>\n"
         "</html>\n";
 
+    // 411
+    _errorPages[411] =
+        "<!DOCTYPE html>\n"
+        "<html lang=\"fr\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <title>411 - Longueur requise</title>\n"
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+        "    <style>\n"
+        "        body {\n"
+        "            margin: 0;\n"
+        "            font-family: Arial, Helvetica, sans-serif;\n"
+        "            background: linear-gradient(135deg, #292e45ff, #764ba2);\n"
+        "            color: #fff;\n"
+        "            display: flex;\n"
+        "            align-items: center;\n"
+        "            justify-content: center;\n"
+        "            height: 100vh;\n"
+        "            text-align: center;\n"
+        "        }\n"
+        "        .container {\n"
+        "            max-width: 500px;\n"
+        "            padding: 40px;\n"
+        "        }\n"
+        "        h1 {\n"
+        "            font-size: 120px;\n"
+        "            margin: 0;\n"
+        "            line-height: 1;\n"
+        "        }\n"
+        "        h2 {\n"
+        "            margin: 10px 0 20px;\n"
+        "            font-weight: normal;\n"
+        "        }\n"
+        "        p {\n"
+        "            opacity: 0.9;\n"
+        "            margin-bottom: 30px;\n"
+        "        }\n"
+        "    </style>\n"
+        "</head>\n"
+        "<body>\n"
+        "    <div class=\"container\">\n"
+        "        <h1>411</h1>\n"
+        "        <h2>Longueur requise</h2>\n"
+        "        <p>Oups... Le header Content-Length est absent de la requête.</p>\n"
+        "    </div>\n"
+        "</body>\n"
+        "</html>\n";
+
+    // 413
+    _errorPages[413] =
+        "<!DOCTYPE html>\n"
+        "<html lang=\"fr\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <title>413 - Entity Too Large</title>\n"
+        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+        "    <style>\n"
+        "        body {\n"
+        "            margin: 0;\n"
+        "            font-family: Arial, Helvetica, sans-serif;\n"
+        "            background: linear-gradient(135deg, #292e45ff, #764ba2);\n"
+        "            color: #fff;\n"
+        "            display: flex;\n"
+        "            align-items: center;\n"
+        "            justify-content: center;\n"
+        "            height: 100vh;\n"
+        "            text-align: center;\n"
+        "        }\n"
+        "        .container {\n"
+        "            max-width: 500px;\n"
+        "            padding: 40px;\n"
+        "        }\n"
+        "        h1 {\n"
+        "            font-size: 120px;\n"
+        "            margin: 0;\n"
+        "            line-height: 1;\n"
+        "        }\n"
+        "        h2 {\n"
+        "            margin: 10px 0 20px;\n"
+        "            font-weight: normal;\n"
+        "        }\n"
+        "        p {\n"
+        "            opacity: 0.9;\n"
+        "            margin-bottom: 30px;\n"
+        "        }\n"
+        "    </style>\n"
+        "</head>\n"
+        "<body>\n"
+        "    <div class=\"container\">\n"
+        "        <h1>413</h1>\n"
+        "        <h2>Entity Too Large</h2>\n"
+        "        <p>Oups... Le fichier ou les données envoyées dépassent la taille maximale autorisée.</p>\n"
+        "    </div>\n"
+        "</body>\n"
+        "</html>\n";
+
     // 405
     _errorPages[405] =
         "<!DOCTYPE html>\n"
@@ -269,6 +365,7 @@ void Response::setErrorPages()
         "    </div>\n"
         "</body>\n"
         "</html>\n";
+
     // 414
     _errorPages[414] =
         "<!DOCTYPE html>\n"

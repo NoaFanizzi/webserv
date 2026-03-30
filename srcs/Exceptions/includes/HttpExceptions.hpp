@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpExceptions.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:24:45 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/03 14:07:52 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/30 15:05:08 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ public:
     int getStatusCode() const { return 413; }
 
     const std::string& getStatusText() const {
-        static std::string text = "Request: Body to large";
+        static std::string text = "Request: Payload to large";
         return text;
     }
 };

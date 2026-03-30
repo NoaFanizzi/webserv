@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/29 14:43:04 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/03/30 15:02:32 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,7 +176,6 @@ int	keyCheck(const std::string &key)
 	return(0);
 }
 
-// helper function for parsing
 static std::map<std::string, std::string>
 separateHeaders(std::vector<std::string> &docRequest) {
     std::map<std::string, std::string> headers;
@@ -184,7 +183,6 @@ separateHeaders(std::vector<std::string> &docRequest) {
     for (size_t i = 1; i < docRequest.size(); ++i) {
         std::string line = docRequest[i];
 
-        // 1. Nettoyage rapide du \r final s'il existe
         if (!line.empty() && line[line.size() - 1] == '\r')
             line.erase(line.size() - 1);
 
@@ -195,26 +193,20 @@ separateHeaders(std::vector<std::string> &docRequest) {
         if (colonPos == std::string::npos)
             continue;
 
-        // 2. Extraire la clé
         std::string key = line.substr(0, colonPos);
         if (key.empty())
             throw Http400Exception();
         for (size_t k = 0; k < key.size(); k++)
             if (isspace((unsigned char)key[k]))
                 throw Http400Exception();
-        // 3. Extraire la valeur et trimmer les espaces au début et à la fin
         std::string value = line.substr(colonPos + 1);
-        size_t first = value.find_first_not_of(" \t");
-        if (first == std::string::npos)
-		{
-			throw (Http400Exception());
-            //value = "";
-        }
-		else
-		{
-            size_t last = value.find_last_not_of(" \t");
-            value = value.substr(first, (last - first + 1));
-        }
+        if (value.empty() || value[0] != ' ' || (value.size() > 1 && value[1] == ' '))
+            throw Http400Exception();
+        value = value.substr(1);
+        if (value.empty())
+            throw Http400Exception();
+        size_t last = value.find_last_not_of(" \t");
+        value = value.substr(0, last + 1);
         if (headers.find(key) != headers.end())
             throw Http400Exception();
         headers[key] = value;
