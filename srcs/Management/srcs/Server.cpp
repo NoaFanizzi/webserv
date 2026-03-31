@@ -8,6 +8,7 @@
 
 Server::Server(const ServerConfig &serverconfig) : _serverConfig(serverconfig) {
 	_closedStatus = false;
+	_startTime = std::time(NULL);
 	_fd = createSocket();
 	createSocketAdress(serverconfig);
 	int opt = 1;
@@ -57,6 +58,8 @@ void Server::bindClient(int fd) {
 		throw std::runtime_error("Bind failed");
 	}
 }
+
+void Server::onTimeout() {}
 
 void Server::PollInHandler(){
     struct sockaddr_in clientaddr;

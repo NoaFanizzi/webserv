@@ -62,7 +62,6 @@ int	check_dir(const std::string &full_path)
 
 std::string Response::checkUrl(const ServerConfig &config)
 {
-	std::cout << _request->getPath() << std::endl;
 	const std::vector<LocationConfig> &locs = _request->getCurrentLocations();
 	std::string reqPath = _request->getPath();
 	std::string path;

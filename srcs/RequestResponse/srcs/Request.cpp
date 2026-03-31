@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/30 15:02:32 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/31 07:31:26 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,9 @@ bool Request::isValid(const std::string &req, const ServerConfig &config) {
 		if (static_cast<long long>(_contentLengthBody) > config.client_max_body_size)                
         	throw Http413Exception();
 		size_t body_size = req.size() - (header_end + 4);
-		return body_size >= static_cast<size_t>(_contentLengthBody);
+		if (body_size > static_cast<size_t>(_contentLengthBody))
+			throw Http400Exception();
+		return body_size == static_cast<size_t>(_contentLengthBody);
 	}
 	return false;
 }

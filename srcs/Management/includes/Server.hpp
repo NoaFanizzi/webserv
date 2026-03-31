@@ -36,6 +36,7 @@ class Server : public AManager {
 
 	// functions
 	void PollInHandler();
+	void onTimeout();
 
 	// getters
 	sockaddr_in getSockddr_in() const { return _servAddr; }

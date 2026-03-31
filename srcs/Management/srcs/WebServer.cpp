@@ -1,6 +1,7 @@
 #include "WebServer.hpp"
 #include "AManager.hpp"
 #include <poll.h>
+#include <iostream>
 #include <stdlib.h>
 
 std::vector <struct pollfd> WebServer::_pollfds;
@@ -27,7 +28,8 @@ void WebServer::updateStatus() {
 		if (manager->isTimeout(now))
 		{
 			manager->onTimeout();
-			manager->setEvents(POLLOUT);
+			if (manager->getClosedStatus())
+				manager->setEvents(POLLOUT);
 		}
 	}
 }
