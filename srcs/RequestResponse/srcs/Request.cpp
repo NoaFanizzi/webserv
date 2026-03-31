@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/31 07:31:26 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/31 17:32:39 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,7 @@ void Request::checkRequest() {
 	if (_method != "GET" && _method != "POST" && _method != "DELETE")
 		throw Http405Exception();
 	if (_version != "HTTP/1.1")
-		throw Http400Exception(); //http505exception
+		throw Http505Exception();
 	if (_headers.find("Host") == _headers.end())
 		throw Http400Exception();
 	if(_method == "POST" && _headers.find("Content-Length") == _headers.end())
@@ -180,7 +180,7 @@ int	keyCheck(const std::string &key)
 
 static std::map<std::string, std::string>
 separateHeaders(std::vector<std::string> &docRequest) {
-    std::map<std::string, std::string> headers;
+    std::map<std::string, std::string> headers;	
 
     for (size_t i = 1; i < docRequest.size(); ++i) {
         std::string line = docRequest[i];

@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/30 19:20:57 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/03/31 17:36:49 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,13 +66,13 @@ void Client::PollInHandler()
 	}
 	catch(const std::exception &e)
 	{
-		_request.setPath(".html");                            
-		_response.setRequest(_request);                       
-		_response.setStatusCode("500");                       
-		_response.setStatusText("Internal Server Error");     
-		_response.setBody(_response.getErrorPageContent(500,_config));                                                 
-		_response.setFinalPath(".html");                      
-		_response.buildErrorHeader();                         
+		_request.setPath(".html");
+		_response.setRequest(_request);
+		_response.setStatusCode("500");
+		_response.setStatusText("Internal Server Error");
+		_response.setBody(_response.getErrorPageContent(500,_config));
+		_response.setFinalPath(".html");
+		_response.buildErrorHeader();
 		_events = POLLOUT;
 	}
 	

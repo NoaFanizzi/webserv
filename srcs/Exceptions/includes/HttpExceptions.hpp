@@ -132,5 +132,17 @@ public:
     }
 };
 
+class Http505Exception : public HttpException {
+public:
+    virtual ~Http505Exception() throw() {}
+
+    int getStatusCode() const { return 505; }
+
+    const std::string& getStatusText() const {
+        static std::string text = "HTTP Version Not Supported";
+        return text;
+    }
+};
+
 
 #endif
