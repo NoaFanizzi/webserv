@@ -375,6 +375,8 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 		std::string uploadDir;
 		if (!_currentLocations.empty() && !_currentLocations[0].upload_dir.empty())
 			uploadDir = _currentLocations[0].upload_dir;
+		else if (!config.upload_dir.empty())
+			uploadDir = config.upload_dir;
 		else
 			uploadDir = config.root + _path;
 		if (!uploadDir.empty() && uploadDir[uploadDir.size() - 1] != '/')

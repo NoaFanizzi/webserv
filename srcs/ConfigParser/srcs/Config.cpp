@@ -30,6 +30,7 @@ void Config::initServerKeys()
     _keysServer[5] = "client_max_body_size";
     _keysServer[6] = "autoindex";
     _keysServer[7] = "allow_methods";
+    _keysServer[8] = "upload_dir";
 }
 
 void Config::initLocationKeys()

@@ -38,6 +38,8 @@ void Config::parseServerDirective(ServerConfig &server, const std::string &key,
         parseAllowMethods(server.allowed_methods, line, j);
     else if (key == "error_page")
         parseErrorPage(server, line, j);
+    else if (key == "upload_dir")
+        server.upload_dir = value;
 }
 
 std::string Config::extractValue(const std::vector<std::string> &line, size_t j, 

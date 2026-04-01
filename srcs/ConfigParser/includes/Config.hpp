@@ -55,6 +55,7 @@ struct ServerConfig
     std::string                 host;
     std::string                 root;
     std::string                 index;
+    std::string                 upload_dir;
     std::vector<ErrorPage>      error_page;
     long long                   client_max_body_size;
     bool                        autoindex;
@@ -68,7 +69,7 @@ class Config
     private:
         std::vector<std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
-        std::string _keysServer[8];
+        std::string _keysServer[9];
         std::string _keysLocation[7];
 
         void initServerKeys();
