@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/31 17:32:39 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/04/01 11:43:54 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -403,6 +403,7 @@ void Request::setCurrentLocations(const ServerConfig &serverConfig)
 	std::string slashed;
 	std::vector<LocationConfig> serverLocations = serverConfig.locations;
 	std::string concatened;
+	LocationConfig *best = NULL;
 
 	vPath = split(_path, "/");
 	while (i < vPath.size()) {
@@ -411,11 +412,14 @@ void Request::setCurrentLocations(const ServerConfig &serverConfig)
 		j = 0;
 		while (j < serverLocations.size()) {
 			if (concatened == serverLocations[j].path)
-				_currentLocations.push_back(serverLocations[j]);
+				best = &serverLocations[j];
 			else if (slashed == serverLocations[j].path)
-				_currentLocations.push_back(serverLocations[j]);
+				best = &serverLocations[j];
 			j++;
 		}
 		i++;
 	}
+	if (best)
+		_currentLocations.push_back(*best);
 }
+

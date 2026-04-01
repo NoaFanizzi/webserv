@@ -91,7 +91,7 @@ public:
     int getStatusCode() const { return 411; }
 
     const std::string& getStatusText() const {
-        static std::string text = "Request: Length not specified";
+        static std::string text = "Length Required";
         return text;
     }
 };
@@ -103,7 +103,7 @@ public:
     int getStatusCode() const { return 413; }
 
     const std::string& getStatusText() const {
-        static std::string text = "Request: Payload to large";
+        static std::string text = "Payload Too Large";
         return text;
     }
 };
@@ -127,7 +127,7 @@ public:
     int getStatusCode() const { return 500; }
 
     const std::string& getStatusText() const {
-        static std::string text = "Internal Error";
+        static std::string text = "Internal Server Error";
         return text;
     }
 };

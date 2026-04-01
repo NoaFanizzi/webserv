@@ -92,7 +92,13 @@ void Client::onTimeout()
            << "\r\n";
 
     std::string full = header.str() + body;
-    send(_fd, full.c_str(), full.size(), 0);
+    size_t sent = 0;
+    while (sent < full.size()) {
+        ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
+        if (n <= 0)
+            break;
+        sent += n;
+    }
 
     _events = 0;
     _closedStatus = true;
@@ -101,7 +107,13 @@ void Client::onTimeout()
 void Client::PollOutHandler() {
 	
 	std::string full = _response.getFullResponse();
-	send(_fd, full.c_str(), full.size(), 0);
+	size_t sent = 0;
+	while (sent < full.size()) {
+		ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
+		if (n <= 0)
+			break;
+		sent += n;
+	}
 
 	_events = 0;
 	_closedStatus = true;

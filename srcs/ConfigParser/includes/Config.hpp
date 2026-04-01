@@ -79,6 +79,7 @@ class Config
         std::string extractValue(const std::vector<std::string> &line, size_t j, 
                                  const std::string &key);
         
+        void parseHost(ServerConfig &server, const std::string &value);
         void parsePort(ServerConfig &server, const std::string &value);
         void parseClientMaxBodySize(ServerConfig &server, const std::string &value);
         void parseAutoindex(ServerConfig &server, const std::string &value);

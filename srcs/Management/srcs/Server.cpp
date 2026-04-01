@@ -27,7 +27,6 @@ Server::~Server() {
 int Server::createSocket() {
 	int fd;
 	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		close(fd);
 		throw std::runtime_error("Socket error");
 	}
 	return fd;

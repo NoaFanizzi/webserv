@@ -27,6 +27,8 @@ void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
     
     if (location.path.empty() || location.path == "{")
         throw Exception("No argument found for the location path");
+    if (location.path[0] != '/')
+        throw Exception("Location path must start with '/': " + location.path);
 
     (*j) += 2;
     while (*i < _fileContent.size())

@@ -236,13 +236,18 @@ std::string AutoIndex::initAutoIndex(const std::string &rPath)
 	dr = opendir(rPath.c_str());
 	if(dr)
 	{
-		while((sdir = readdir(dr)) != NULL)
-		{
-			// std::cout << sdir->d_name << std::endl;
-			addNewRow(*sdir, rPath);
+		try {
+			while((sdir = readdir(dr)) != NULL)
+			{
+				// std::cout << sdir->d_name << std::endl;
+				addNewRow(*sdir, rPath);
+			}
+		} catch (...) {
+			closedir(dr);
+			throw;
 		}
+		closedir(dr);
 	}
 	_content.append(_footer);
-	closedir(dr);
 	return(_content);
 }

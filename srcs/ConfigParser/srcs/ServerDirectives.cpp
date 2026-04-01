@@ -25,7 +25,7 @@ void Config::parseServerDirective(ServerConfig &server, const std::string &key,
     if (key == "port")
         parsePort(server, value);
     else if (key == "host")
-        server.host = value;
+        parseHost(server, value);
     else if (key == "root")
         server.root = value;
     else if (key == "index")
@@ -66,6 +66,37 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
         throw Exception("No semicolon on the line -> " + key);
 
     return value;
+}
+
+void Config::parseHost(ServerConfig &server, const std::string &value)
+{
+    if (value == "localhost")
+    {
+        server.host = value;
+        return;
+    }
+
+    std::istringstream iss(value);
+    std::string token;
+    int parts = 0;
+
+    while (std::getline(iss, token, '.'))
+    {
+        if (token.empty() || token.size() > 3)
+            throw Exception("Invalid host format -> " + value);
+        for (size_t i = 0; i < token.size(); i++)
+            if (!isdigit(token[i]))
+                throw Exception("Invalid host format -> " + value);
+        std::istringstream num(token);
+        int n;
+        num >> n;
+        if (n < 0 || n > 255)
+            throw Exception("Invalid host format -> " + value);
+        parts++;
+    }
+    if (parts != 4)
+        throw Exception("Invalid host format -> " + value);
+    server.host = value;
 }
 
 void Config::parsePort(ServerConfig &server, const std::string &value)
