@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/31 17:36:49 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/04/01 17:56:43 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 #include <poll.h>
 #include <sys/stat.h>
 
-Client::Client(int fd, const ServerConfig &config) : _config(config) {
+Client::Client(int fd, const ServerConfig &config) : _config(config)
+{
 	_fd = fd;
 	_requestEnded = false;
 	_closedStatus = false;
@@ -29,14 +30,15 @@ Client::Client(int fd, const ServerConfig &config) : _config(config) {
 }
 
 void Client::PollInHandler()
-{	
+{
 	// if(_requestEnded)
 	// 	return;
-	_request.readRaw(_fd, _closedStatus, _rawRequest);\
+	_request.readRaw(_fd, _closedStatus, _rawRequest);
 	_startTime = std::time(NULL);
 	try
 	{
-		if (_request.isValid(_rawRequest, _config) == true) {
+		if (_request.isValid(_rawRequest, _config) == true)
+		{
 			//_requestEnded = true;
 			_request.parse(_rawRequest, _config);
 			_response.setRequest(_request);
@@ -47,7 +49,7 @@ void Client::PollInHandler()
 			std::cout << "===============================" << std::endl;
 		}
 	}
-	catch(const HttpException& e)
+	catch (const HttpException &e)
 	{
 		//_requestEnded = true;
 		int errorCode = e.getStatusCode();
@@ -55,27 +57,26 @@ void Client::PollInHandler()
 		std::ostringstream oss;
 		oss << errorCode;
 		_request.setPath(".html");
-    	_response.setRequest(_request);
+		_response.setRequest(_request);
 		_response.setStatusCode(oss.str());
 		_response.setStatusText(e.getStatusText());
 		_response.setBody(_response.getErrorPageContent(errorCode, _config));
 		_response.setFinalPath(".html");
-		 _response.buildErrorHeader();
+		_response.buildErrorHeader();
 		_events = POLLOUT;
 		// _isCgi = false;
 	}
-	catch(const std::exception &e)
+	catch (const std::exception &e)
 	{
 		_request.setPath(".html");
 		_response.setRequest(_request);
 		_response.setStatusCode("500");
 		_response.setStatusText("Internal Server Error");
-		_response.setBody(_response.getErrorPageContent(500,_config));
+		_response.setBody(_response.getErrorPageContent(500, _config));
 		_response.setFinalPath(".html");
 		_response.buildErrorHeader();
 		_events = POLLOUT;
 	}
-	
 }
 
 void Client::onTimeout()
@@ -83,32 +84,18 @@ void Client::onTimeout()
 	if (_timedOut)
 		return;
 	_timedOut = true;
-    std::string body = _response.getErrorPageContent(408, _config);
-    std::ostringstream header;
-    header << "HTTP/1.1 408 Request Timeout\r\n"
-           << "Content-Type: text/html; charset=UTF-8\r\n"
-           << "Content-Length: " << body.size() << "\r\n"
-           << "Connection: close\r\n"
-           << "\r\n";
+	std::string body = _response.getErrorPageContent(408, _config);
+	std::ostringstream header;
+	header << "HTTP/1.1 408 Request Timeout\r\n"
+		   << "Content-Type: text/html; charset=UTF-8\r\n"
+		   << "Content-Length: " << body.size() << "\r\n"
+		   << "Connection: close\r\n"
+		   << "\r\n";
 
-    std::string full = header.str() + body;
-    size_t sent = 0;
-    while (sent < full.size()) {
-        ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
-        if (n <= 0)
-            break;
-        sent += n;
-    }
-
-    _events = 0;
-    _closedStatus = true;
-}
-
-void Client::PollOutHandler() {
-	
-	std::string full = _response.getFullResponse();
+	std::string full = header.str() + body;
 	size_t sent = 0;
-	while (sent < full.size()) {
+	while (sent < full.size())
+	{
 		ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
 		if (n <= 0)
 			break;
@@ -119,3 +106,19 @@ void Client::PollOutHandler() {
 	_closedStatus = true;
 }
 
+void Client::PollOutHandler()
+{
+
+	std::string full = _response.getFullResponse();
+	size_t sent = 0;
+	while (sent < full.size())
+	{
+		ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
+		if (n <= 0)
+			break;
+		sent += n;
+	}
+
+	_events = 0;
+	_closedStatus = true;
+}

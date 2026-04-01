@@ -4,11 +4,12 @@
 #include <iostream>
 #include <stdlib.h>
 
-std::vector <struct pollfd> WebServer::_pollfds;
-std::map <int, AManager *> WebServer::_managers;
+std::vector<struct pollfd> WebServer::_pollfds;
+std::map<int, AManager *> WebServer::_managers;
 bool WebServer::_firstLoopRequest = true;
 
-void WebServer::pollFdCreation(const int &fd, AManager *manager) {
+void WebServer::pollFdCreation(const int &fd, AManager *manager)
+{
 	struct pollfd pollfd;
 
 	pollfd.fd = fd;
@@ -18,10 +19,12 @@ void WebServer::pollFdCreation(const int &fd, AManager *manager) {
 	_managers.insert(std::make_pair(fd, manager));
 }
 
-void WebServer::updateStatus() {
+void WebServer::updateStatus()
+{
 
 	time_t now = std::time(NULL);
-	for (size_t i = 0; i < _pollfds.size(); ++i) {
+	for (size_t i = 0; i < _pollfds.size(); ++i)
+	{
 		AManager *manager = getManager(_pollfds[i].fd);
 		_pollfds[i].events = manager->getEvents();
 		_pollfds[i].revents = 0;
@@ -34,7 +37,8 @@ void WebServer::updateStatus() {
 	}
 }
 
-AManager *WebServer::getManager(int fd) {
+AManager *WebServer::getManager(int fd)
+{
 	std::map<int, AManager *>::iterator it = _managers.find(fd);
 	if (it != _managers.end())
 		return (it->second);
@@ -43,9 +47,9 @@ AManager *WebServer::getManager(int fd) {
 
 void WebServer::destroy()
 {
-	for(size_t i = 0; i < _pollfds.size(); i++)
+	for (size_t i = 0; i < _pollfds.size(); i++)
 	{
-		const int fd =_pollfds[i].fd;
+		const int fd = _pollfds[i].fd;
 		AManager *current = getManager(fd);
 		_managers.erase(fd);
 		close(fd);
@@ -53,20 +57,24 @@ void WebServer::destroy()
 	}
 }
 
-void WebServer::run() {
+void WebServer::run()
+{
 	_firstLoopRequest = true;
-	while (true) {
+	while (true)
+	{
 		updateStatus();
-		
+
 		int poll_value = poll(&_pollfds[0], _pollfds.size(), 1000);
-		if (poll_value < 0) {
+		if (poll_value < 0)
+		{
 			perror("poll error");
 			exit(1);
 		}
-		for (size_t i = 0; i < _pollfds.size() && poll_value; i++) {
+		for (size_t i = 0; i < _pollfds.size() && poll_value; i++)
+		{
 			AManager *current = getManager(_pollfds[i].fd);
 			if (!current || !_pollfds[i].revents)
-        		continue;
+				continue;
 			poll_value--;
 			if (!current)
 				continue;
@@ -74,7 +82,8 @@ void WebServer::run() {
 				current->PollInHandler();
 			if (_pollfds[i].revents & POLLOUT)
 				current->PollOutHandler();
-			if (current->getClosedStatus()) {
+			if (current->getClosedStatus())
+			{
 				_managers.erase(_pollfds[i].fd);
 				_pollfds.erase(_pollfds.begin() + i);
 				close(current->getFd());
@@ -84,4 +93,3 @@ void WebServer::run() {
 		}
 	}
 }
-
