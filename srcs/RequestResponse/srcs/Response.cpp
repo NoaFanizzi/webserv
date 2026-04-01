@@ -157,12 +157,11 @@ std::string Response::buildHeader(size_t contentLength,
 	oss << contentLength;
 	
 	std::string ContentType = "application/octet-stream";
-	std::string url = _request->getPath();
 
-	if (!url.empty()) {
-		size_t pos = url.rfind('.');
-		if (pos != std::string::npos && pos != url.size() - 1) {
-			std::string ext = url.substr(pos);
+	if (!_finalPath.empty()) {
+		size_t pos = _finalPath.rfind('.');
+		if (pos != std::string::npos && pos != _finalPath.size() - 1) {
+			std::string ext = _finalPath.substr(pos);
 			std::map<std::string, std::string>::iterator it =
 			    _mimeTypes.find(ext);
 			if (it != _mimeTypes.end())
