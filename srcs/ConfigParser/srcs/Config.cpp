@@ -40,6 +40,7 @@ void Config::initLocationKeys()
     _keysLocation[3] = "autoindex";
     _keysLocation[4] = "allow_methods";
     _keysLocation[5] = "return";
+    _keysLocation[6] = "upload_dir";
 }
 
 bool Config::setFile(std::string doc)

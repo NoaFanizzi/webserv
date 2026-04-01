@@ -372,7 +372,11 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 
 	if (_method == "POST" && static_cast<long long>(_contentLengthBody) <= config.client_max_body_size)
 	{
-		std::string uploadDir = config.root + _path;
+		std::string uploadDir;
+		if (!_currentLocations.empty() && !_currentLocations[0].upload_dir.empty())
+			uploadDir = _currentLocations[0].upload_dir;
+		else
+			uploadDir = config.root + _path;
 		if (!uploadDir.empty() && uploadDir[uploadDir.size() - 1] != '/')
 			uploadDir += '/';
 		parsePostMethod(request, body_start, uploadDir);

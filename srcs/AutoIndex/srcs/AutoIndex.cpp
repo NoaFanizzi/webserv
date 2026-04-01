@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   AutoIndex.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/03/30 15:07:40 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/04/01 13:29:10 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,43 +211,27 @@ void AutoIndex::addNewRow(struct dirent &sdir, const std::string &rPath)
 {
 	std::string newRow = replaceTemplate(sdir, rPath);
 	_content.append(newRow);
-	
 }
 
 std::string AutoIndex::initAutoIndex(const std::string &rPath)
 {
-
-// Begin
-//    Declare a pointer dr to the DIR type.
-//    Declare another pointer en of the dirent structure.
-//    Call opendir() function to open all file in present directory.
-//    Initialize dr pointer as dr = opendir(".").
-//    If(dr)
-//       while ((en = readdir(dr)) != NULL)
-//          print all the file name using en->d_name.
-//       call closedir() function to close the directory.
-// End.
-
 	DIR *dr;
-	
 	struct dirent* sdir;
 
-	_content = _header;
 	dr = opendir(rPath.c_str());
-	if(dr)
-	{
-		try {
-			while((sdir = readdir(dr)) != NULL)
-			{
-				// std::cout << sdir->d_name << std::endl;
-				addNewRow(*sdir, rPath);
-			}
-		} catch (...) {
-			closedir(dr);
-			throw;
+	if (!dr)
+		throw Http403Exception();
+	_content = _header;
+	try {
+		while((sdir = readdir(dr)) != NULL)
+		{
+			addNewRow(*sdir, rPath);
 		}
+	} catch (...) { //TODO ... c'est quoi cette merde !
 		closedir(dr);
+		throw;
 	}
+	closedir(dr);
 	_content.append(_footer);
 	return(_content);
 }

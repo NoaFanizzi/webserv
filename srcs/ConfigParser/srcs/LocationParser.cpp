@@ -13,7 +13,7 @@
 #include "Config.hpp"
 #include <cstdlib>
 
-static const size_t LOCATION_KEYS_COUNT = 6;
+static const size_t LOCATION_KEYS_COUNT = 7;
 
 void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
 {
@@ -126,6 +126,8 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
         location.root = value;
     else if (key == "index")
         location.index = value;
+    else if (key == "upload_dir")
+        location.upload_dir = value;
     else if (key == "autoindex")
         parseLocationAutoindex(location, value);
 }

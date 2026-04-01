@@ -1,259 +1,258 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="fr">
 
 <head>
 
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-<title>Mon Web Server</title>
+  <title>Mon Web Server</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+  <style>
+    body {
 
-body {
+      margin: 0;
 
-margin: 0;
+      font-family: 'Poppins', sans-serif;
 
-font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #265868, #334a70);
 
-background: linear-gradient(135deg, #265868, #334a70);
+      color: white;
 
-color: white;
+      display: flex;
 
-display: flex;
+      justify-content: center;
 
-justify-content: center;
+      align-items: center;
 
-align-items: center;
+      height: 100vh;
 
-height: 100vh;
+      text-align: center;
 
-text-align: center;
+    }
 
-}
 
+    .container {
 
-.container {
+      background: rgba(0, 0, 0, 0.3);
 
-background: rgba(0, 0, 0, 0.3);
+      padding: 40px;
 
-padding: 40px;
+      border-radius: 16px;
 
-border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 
-box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      width: 380px;
 
-width: 380px;
+    }
 
-}
 
+    h1 {
 
-h1 {
+      margin-bottom: 10px;
 
-margin-bottom: 10px;
+      font-size: 2.4em;
 
-font-size: 2.4em;
+      font-weight: 600;
 
-font-weight: 600;
+    }
 
-}
 
+    p {
 
-p {
+      font-size: 1.1em;
 
-font-size: 1.1em;
+      opacity: 0.9;
 
-opacity: 0.9;
+    }
 
-}
+    .btn {
 
-.btn {
+      display: inline-block;
 
-display: inline-block;
+      margin: 20px 0;
 
-margin: 20px 0;
+      padding: 12px 28px;
 
-padding: 12px 28px;
+      background: #ffffff;
 
-background: #ffffff;
+      color: #334a70;
 
-color: #334a70;
+      text-decoration: none;
 
-text-decoration: none;
+      border-radius: 30px;
 
-border-radius: 30px;
+      font-weight: 600;
 
-font-weight: 600;
+      transition: all 0.2s ease;
 
-transition: all 0.2s ease;
+    }
 
-}
 
+    .btn:hover {
 
-.btn:hover {
+      transform: translateY(-2px);
 
-transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 
-box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
 
-}
 
+    form {
 
-form {
+      display: grid;
 
-display: grid;
+      gap: 10px;
 
-gap: 10px;
+      flex-direction: column;
 
-flex-direction: column;
+      margin-top: 20px;
 
-margin-top: 20px;
+    }
 
-}
 
+    input[type="file"] {
 
-input[type="file"] {
+      /* margin: 10px 0; */
 
-/* margin: 10px 0; */
+      padding: 10px;
 
-padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
 
-background: rgba(255,255,255,0.1);
+      border: 2px dashed rgba(255, 255, 255, 0.4);
 
-border: 2px dashed rgba(255,255,255,0.4);
+      border-radius: 12px;
 
-border-radius: 12px;
+      color: white;
 
-color: white;
+      cursor: pointer;
 
-cursor: pointer;
+      font-family: 'Poppins', sans-serif;
 
-font-family: 'Poppins', sans-serif;
+    }
 
-}
 
+    input[type="file"]::-webkit-file-upload-button {
 
-input[type="file"]::-webkit-file-upload-button {
+      background: white;
 
-background: white;
+      color: #334a70;
 
-color: #334a70;
+      border: none;
 
-border: none;
+      padding: 8px 16px;
 
-padding: 8px 16px;
+      border-radius: 20px;
 
-border-radius: 20px;
+      font-weight: 600;
 
-font-weight: 600;
+      cursor: pointer;
 
-cursor: pointer;
+      margin-right: 10px;
 
-margin-right: 10px;
+      transition: background 0.2s ease;
 
-transition: background 0.2s ease;
+      transition: all 0.3s ease;
 
-transition: all 0.3s ease;
+    }
 
-}
 
+    input[type="file"]::-webkit-file-upload-button:hover {
 
-input[type="file"]::-webkit-file-upload-button:hover {
+      background: #e6e6e6;
 
-background: #e6e6e6;
+    }
 
-}
 
+    input[type="file"]::-webkit-file-upload-button:hover {
 
-input[type="file"]::-webkit-file-upload-button:hover{
+      transform: translateY(-1px);
 
-transform: translateY(-1px);
 
+    }
 
-}
+    button {
 
-button {
+      margin-top: 15px;
 
-margin-top: 15px;
+      width: 100%;
 
-width: 100%;
+      padding: 12px;
 
-padding: 12px;
+      border: none;
 
-border: none;
+      border-radius: 30px;
 
-border-radius: 30px;
+      background: #ffffff;
 
-background: #ffffff;
+      color: #334a70;
 
-color: #334a70;
+      font-weight: 600;
 
-font-weight: 600;
+      font-size: 1em;
 
-font-size: 1em;
+      cursor: pointer;
 
-cursor: pointer;
+      transition: all 0.2s ease;
 
-transition: all 0.2s ease;
+    }
 
-}
 
+    button:hover {
 
-button:hover {
+      transform: translateY(-2px);
 
-transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 
-box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-
-}
-
-</style>
+    }
+  </style>
 
 
 </head>
 
 <body>
 
-<div class="container">
+  <div class="container">
 
-<h1>🚀 Webserv OK</h1>
+    <h1>🚀 Webserv OK</h1>
 
-<p>Votre serveur web fonctionne correctement.</p>
+    <p>Votre serveur web fonctionne correctement.</p>
 
 
-<a href="index2.html" class="btn">Accéder a index2</a>
+    <a href="index2.html" class="btn">Accéder a index2</a>
 
-<form action="/upload/" method="post" enctype="multipart/form-data">
+    <form action="/upload/" method="post" enctype="multipart/form-data">
 
-<input type="file" name="file1">
+      <input type="file" name="file1">
 
-<input type="file" name="file2">
+      <input type="file" name="file2">
 
-<button type="submit">Upload</button>
+      <button type="submit">Upload</button>
 
-</form>
+    </form>
 
-<textarea id="userInput" placeholder="Tapez quelque chose pour les CGI..." rows="3" style="width:100%; margin-top:15px; padding:10px; border-radius:12px; border: 1px solid #ccc;"></textarea>
-<a href="cgi/hello.py" class="btn" id="cgiLink">cgi test<a/>
-<a href="cgi/error.py" class="btn">cgi error<a/>
+    <textarea id="userInput" placeholder="Tapez quelque chose pour les CGI..." rows="3"
+      style="width:100%; margin-top:15px; padding:10px; border-radius:12px; border: 1px solid #ccc;"></textarea>
+    <a href="cgi/hello.py" class="btn" id="cgiLink">cgi test<a />
+      <a href="cgi/error.py" class="btn">cgi error<a />
 
-<script>
-  const cgiLink = document.getElementById('cgiLink');
-  const userInput = document.getElementById('userInput');
+        <script>
+          const cgiLink = document.getElementById('cgiLink');
+          const userInput = document.getElementById('userInput');
 
-  cgiLink.addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default link behavior
-    const text = encodeURIComponent(userInput.value); // Encode for URL safety
-    const url = `cgi/hello.py?input=${text}`; // Append as query parameter
-    window.location.href = url; // Navigate to the CGI script with input
-  });
-</script>
-</div>
+          cgiLink.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent default link behavior
+            const text = encodeURIComponent(userInput.value); // Encode for URL safety
+            const url = `cgi/hello.py?input=${text}`; // Append as query parameter
+            window.location.href = url; // Navigate to the CGI script with input
+          });
+        </script>
+  </div>
 
 </body>
 
-</html> 
+</html>

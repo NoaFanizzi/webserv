@@ -34,7 +34,8 @@ struct LocationConfig
     std::string path;
     std::string root;
     std::string index;
-    bool autoindex;     
+    std::string upload_dir;
+    bool autoindex;
     std::vector<std::string> allowed_methods;
     int         redirectCode;
     std::string redirectUrl;
@@ -68,7 +69,7 @@ class Config
         std::vector<std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
         std::string _keysServer[8];
-        std::string _keysLocation[6];
+        std::string _keysLocation[7];
 
         void initServerKeys();
         void initLocationKeys();

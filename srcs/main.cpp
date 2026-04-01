@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 11:58:11 by mvachon           #+#    #+#             */
-/*   Updated: 2026/02/25 17:21:55 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/04/01 13:33:00 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,14 @@
 #include <csignal>
 
 
-void signalHandler(int signal) {
-    if (signal == SIGINT) {
+void signalHandler(int ) {
+    // if (signal == SIGINT) {
 		std::cout << std::endl;
 		WebServer::destroy();
         throw Exception("Ctrl + C detected");
-    }
+    // }
 }
+	
 
 int main(int ac, char **av)
 {
@@ -33,6 +34,8 @@ int main(int ac, char **av)
 		return 1;
 	}
     signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGTERM, SIG_IGN);
 	Config config;
 	if (!config.setFile(av[1]))
 		return 1;
@@ -43,6 +46,8 @@ int main(int ac, char **av)
 		for (size_t i = 0; i < SavedServers.size(); i++)
 			new Server(SavedServers[i]);
 		std::signal(SIGINT, signalHandler);
+		std::signal(SIGQUIT, signalHandler);
+		std::signal(SIGTERM, signalHandler);
 		WebServer::run();
 	}
 	catch (const std::exception &e)
