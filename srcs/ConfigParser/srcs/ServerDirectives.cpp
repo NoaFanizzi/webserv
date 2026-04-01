@@ -44,7 +44,7 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
                                   const std::string &key)
 {
     bool semicolon = false;
-    std::string value = line[j + line.size() - 1];
+    std::string value = line[j + 1];
     if (_keysServer->find(key) && key != "error_page" && key != "allow_methods")
     {
         if (line.size() > 2)
@@ -62,8 +62,11 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
         semicolon = true;
     }
 
-    if (!semicolon && key != "error_page")
+    if (!semicolon && key != "error_page" && key != "allow_methods")
         throw Exception("No semicolon on the line -> " + key);
+
+    if (value.empty() && key != "error_page" && key != "allow_methods")
+        throw Exception("Empty value for -> " + key);
 
     return value;
 }

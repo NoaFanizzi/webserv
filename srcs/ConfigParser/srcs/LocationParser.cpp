@@ -117,6 +117,9 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
     if (!semicolon)
         throw Exception("No semicolon on the line -> " + key);
 
+    if (value.empty())
+        throw Exception("Empty value for -> " + key);
+
     if (key == "path")
         location.path = value;
     else if (key == "root")
