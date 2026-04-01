@@ -140,9 +140,9 @@ void Request::checkRequest() {
 		throw Http405Exception();
 	if (_version != "HTTP/1.1")
 		throw Http505Exception();
-	if (_headers.find("Host") == _headers.end())
+	if (_headers.find("host") == _headers.end())
 		throw Http400Exception();
-	if(_method == "POST" && _headers.find("Content-Length") == _headers.end())
+	if(_method == "POST" && _headers.find("content-length") == _headers.end())
 		throw Http411Exception();
 	if (_path.empty())
 		throw Http400Exception();
@@ -198,9 +198,11 @@ separateHeaders(std::vector<std::string> &docRequest) {
         std::string key = line.substr(0, colonPos);
         if (key.empty())
             throw Http400Exception();
-        for (size_t k = 0; k < key.size(); k++)
+        for (size_t k = 0; k < key.size(); k++) {
             if (isspace((unsigned char)key[k]))
                 throw Http400Exception();
+            key[k] = std::tolower((unsigned char)key[k]);
+        }
         std::string value = line.substr(colonPos + 1);
         if (value.empty() || value[0] != ' ' || (value.size() > 1 && value[1] == ' '))
             throw Http400Exception();
@@ -393,8 +395,11 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 
 std::string Request::getHeaders(const std::string toGet) const
 {
+	std::string key = toGet;
+	for (size_t i = 0; i < key.size(); i++)
+		key[i] = std::tolower((unsigned char)key[i]);
 	std::map<std::string, std::string>::const_iterator it;
-	it = _headers.find(toGet);
+	it = _headers.find(key);
 	if (it != _headers.end())
 		return it->second;
 	return "";
