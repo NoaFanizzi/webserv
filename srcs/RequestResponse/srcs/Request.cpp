@@ -33,7 +33,8 @@ void Request::readRaw(int &fd, bool &closedStatus,
 }
 
 void Request::parseContentLength(const std::string &req) {
-	size_t pos = req.find("Content-Length:");
+	std::string lower = toLower(req);
+	size_t pos = lower.find("content-length:");
 	if (pos == std::string::npos) {
 		_contentLengthBody = 0;
 		return;
@@ -65,17 +66,19 @@ void Request::parseContentLength(const std::string &req) {
 }
 
 void Request::parseWebKitForm(const std::string &headers) {
-    size_t ct = headers.find("Content-Type:");
+    std::string lower = toLower(headers);
+    size_t ct = lower.find("content-type:");
     if (ct == std::string::npos)
         return;
 
-    size_t lineEnd = headers.find("\r\n", ct);
+    size_t lineEnd = lower.find("\r\n", ct);
     if (lineEnd == std::string::npos)
         return;
 
     std::string line = headers.substr(ct, lineEnd - ct);
+    std::string lineLower = lower.substr(ct, lineEnd - ct);
 
-    size_t b = line.find("boundary=");
+    size_t b = lineLower.find("boundary=");
     if (b == std::string::npos)
         return;
 
@@ -93,15 +96,7 @@ std::string toLower(const std::string &s) {
 bool Request::isValid(const std::string &req, const ServerConfig &config) {
 	size_t header_end = req.find("\r\n\r\n");
 	if (header_end == std::string::npos)
-	{
-		for (size_t i = 0; i < req.size(); i++)
-		{
-			if (i == req.size() - 1) {
-				throw Http400Exception();
-			}
-		}
 		return false;
-	}
 	std::string lower_req = toLower(req);
 	if (_method.empty()) {
 		if (req.compare(0, 4, "GET ") == 0)
@@ -144,10 +139,15 @@ void Request::checkRequest() {
 		throw Http400Exception();
 	if(_method == "POST" && _headers.find("content-length") == _headers.end())
 		throw Http411Exception();
-	if (_path.empty())
+	if (_path.empty() || _path[0] != '/')
 		throw Http400Exception();
 	if (_path.size() > 2048)
 		throw Http414Exception();
+	for (size_t i = 0; i < _path.size(); i++) {
+		unsigned char c = static_cast<unsigned char>(_path[i]);
+		if (c < 32 || c == 127)
+			throw Http400Exception();
+	}
 }
 
 size_t	findSpaceLength(size_t pos, std::string line)
@@ -310,6 +310,11 @@ void Request::parsePostMethod(const std::string &request, size_t body_start, con
 		pos = part.find("\r\n\r\n");
 		if (pos != std::string::npos)
 			body = part.substr(pos + 4);
+		if (filename.empty())
+			continue;
+		size_t slash = filename.rfind('/');
+		if (slash != std::string::npos)
+			filename = filename.substr(slash + 1);
 		if (filename.empty())
 			continue;
 		_bodyRequests.push_back(BodyRequest(body, filename, type));
