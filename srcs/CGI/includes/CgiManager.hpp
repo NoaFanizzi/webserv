@@ -30,7 +30,7 @@ public:
 	~CgiManager();
 
 	// static function
-	static bool isCgi(std::string path);
+	static bool isCgi(const std::string& path);
 
 	// function
 	bool start();

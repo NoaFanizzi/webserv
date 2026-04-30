@@ -23,6 +23,7 @@ CgiManager::CgiManager(Client &client, const std::string &scriptPath)
 	_events = POLLIN;
 	_startTime = std::time(NULL);
 	if (!start()) {
+		// TODO manage error500
 		_client.setCgiOutput("");
 		return;
 	}
@@ -37,9 +38,10 @@ CgiManager::~CgiManager() {
 std::string CgiManager::getOutput() const { return _output; }
 
 // static function
-bool CgiManager::isCgi(std::string path) {
-	if (path.rfind(".py") != std::string::npos ||
-		path.rfind(".php") != std::string::npos)
+bool CgiManager::isCgi(const std::string& path) {
+	if (path.size() >= 3 && path.compare(path.size() - 3, 3, ".py") == 0)
+		return true;
+	if (path.size() >= 4 && path.compare(path.size() - 4, 4, ".php") == 0)
 		return true;
 	return false;
 }
@@ -152,6 +154,7 @@ void CgiManager::PollInHandler()
 	{
 		int status;
 		waitpid(_pid, &status, 0);
+		// TODO manage if script fail error 500 + kill the process
 		_pid = -1;
 	}
 
@@ -164,6 +167,4 @@ void CgiManager::PollInHandler()
 	_closedStatus = true;
 }
 
-void CgiManager::PollOutHandler() {
-	return;
-}
+void CgiManager::PollOutHandler() {}
