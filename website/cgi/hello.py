@@ -1,26 +1,31 @@
 #!/usr/bin/env python3
 
-import cgi
-import cgitb
+import os
+import sys
 import html
+from urllib.parse import parse_qs
 
-# Enable debugging
-cgitb.enable()
+method = os.environ.get("REQUEST_METHOD", "GET")
+query_string = os.environ.get("QUERY_STRING", "")
 
-# Get the query parameter
-form = cgi.FieldStorage()
-user_input = form.getfirst("input", "")
+if method == "POST":
+    try:
+        length = int(os.environ.get("CONTENT_LENGTH", "0"))
+    except ValueError:
+        length = 0
+    body = sys.stdin.read(length) if length > 0 else ""
+    params = parse_qs(body)
+else:
+    params = parse_qs(query_string)
 
-# CGI header
-print("HTTP/1.1 200 OK")
-print("Content-Type: text/html")
-print()
-
-# Safely escape user input
+user_input = params.get("input", [""])[0]
 safe_input = html.escape(user_input)
 
-html_page = f"""
-<!DOCTYPE html>
+print("HTTP/1.1 200 OK")
+print("Content-Type: text/html; charset=UTF-8")
+print()
+
+print(f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -60,8 +65,4 @@ html_page = f"""
         <p class="user-input">You typed: {safe_input}</p>
     </div>
 </body>
-</html>
-"""
-
-print(html_page)
-
+</html>""")

@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/04/01 17:56:43 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/04/30 15:39:28 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,21 +34,21 @@ Client::Client(int fd, const ServerConfig &config) : _config(config)
 
 void Client::PollInHandler()
 {
-	// if(_requestEnded)
-	// 	return;
+	if (_requestEnded)
+		return;
 	_request.readRaw(_fd, _closedStatus, _rawRequest);
 	_startTime = std::time(NULL);
 	try
 	{
 		if (_request.isValid(_rawRequest, _config) == true)
 		{
-			//_requestEnded = true;
+			_requestEnded = true;
 			_request.parse(_rawRequest, _config);
 			_response.setRequest(_request);
 
 			if (CgiManager::isCgi(_request.getPath())) {
 				std::cout << "IS CGI\n";
-				_events = 0;
+				_events = POLLOUT;
 				_response.setIsCgi(true);
 				CgiManager *cgi = new CgiManager(*this, "website/cgi/hello.py");
 				(void)cgi;

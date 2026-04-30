@@ -151,11 +151,7 @@ void CgiManager::PollInHandler()
 	if (readSize == 0)
 	{
 		int status;
-		pid_t ret = waitpid(_pid, &status, WNOHANG);
-		if (ret == 0)
-			return;
-		close(_fd);
-		_fd = -1;
+		waitpid(_pid, &status, WNOHANG);
 
 		_client.setCgiOutput(_output);
 
