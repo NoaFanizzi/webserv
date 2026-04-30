@@ -17,7 +17,6 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <sys/socket.h>
 
 void Request::readRaw(int &fd, bool &closedStatus,
@@ -32,6 +31,16 @@ void Request::readRaw(int &fd, bool &closedStatus,
 	}
 	buffer[n] = '\0';
 	request.append(buffer, n);
+}
+
+std::string toLower(const std::string &s)
+{
+	std::string result = s;
+	for (size_t i = 0; i < result.size(); ++i)
+	{
+		result[i] = std::tolower(result[i]);
+	}
+	return result;
 }
 
 void Request::parseContentLength(const std::string &req)
@@ -88,16 +97,6 @@ void Request::parseWebKitForm(const std::string &headers)
 		return;
 
 	_webKitForm = line.substr(b + 9);
-}
-
-std::string toLower(const std::string &s)
-{
-	std::string result = s;
-	for (size_t i = 0; i < result.size(); ++i)
-	{
-		result[i] = std::tolower(result[i]);
-	}
-	return result;
 }
 
 bool Request::isValid(const std::string &req, const ServerConfig &config)

@@ -13,7 +13,7 @@ void WebServer::pollFdCreation(const int &fd, AManager *manager)
 	struct pollfd pollfd;
 
 	pollfd.fd = fd;
-	pollfd.events = 0;
+	pollfd.events = manager->getEvents();
 	pollfd.revents = 0;
 	_pollfds.push_back(pollfd);
 	_managers.insert(std::make_pair(fd, manager));
@@ -76,8 +76,6 @@ void WebServer::run()
 			if (!current || !_pollfds[i].revents)
 				continue;
 			poll_value--;
-			if (!current)
-				continue;
 			if (_pollfds[i].revents & POLLIN)
 				current->PollInHandler();
 			if (_pollfds[i].revents & POLLOUT)

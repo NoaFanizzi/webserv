@@ -1,33 +1,43 @@
 #pragma once
 
 #include "Request.hpp"
+#include "AManager.hpp"
 #include <string>
 #include <vector>
 
-class CgiManager
-{
-  private:
-    // variables
-    std::vector<std::string> _env;
-    const Request &_request;
-    std::string _scriptPath;
-    std::string _output;
+#include "Client.hpp"
 
-    // function
-    void buildEnv();
-    char **envToCharArray(); // used by function execv
+class CgiManager : public AManager {
+private:
+	// variables
+	std::vector<std::string> _env;
+	const Request &_request;
+	std::string _scriptPath;
+	std::string _output;
+	Client &_client;
 
-  public:
-    // constructor
-    CgiManager(const Request &req, const std::string &scriptPath);
-    ~CgiManager();
+	pid_t _pid;
+	int _stdinFd;
+	bool _finished;
 
-    // static function
-    static bool isCgi(std::string path);
+	// function
+	void buildEnv();
+	char **envToCharArray() const; // used by function execv
 
-    // function
-    bool execute();
+public:
+	// constructor
+	CgiManager(Client &client, const std::string &scriptPath);
+	~CgiManager();
 
-    // getter
-    std::string getOutput() const;
+	// static function
+	static bool isCgi(std::string path);
+
+	// function
+	bool start();
+
+	void PollInHandler();
+	void PollOutHandler();
+
+	// getter
+	std::string getOutput() const;
 };

@@ -252,15 +252,7 @@ void Response::generate(const ServerConfig &config)
 		return;
 	}
 
-	if (CgiManager::isCgi(_finalPath))
-	{
-		CgiManager cgi(*_request, _finalPath);
-		if (!cgi.execute())
-			throw Http500Exception();
-		_body = cgi.getOutput();
-		_isCgi = true; // CGI outputs already include headers
-	}
-	else if (_request->getMethod() == "DELETE")
+	if (_request->getMethod() == "DELETE")
 	{
 		if (std::remove(_finalPath.c_str()) != 0)
 		{

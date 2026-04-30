@@ -16,6 +16,7 @@ class Client : public AManager {
 	bool _firstLoopRequets;
 	bool _requestEnded;
 	bool _timedOut;
+	bool _cgi;
 	// functions
 
 	Response _response;
@@ -34,7 +35,12 @@ class Client : public AManager {
 	void PollOutHandler();
 
 	// getter
+	Request &getRequest() { return _request; }
 	std::string GetRawRequest() { return _rawRequest; }
+
+	// setter
+	void setCgi(const bool cgi) { _cgi = cgi; }
+	void setCgiOutput(const std::string &output);
 };
 
 #endif

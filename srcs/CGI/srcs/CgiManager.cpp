@@ -1,126 +1,181 @@
 #include "CgiManager.hpp"
+
+#include "WebServer.hpp"
+#include <cerrno>
 #include <cstring>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <poll.h>
 
 // constructor
-CgiManager::CgiManager(const Request &req, const std::string &scriptPath)
-    : _request(req), _scriptPath(scriptPath) {}
+CgiManager::CgiManager(Client &client, const std::string &scriptPath)
+	: _request(client.getRequest()),
+	  _scriptPath(scriptPath),
+	  _client(client),
+	  _pid(-1),
+	  _stdinFd(-1),
+	  _finished(false) {
+	_fd = -1;
+	_closedStatus = false;
+	_events = POLLIN;
+	_startTime = std::time(NULL);
+	if (!start()) {
+		// TODO handle error
+	}
+	fcntl(_fd, F_SETFL, O_NONBLOCK);
+	WebServer::pollFdCreation(_fd, this);
+}
 
-CgiManager::~CgiManager() {}
+CgiManager::~CgiManager() {
+}
 
 // getter
 std::string CgiManager::getOutput() const { return _output; }
 
 // static function
 bool CgiManager::isCgi(std::string path) {
-  // TODO add file format that we could manage
-  // 2 file formats is the minimum for bonus
-
-  if (path.rfind(".py") != std::string::npos ||
-      path.rfind(".php") != std::string::npos)
-    return true;
-  return false;
+	if (path.rfind(".py") != std::string::npos ||
+		path.rfind(".php") != std::string::npos)
+		return true;
+	return false;
 }
 
 // functions
 void CgiManager::buildEnv() {
-  _env.push_back("REQUEST_METHOD=" + _request.getMethod());
-  _env.push_back("SCRIPT_FILENAME=" + _scriptPath);
-  _env.push_back("SCRIPT_NAME=" + _request.getPath());
-  _env.push_back("QUERY_STRING=" + _request.getQuery());
-  _env.push_back("CONTENT_LENGTH=" + _request.getHeaders("Content-Length"));
-  _env.push_back("CONTENT_TYPE=" + _request.getHeaders("Content-Type"));
-  _env.push_back("SERVER_PROTOCOL=HTTP/1.1");
-  _env.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	_env.push_back("REQUEST_METHOD=" + _request.getMethod());
+	_env.push_back("SCRIPT_FILENAME=" + _scriptPath);
+	_env.push_back("SCRIPT_NAME=" + _request.getPath());
+	_env.push_back("QUERY_STRING=" + _request.getQuery());
+	_env.push_back("CONTENT_LENGTH=" + _request.getHeaders("Content-Length"));
+	_env.push_back("CONTENT_TYPE=" + _request.getHeaders("Content-Type"));
+	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 }
 
-char **CgiManager::envToCharArray() {
-  char **envp = new char *[_env.size() + 1];
-  if (!envp)
-    return NULL;
-  int i = 0;
-  for (; i < (int)_env.size(); i++) {
-    envp[i] = strdup(_env[i].c_str());
-    if (!envp[i]) {
-      while (--i != -1)
-        free(envp[i]);
-      delete[] envp;
-      return NULL;
-    }
-  }
-  envp[i] = NULL;
-  return envp;
+char **CgiManager::envToCharArray() const {
+	char **envp = new char *[_env.size() + 1];
+
+	int i = 0;
+	for (; i < static_cast<int>(_env.size()); i++) {
+		envp[i] = strdup(_env[i].c_str());
+		if (!envp[i]) {
+			while (--i != -1)
+				free(envp[i]);
+			delete[] envp;
+			return NULL;
+		}
+	}
+	envp[i] = NULL;
+	return envp;
 }
 
 // execute the cgi script
-// dup STDIN to pass it the request body if method == POST
-// return the output of the executed script
-bool CgiManager::execute() {
-  buildEnv();
+bool CgiManager::start() {
+	buildEnv();
 
-  int fdIn[2];
-  int fdOut[2];
-  pid_t pid;
+	int fdIn[2];
+	int fdOut[2];
 
-  if (pipe(fdIn) < 0 || pipe(fdOut) < 0)
-    return false;
+	if (pipe(fdIn) < 0 || pipe(fdOut) < 0)
+		return false;
 
-  if ((pid = fork()) < 0) {
-    close(fdIn[0]);
-    close(fdIn[1]);
-    close(fdOut[0]);
-    close(fdOut[1]);
+	_pid = fork();
 
-    return false;
-  }
+	if (_pid < 0) {
+		close(fdIn[0]);
+		close(fdIn[1]);
+		close(fdOut[0]);
+		close(fdOut[1]);
+		return false;
+	}
 
-  if (pid == 0) {
-    if (dup2(fdIn[0], STDIN_FILENO) < 0) {
-      close(fdIn[1]);
-      close(fdOut[0]);
-      exit(false);
-    }
-    if (dup2(fdOut[1], STDOUT_FILENO) < 0) {
-      close(fdIn[1]);
-      close(fdOut[0]);
-      exit(false);
-    }
-    close(fdIn[1]);
-    close(fdOut[0]);
+	if (_pid == 0) {
+		dup2(fdIn[0], STDIN_FILENO);
+		dup2(fdOut[1], STDOUT_FILENO);
 
-    char *argv[] = {(char *)_scriptPath.c_str(), NULL};
-    execve(_scriptPath.c_str(), argv, envToCharArray());
-    std::cerr << _scriptPath;
-    perror(": ");
-    exit(1);
-  }
+		close(fdIn[0]);
+		close(fdIn[1]);
+		close(fdOut[0]);
+		close(fdOut[1]);
 
-  close(fdIn[0]);
-  close(fdOut[1]);
-  // TODO: manage new request factoring
-  //  if (_request.GetMethod() == "POST") // write the request body in STDIN
-  //  {
-  //  	const std::string &body = _request.getBody();
-  //  	if (!body.empty())
-  //  		write(fdIn[1], body.c_str(), body.size());
-  //  }
-  close(fdIn[1]);
+		char **envp = envToCharArray();
+		char *argv[] = {
+			const_cast<char *>(_scriptPath.c_str()),
+			NULL
+		};
 
-  char buffer[1024];
-  ssize_t readSize;
-  while ((readSize = read(fdOut[0], buffer, sizeof(buffer) - 1)) > 0) {
-    buffer[readSize] = 0;
-    _output += buffer;
-  }
+		execve(_scriptPath.c_str(), argv, envp);
 
-  close(fdOut[0]);
-  int status;
-  waitpid(pid, &status, 0);
-  if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
-    return false;
-  return true;
+		std::cerr << _scriptPath;
+		perror(": ");
+		exit(127);
+	}
+
+	close(fdIn[0]);
+	close(fdOut[1]);
+
+	_stdinFd = fdIn[1];
+	_fd = fdOut[0];
+
+	// TODO demande a mat comment get le body
+	//const std::string &body = _client.getRequest().getBody();
+	//if (!body.empty()) {
+	//	ssize_t written = write(_stdinFd, body.c_str(), body.size());
+	//	(void)written;
+	//}
+	close(_stdinFd);
+	_stdinFd = -1;
+	_finished = false;
+
+	std::cout << "CGI fd = " << _fd << std::endl;
+	std::cout << "CGI events = " << _events << std::endl;
+	return true;
+}
+
+void CgiManager::PollInHandler()
+{
+	std::cout << "POLLIN CGI\n";
+	char buffer[4096];
+
+	const ssize_t readSize = read(_fd, buffer, sizeof(buffer));
+
+	if (readSize > 0)
+	{
+		_output.append(buffer, readSize);
+		return;
+	}
+
+	if (readSize == 0)
+	{
+		int status;
+		pid_t ret = waitpid(_pid, &status, WNOHANG);
+		if (ret == 0)
+			return;
+		close(_fd);
+		_fd = -1;
+
+		_client.setCgiOutput(_output);
+
+		_finished = true;
+		_closedStatus = true;
+		return;
+	}
+
+	if (readSize < 0)
+	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return;
+
+		_client.setCgiOutput("");
+		_closedStatus = true;
+		_finished = true;
+		return;
+	}
+}
+
+void CgiManager::PollOutHandler() {
+	return;
 }

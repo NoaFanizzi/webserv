@@ -40,7 +40,7 @@ class Response {
 	void buildErrorHeader();
 	// functions
 	void generate(const ServerConfig &config);
-	std::string getFullResponse() { 
+	std::string getFullResponse() {
 		if (_isCgi)
 			return _body;
 		return _header + _body; 

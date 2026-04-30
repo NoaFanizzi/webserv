@@ -18,6 +18,8 @@
 #include <poll.h>
 #include <sys/stat.h>
 
+#include "CgiManager.hpp"
+
 Client::Client(int fd, const ServerConfig &config) : _config(config)
 {
 	_fd = fd;
@@ -25,6 +27,7 @@ Client::Client(int fd, const ServerConfig &config) : _config(config)
 	_closedStatus = false;
 	_events = POLLIN;
 	_timedOut = false;
+	_cgi = false;
 	_startTime = std::time(NULL);
 	WebServer::pollFdCreation(_fd, this);
 }
@@ -43,8 +46,18 @@ void Client::PollInHandler()
 			_request.parse(_rawRequest, _config);
 			_response.setRequest(_request);
 
-			_response.generate(_config);
-			_events = POLLOUT;
+			if (CgiManager::isCgi(_request.getPath())) {
+				std::cout << "IS CGI\n";
+				_events = 0;
+				_response.setIsCgi(true);
+				CgiManager *cgi = new CgiManager(*this, "website/cgi/hello.py");
+				(void)cgi;
+				_cgi = true;
+			}
+			else {
+				_response.generate(_config);
+				_events = POLLOUT;
+			}
 			std::cout << _rawRequest << std::endl;
 			std::cout << "===============================" << std::endl;
 		}
@@ -108,7 +121,8 @@ void Client::onTimeout()
 
 void Client::PollOutHandler()
 {
-
+	if (_cgi)
+		return;
 	std::string full = _response.getFullResponse();
 	size_t sent = 0;
 	while (sent < full.size())
@@ -121,4 +135,10 @@ void Client::PollOutHandler()
 
 	_events = 0;
 	_closedStatus = true;
+}
+
+void Client::setCgiOutput(const std::string &output) {
+	_response.setBody(output);
+	_events = POLLOUT;
+	_cgi = false;
 }
