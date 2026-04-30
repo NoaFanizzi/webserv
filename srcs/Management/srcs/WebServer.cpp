@@ -76,7 +76,7 @@ void WebServer::run()
 			if (!current || !_pollfds[i].revents)
 				continue;
 			poll_value--;
-			if (_pollfds[i].revents & POLLIN)
+			if (_pollfds[i].revents & (POLLIN | POLLHUP | POLLERR))
 				current->PollInHandler();
 			if (_pollfds[i].revents & POLLOUT)
 				current->PollOutHandler();

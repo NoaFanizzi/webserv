@@ -23,7 +23,8 @@ CgiManager::CgiManager(Client &client, const std::string &scriptPath)
 	_events = POLLIN;
 	_startTime = std::time(NULL);
 	if (!start()) {
-		// TODO handle error
+		_client.setCgiOutput("");
+		return;
 	}
 	fcntl(_fd, F_SETFL, O_NONBLOCK);
 	WebServer::pollFdCreation(_fd, this);
@@ -130,14 +131,13 @@ bool CgiManager::start() {
 	_stdinFd = -1;
 	_finished = false;
 
-	std::cout << "CGI fd = " << _fd << std::endl;
-	std::cout << "CGI events = " << _events << std::endl;
 	return true;
 }
 
 void CgiManager::PollInHandler()
 {
-	std::cout << "POLLIN CGI\n";
+	if (_finished)
+		return;
 	char buffer[4096];
 
 	const ssize_t readSize = read(_fd, buffer, sizeof(buffer));
@@ -148,28 +148,20 @@ void CgiManager::PollInHandler()
 		return;
 	}
 
-	if (readSize == 0)
+	if (_pid > 0)
 	{
 		int status;
-		waitpid(_pid, &status, WNOHANG);
+		waitpid(_pid, &status, 0);
+		_pid = -1;
+	}
 
+	if (readSize == 0)
 		_client.setCgiOutput(_output);
-
-		_finished = true;
-		_closedStatus = true;
-		return;
-	}
-
-	if (readSize < 0)
-	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			return;
-
+	else
 		_client.setCgiOutput("");
-		_closedStatus = true;
-		_finished = true;
-		return;
-	}
+
+	_finished = true;
+	_closedStatus = true;
 }
 
 void CgiManager::PollOutHandler() {

@@ -47,19 +47,15 @@ void Client::PollInHandler()
 			_response.setRequest(_request);
 
 			if (CgiManager::isCgi(_request.getPath())) {
-				std::cout << "IS CGI\n";
-				_events = POLLOUT;
+				_events = 0;
 				_response.setIsCgi(true);
-				CgiManager *cgi = new CgiManager(*this, "website/cgi/hello.py");
-				(void)cgi;
+				new CgiManager(*this, "website" + _request.getPath());
 				_cgi = true;
 			}
 			else {
 				_response.generate(_config);
 				_events = POLLOUT;
 			}
-			std::cout << _rawRequest << std::endl;
-			std::cout << "===============================" << std::endl;
 		}
 	}
 	catch (const HttpException &e)
