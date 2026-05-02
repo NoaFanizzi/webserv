@@ -20,7 +20,8 @@ class AManager {
 	// functions
 	virtual void PollInHandler() = 0;
 	virtual void PollOutHandler() {};
-	bool isTimeout(time_t timeNow) {return (timeNow - _startTime > 5);}
+	virtual bool isTimeout(time_t timeNow) {return (timeNow - _startTime > 5);}
+
 	// getter
 	time_t getStartTime() {return _startTime;}
 	bool getClosedStatus() { return _closedStatus; }
@@ -29,6 +30,7 @@ class AManager {
 
 	// setter
 	void setEvents(short events) { _events = events; }
+	void setStartTime(const time_t timeNow) { _startTime = timeNow; }
 	virtual void onTimeout() {
 		_closedStatus = true;
 	}

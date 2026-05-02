@@ -28,6 +28,7 @@ class Client : public AManager {
 	~Client() {};
 
 	// functions
+	bool isTimeout(time_t timeNow);
 	void onTimeout();
 	void updateRequest(std::string &buffer, int n);
 	void handleRequestReception();
@@ -39,8 +40,7 @@ class Client : public AManager {
 	std::string GetRawRequest() { return _rawRequest; }
 
 	// setter
-	void setCgi(const bool cgi) { _cgi = cgi; }
-	void setCgiOutput(const std::string &output);
+	void setCgiOutput(const std::string &output, int error);
 };
 
 #endif

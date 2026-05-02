@@ -18,7 +18,7 @@ private:
 
 	pid_t _pid;
 	int _stdinFd;
-	bool _finished;
+	bool _timedOut;
 
 	// function
 	void buildEnv();
@@ -37,6 +37,8 @@ public:
 
 	void PollInHandler();
 	void PollOutHandler();
+
+	void onTimeout();
 
 	// getter
 	std::string getOutput() const;

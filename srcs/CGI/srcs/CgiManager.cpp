@@ -17,14 +17,14 @@ CgiManager::CgiManager(Client &client, const std::string &scriptPath)
 	  _client(client),
 	  _pid(-1),
 	  _stdinFd(-1),
-	  _finished(false) {
+	  _timedOut(false) {
 	_fd = -1;
 	_closedStatus = false;
 	_events = POLLIN;
 	_startTime = std::time(NULL);
 	if (!start()) {
 		// TODO manage error500
-		_client.setCgiOutput("");
+		_client.setCgiOutput("", 500);
 		return;
 	}
 	fcntl(_fd, F_SETFL, O_NONBLOCK);
@@ -38,7 +38,7 @@ CgiManager::~CgiManager() {
 std::string CgiManager::getOutput() const { return _output; }
 
 // static function
-bool CgiManager::isCgi(const std::string& path) {
+bool CgiManager::isCgi(const std::string &path) {
 	if (path.size() >= 3 && path.compare(path.size() - 3, 3, ".py") == 0)
 		return true;
 	if (path.size() >= 4 && path.compare(path.size() - 4, 4, ".php") == 0)
@@ -131,40 +131,77 @@ bool CgiManager::start() {
 	//}
 	close(_stdinFd);
 	_stdinFd = -1;
-	_finished = false;
 
 	return true;
 }
 
-void CgiManager::PollInHandler()
-{
-	if (_finished)
-		return;
+void CgiManager::PollInHandler() {
+	if (_timedOut) {
+		return ;
+	}
 	char buffer[4096];
 
 	const ssize_t readSize = read(_fd, buffer, sizeof(buffer));
 
-	if (readSize > 0)
-	{
+	if (readSize > 0) {
 		_output.append(buffer, readSize);
 		return;
 	}
-
-	if (_pid > 0)
-	{
-		int status;
-		waitpid(_pid, &status, 0);
-		// TODO manage if script fail error 500 + kill the process
-		_pid = -1;
+	if (readSize < 0) {
+		_client.setCgiOutput("", 500);
+		_events = 0;
+		_closedStatus = true;
+		return;
 	}
 
-	if (readSize == 0)
-		_client.setCgiOutput(_output);
-	else
-		_client.setCgiOutput("");
+	if (_pid > 0) {
+		int status;
+		const pid_t ret = waitpid(_pid, &status, WNOHANG);
 
-	_finished = true;
+		if (ret == 0)
+			return;
+		if (ret < 0) {
+			_client.setCgiOutput("", 500);
+			_events = 0;
+			_closedStatus = true;
+			_pid = -1;
+			return;
+		}
+
+		if (WIFEXITED(status)) {
+			const int code = WEXITSTATUS(status);
+
+			if (code != 0) {
+				_client.setCgiOutput("", 500);
+				_events = 0;
+				_closedStatus = true;
+				return;
+			}
+		}
+	}
+
+	_client.setCgiOutput(_output, 0);
+
+	_pid = -1;
+	_events = 0;
 	_closedStatus = true;
 }
 
-void CgiManager::PollOutHandler() {}
+void CgiManager::PollOutHandler() {
+	_closedStatus = true;
+	_events = 0;
+}
+
+void CgiManager::onTimeout() {
+	if (_timedOut)
+		return ;
+	if (_pid != -1) {
+		kill(_pid, SIGKILL);
+		waitpid(_pid, NULL, 0);
+		_pid = -1;
+	}
+	_client.setCgiOutput("", 504);
+	_events = 0;
+	_closedStatus = true;
+	_timedOut = true;
+}

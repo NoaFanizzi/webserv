@@ -27,8 +27,8 @@ Client::Client(int fd, const ServerConfig &config) : _config(config)
 	_closedStatus = false;
 	_events = POLLIN;
 	_timedOut = false;
-	_cgi = false;
 	_startTime = std::time(NULL);
+	_cgi = false;
 	WebServer::pollFdCreation(_fd, this);
 }
 
@@ -49,19 +49,21 @@ void Client::PollInHandler()
 			if (CgiManager::isCgi(_request.getPath())) {
 				_events = 0;
 				_response.setIsCgi(true);
-				new CgiManager(*this, "website" + _request.getPath());
 				_cgi = true;
+				new CgiManager(*this, "website" + _request.getPath());
+				_startTime = std::time(NULL);
 			}
 			else {
 				_response.generate(_config);
 				_events = POLLOUT;
 			}
+			std::cout << _rawRequest << std::endl;
+			std::cout << "===============================" << std::endl;
 		}
 	}
 	catch (const HttpException &e)
 	{
-		//_requestEnded = true;
-		int errorCode = e.getStatusCode();
+		const int errorCode = e.getStatusCode();
 		std::cout << "error code = " << errorCode << std::endl;
 		std::ostringstream oss;
 		oss << errorCode;
@@ -73,7 +75,6 @@ void Client::PollInHandler()
 		_response.setFinalPath(".html");
 		_response.buildErrorHeader();
 		_events = POLLOUT;
-		// _isCgi = false;
 	}
 	catch (const std::exception &e)
 	{
@@ -86,6 +87,12 @@ void Client::PollInHandler()
 		_response.buildErrorHeader();
 		_events = POLLOUT;
 	}
+}
+
+bool Client::isTimeout(time_t timeNow) {
+	if (_cgi)
+		return false;
+	return (timeNow - _startTime > 5);
 }
 
 void Client::onTimeout()
@@ -101,11 +108,11 @@ void Client::onTimeout()
 		   << "Connection: close\r\n"
 		   << "\r\n";
 
-	std::string full = header.str() + body;
+	const std::string full = header.str() + body;
 	size_t sent = 0;
 	while (sent < full.size())
 	{
-		ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
+		const ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
 		if (n <= 0)
 			break;
 		sent += n;
@@ -117,13 +124,11 @@ void Client::onTimeout()
 
 void Client::PollOutHandler()
 {
-	if (_cgi)
-		return;
-	std::string full = _response.getFullResponse();
+	const std::string full = _response.getFullResponse();
 	size_t sent = 0;
 	while (sent < full.size())
 	{
-		ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
+		const ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
 		if (n <= 0)
 			break;
 		sent += n;
@@ -133,8 +138,23 @@ void Client::PollOutHandler()
 	_closedStatus = true;
 }
 
-void Client::setCgiOutput(const std::string &output) {
-	_response.setBody(output);
+void Client::setCgiOutput(const std::string &output, const int error) {
+	if (error) {
+		std::ostringstream oss;
+		oss << error;
+		_response.setIsCgi(false);
+		_request.setPath(".html");
+		_response.setRequest(_request);
+		_response.setStatusCode(oss.str());
+		if (error == 504)
+			_response.setStatusText("Gateway Timeout");
+		else
+			_response.setStatusText("Internal Server Error");
+		_response.setBody(_response.getErrorPageContent(error, _config));
+		_response.setFinalPath(".html");
+		_response.buildErrorHeader();
+	}
+	else
+		_response.setBody(output);
 	_events = POLLOUT;
-	_cgi = false;
 }
