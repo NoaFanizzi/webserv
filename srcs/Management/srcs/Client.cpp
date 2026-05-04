@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/04/30 15:39:28 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/04 13:02:45 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,17 @@ void Client::PollInHandler()
 			_response.setRequest(_request);
 
 			if (CgiManager::isCgi(_request.getPath())) {
+				 // TODO vrai path
+				std::string realPath = "website" + _request.getPath();
+				if (access(realPath.c_str(), F_OK) == -1)
+					throw Http404Exception();
+				// TODO check if R_OK is needed
+				if (access(realPath.c_str(), R_OK | X_OK) == -1)
+					throw Http403Exception();
 				_events = 0;
 				_response.setIsCgi(true);
 				_cgi = true;
-				new CgiManager(*this, "website" + _request.getPath()); // TODO vrai path
+				new CgiManager(*this, realPath);
 				_startTime = std::time(NULL);
 			}
 			else {

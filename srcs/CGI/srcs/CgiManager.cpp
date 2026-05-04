@@ -43,12 +43,12 @@ bool CgiManager::isCgi(const std::string &path) {
 	return false;
 }
 
-static void freeEnv(char ***env) {
-	for (size_t i = 0; *env[i] != NULL; i++)
+static void freeEnv(char **env) {	
+	for (size_t i = 0; env[i] != NULL; i++)
 	{
-		free(*env[i]);
+		free(env[i]);
 	}
-	free(*env);
+	delete[] env;
 }
 
 // functions
@@ -114,11 +114,12 @@ bool CgiManager::start() {
 			const_cast<char *>(_scriptPath.c_str()),
 			NULL
 		};
-
-		execve(_scriptPath.c_str(), argv, envp);
+		execve(argv[0], argv, envp);
 		std::cerr << _scriptPath;
 		perror(": ");
-		freeEnv(&envp);
+		freeEnv(envp);
+		(*this).~CgiManager();
+		WebServer::destroy();
 		exit(127);
 	}
 
@@ -148,6 +149,12 @@ void CgiManager::PollInHandler() {
 
 	const ssize_t readSize = read(_fd, buffer, sizeof(buffer));
 
+	if (readSize == 0)
+	{
+		_client.setCgiOutput("", 501);
+		_events = 0;
+		_closedStatus = true;
+	}
 	if (readSize > 0) {
 		_output.append(buffer, readSize);
 		return;

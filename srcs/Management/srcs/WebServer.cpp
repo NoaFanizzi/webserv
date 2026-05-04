@@ -63,7 +63,6 @@ void WebServer::run()
 	while (true)
 	{
 		updateStatus();
-
 		int poll_value = poll(&_pollfds[0], _pollfds.size(), 1000);
 		if (poll_value < 0)
 		{
