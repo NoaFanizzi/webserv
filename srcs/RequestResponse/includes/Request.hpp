@@ -36,6 +36,7 @@ class Request {
 	std::string _version; // HTTP/1.1 usually
 	size_t _contentLengthBody;
 	std::string _webKitForm;
+	std::string _body;
 	std::map<std::string, std::string> _headers; // headers
 	std::vector<BodyRequest> _bodyRequests;      // body content
 	std::vector<LocationConfig> _currentLocations; // matching locations
@@ -59,6 +60,7 @@ class Request {
 	std::string getQuery() const { return _query; }
 	std::string getVersion() const { return _version; }
 	std::string getHeaders(const std::string toGet) const;
+	std::string getBody() const;
 	const std::vector<LocationConfig> &getCurrentLocations() const { return _currentLocations; }
 
 	void setPath(const std::string &str) { _path = str; }

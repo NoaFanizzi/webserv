@@ -1,6 +1,7 @@
 #include "CgiManager.hpp"
 
 #include "WebServer.hpp"
+#include "CgiWriter.hpp"
 #include <cerrno>
 #include <cstring>
 #include <iostream>
@@ -11,12 +12,7 @@
 #include <poll.h>
 
 // constructor
-CgiManager::CgiManager(Client &client, const std::string &scriptPath)
-	: _request(client.getRequest()),
-	  _scriptPath(scriptPath),
-	  _client(client),
-	  _pid(-1),
-	  _stdinFd(-1),
+CgiManager::CgiManager(Client &client, const std::string &sc`
 	  _timedOut(false) {
 	_fd = -1;
 	_closedStatus = false;
@@ -43,7 +39,7 @@ bool CgiManager::isCgi(const std::string &path) {
 	return false;
 }
 
-static void freeEnv(char **env) {	
+static void freeEnv(char **env) {
 	for (size_t i = 0; env[i] != NULL; i++)
 	{
 		free(env[i]);
@@ -58,6 +54,7 @@ void CgiManager::buildEnv() {
 	_env.push_back("SCRIPT_NAME=" + _request.getPath());
 	_env.push_back("QUERY_STRING=" + _request.getQuery());
 	_env.push_back("CONTENT_LENGTH=" + _request.getHeaders("Content-Length"));
+	std::cout << "metssshod:" <<  _request.getMethod() << std::endl;
 	_env.push_back("CONTENT_TYPE=" + _request.getHeaders("Content-Type"));
 	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
@@ -130,12 +127,11 @@ bool CgiManager::start() {
 	_fd = fdOut[0];
 
 	// TODO demande a mat comment get le body
-	//const std::string &body = _client.getRequest().getBody();
-	//if (!body.empty()) {
-	//	ssize_t written = write(_stdinFd, body.c_str(), body.size());
-	//	(void)written;
-	//}
-	close(_stdinFd);
+	if (_client.getRequest().getMethod() == "POST") {
+		new CgiWriter(_stdinFd, _client.getRequest().getBody());
+	}
+	else
+		close(_stdinFd);
 	_stdinFd = -1;
 
 	return true;
@@ -146,15 +142,8 @@ void CgiManager::PollInHandler() {
 		return ;
 	}
 	char buffer[4096];
-
 	const ssize_t readSize = read(_fd, buffer, sizeof(buffer));
 
-	if (readSize == 0)
-	{
-		_client.setCgiOutput("", 501);
-		_events = 0;
-		_closedStatus = true;
-	}
 	if (readSize > 0) {
 		_output.append(buffer, readSize);
 		return;

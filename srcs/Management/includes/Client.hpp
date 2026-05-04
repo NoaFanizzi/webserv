@@ -13,7 +13,6 @@ class Client : public AManager {
 	const ServerConfig _config;
 	std::string _rawRequest;
 	Request _request;
-	bool _firstLoopRequets;
 	bool _requestEnded;
 	bool _timedOut;
 	bool _cgi;
@@ -30,8 +29,6 @@ class Client : public AManager {
 	// functions
 	bool isTimeout(time_t timeNow);
 	void onTimeout();
-	void updateRequest(std::string &buffer, int n);
-	void handleRequestReception();
 	void PollInHandler();
 	void PollOutHandler();
 
