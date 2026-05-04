@@ -50,7 +50,7 @@ void Client::PollInHandler()
 				_events = 0;
 				_response.setIsCgi(true);
 				_cgi = true;
-				new CgiManager(*this, "website" + _request.getPath());
+				new CgiManager(*this, "website" + _request.getPath()); // TODO vrai path
 				_startTime = std::time(NULL);
 			}
 			else {

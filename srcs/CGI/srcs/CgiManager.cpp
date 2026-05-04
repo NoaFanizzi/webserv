@@ -34,9 +34,6 @@ CgiManager::CgiManager(Client &client, const std::string &scriptPath)
 CgiManager::~CgiManager() {
 }
 
-// getter
-std::string CgiManager::getOutput() const { return _output; }
-
 // static function
 bool CgiManager::isCgi(const std::string &path) {
 	if (path.size() >= 3 && path.compare(path.size() - 3, 3, ".py") == 0)
@@ -44,6 +41,14 @@ bool CgiManager::isCgi(const std::string &path) {
 	if (path.size() >= 4 && path.compare(path.size() - 4, 4, ".php") == 0)
 		return true;
 	return false;
+}
+
+static void freeEnv(char ***env) {
+	for (size_t i = 0; *env[i] != NULL; i++)
+	{
+		free(*env[i]);
+	}
+	free(*env);
 }
 
 // functions
@@ -111,9 +116,9 @@ bool CgiManager::start() {
 		};
 
 		execve(_scriptPath.c_str(), argv, envp);
-
 		std::cerr << _scriptPath;
 		perror(": ");
+		freeEnv(&envp);
 		exit(127);
 	}
 

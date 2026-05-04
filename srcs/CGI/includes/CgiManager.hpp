@@ -41,5 +41,5 @@ public:
 	void onTimeout();
 
 	// getter
-	std::string getOutput() const;
+	std::string getOutput() const { return _output; }
 };
