@@ -76,9 +76,9 @@ void WebServer::run()
 				continue;
 			poll_value--;
 			if (_pollfds[i].revents & (POLLIN | POLLHUP | POLLERR))
-				current->PollInHandler();
+				current->pollInHandler();
 			if (_pollfds[i].revents & POLLOUT)
-				current->PollOutHandler();
+				current->pollOutHandler();
 			if (current->getClosedStatus())
 			{
 				_managers.erase(_pollfds[i].fd);

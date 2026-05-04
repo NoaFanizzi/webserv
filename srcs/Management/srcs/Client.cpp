@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/05/04 13:02:45 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/04 13:43:28 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ Client::Client(int fd, const ServerConfig &config) : _config(config)
 	WebServer::pollFdCreation(_fd, this);
 }
 
-void Client::PollInHandler()
+void Client::pollInHandler()
 {
 	if (_requestEnded)
 		return;
@@ -129,7 +129,7 @@ void Client::onTimeout()
 	_closedStatus = true;
 }
 
-void Client::PollOutHandler()
+void Client::pollOutHandler()
 {
 	const std::string full = _response.getFullResponse();
 	size_t sent = 0;

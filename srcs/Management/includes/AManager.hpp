@@ -18,8 +18,8 @@ class AManager {
 	virtual ~AManager() {};
 
 	// functions
-	virtual void PollInHandler() = 0;
-	virtual void PollOutHandler() {};
+	virtual void pollInHandler() = 0;
+	virtual void pollOutHandler() {};
 	virtual bool isTimeout(time_t timeNow) {return (timeNow - _startTime > 5);}
 
 	// getter

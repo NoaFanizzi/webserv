@@ -32,8 +32,8 @@ class Client : public AManager {
 	void onTimeout();
 	void updateRequest(std::string &buffer, int n);
 	void handleRequestReception();
-	void PollInHandler();
-	void PollOutHandler();
+	void pollInHandler();
+	void pollOutHandler();
 
 	// getter
 	Request &getRequest() { return _request; }
