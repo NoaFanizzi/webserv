@@ -12,7 +12,12 @@
 #include <poll.h>
 
 // constructor
-CgiManager::CgiManager(Client &client, const std::string &sc`
+CgiManager::CgiManager(Client &client, const std::string &scriptPath)
+	: _request(client.getRequest()),
+	  _scriptPath(scriptPath),
+	  _client(client),
+	  _pid(-1),
+	  _stdinFd(-1),
 	  _timedOut(false) {
 	_fd = -1;
 	_closedStatus = false;
