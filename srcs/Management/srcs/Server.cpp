@@ -68,7 +68,7 @@ void Server::bindClient(int fd)
 
 void Server::onTimeout() {}
 
-void Server::PollInHandler()
+void Server::pollInHandler()
 {
 	struct sockaddr_in clientaddr;
 	socklen_t addr_len = sizeof(clientaddr);

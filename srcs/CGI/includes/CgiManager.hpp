@@ -36,8 +36,8 @@ public:
 	// function
 	bool start();
 
-	void PollInHandler();
-	void PollOutHandler();
+	void pollInHandler();
+	void pollOutHandler();
 
 	void onTimeout();
 

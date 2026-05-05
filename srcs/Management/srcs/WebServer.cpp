@@ -1,8 +1,10 @@
 #include "WebServer.hpp"
 #include "AManager.hpp"
+#include "Config.hpp"
 #include <poll.h>
 #include <iostream>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstring>
 
 std::vector<struct pollfd> WebServer::_pollfds;
 std::map<int, AManager *> WebServer::_managers;
@@ -66,8 +68,8 @@ void WebServer::run()
 		int poll_value = poll(&_pollfds[0], _pollfds.size(), 1000);
 		if (poll_value < 0)
 		{
-			perror("poll error");
-			exit(1);
+			destroy();
+			throw Exception(std::string("poll: ") + strerror(errno)); 
 		}
 		for (size_t i = 0; i < _pollfds.size() && poll_value; i++)
 		{
@@ -76,9 +78,9 @@ void WebServer::run()
 				continue;
 			poll_value--;
 			if (_pollfds[i].revents & (POLLIN | POLLHUP | POLLERR))
-				current->PollInHandler();
+				current->pollInHandler();
 			if (_pollfds[i].revents & POLLOUT)
-				current->PollOutHandler();
+				current->pollOutHandler();
 			if (current->getClosedStatus())
 			{
 				_managers.erase(_pollfds[i].fd);

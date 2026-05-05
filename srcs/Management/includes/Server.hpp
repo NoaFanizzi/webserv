@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/05/04 13:02:35 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/04 13:42:48 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class Server : public AManager {
 	~Server();
 
 	// functions
-	void PollInHandler();
+	void pollInHandler();
 	void onTimeout();
 
 	// getters

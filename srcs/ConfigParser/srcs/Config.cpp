@@ -42,6 +42,7 @@ void Config::initLocationKeys()
     _keysLocation[4] = "allow_methods";
     _keysLocation[5] = "return";
     _keysLocation[6] = "upload_dir";
+    _keysLocation[7] = "cgi_pass";
 }
 
 bool Config::setFile(std::string doc)

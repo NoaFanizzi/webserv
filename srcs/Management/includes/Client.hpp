@@ -12,6 +12,8 @@ class Client : public AManager {
 	// variables
 	const ServerConfig _config;
 	std::string _rawRequest;
+	std::string _sendBuffer;
+	size_t _sendOffset;
 	Request _request;
 	bool _requestEnded;
 	bool _timedOut;
@@ -29,8 +31,10 @@ class Client : public AManager {
 	// functions
 	bool isTimeout(time_t timeNow);
 	void onTimeout();
-	void PollInHandler();
-	void PollOutHandler();
+	void updateRequest(std::string &buffer, int n);
+	void handleRequestReception();
+	void pollInHandler();
+	void pollOutHandler();
 
 	// getter
 	Request &getRequest() { return _request; }

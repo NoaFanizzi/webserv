@@ -137,7 +137,7 @@ bool CgiManager::start() {
 	return true;
 }
 
-void CgiManager::PollInHandler() {
+void CgiManager::pollInHandler() {
 	if (_timedOut) {
 		return ;
 	}
@@ -188,7 +188,7 @@ void CgiManager::PollInHandler() {
 	_closedStatus = true;
 }
 
-void CgiManager::PollOutHandler() {
+void CgiManager::pollOutHandler() {
 	_closedStatus = true;
 	_events = 0;
 }

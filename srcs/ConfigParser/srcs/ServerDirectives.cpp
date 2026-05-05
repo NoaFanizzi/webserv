@@ -155,8 +155,14 @@ void Config::parseErrorPage(ServerConfig &server, const std::vector<std::string>
     if (code < 400 || code > 599)
         throw Exception("error_page out of range [400-599] -> " + line[j + 1]);
 
+    bool semicolon = false;
     if (!path.empty() && path[path.size() - 1] == ';')
+    {
         path = path.substr(0, path.size() - 1);
+        semicolon = true;
+    }
+    if (!semicolon)
+        throw Exception("No semicolon on the line -> error_page");
 
     ErrorPage page;
     page.index = static_cast<int>(code);

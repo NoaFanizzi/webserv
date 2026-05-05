@@ -13,7 +13,7 @@
 #include "Config.hpp"
 #include <cstdlib>
 
-static const size_t LOCATION_KEYS_COUNT = 7;
+static const size_t LOCATION_KEYS_COUNT = 8;
 
 void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
 {
@@ -81,14 +81,46 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
         return;
     }
 
+    if (key == "cgi_pass")
+    {
+        if (j + 2 >= line.size())
+            throw Exception("cgi_pass requires an extension and an executable path");
+        std::string ext = line[j + 1];
+        std::string executable = line[j + 2];
+        bool semicolon = false;
+        if (!executable.empty() && executable[executable.size() - 1] == ';')
+        {
+            executable = executable.substr(0, executable.size() - 1);
+            semicolon = true;
+        }
+        else if (j + 3 < line.size() && line[j + 3] == ";")
+            semicolon = true;
+        if (!semicolon)
+            throw Exception("No semicolon on the line -> cgi_pass");
+        if (ext.empty() || ext[0] != '.')
+            throw Exception("cgi_pass extension must start with '.' -> " + ext);
+        if (executable.empty())
+            throw Exception("cgi_pass executable path is empty");
+        location.cgi_pass[ext] = executable;
+        return;
+    }
+
     if (key == "return")
     {
         if (j + 2 >= line.size())
             throw Exception("return directive requires a code and a url");
         std::string codeStr = line[j + 1];
         std::string url = line[j + 2];
+        bool semicolon = false;
         if (!url.empty() && url[url.size() - 1] == ';')
+        {
             url = url.substr(0, url.size() - 1);
+            semicolon = true;
+        }
+        else if (j + 3 < line.size() && line[j + 3] == ";")
+            semicolon = true;
+        if (!semicolon)
+            throw Exception("No semicolon on the line -> return");
         for (size_t k = 0; k < codeStr.size(); k++)
             if (!std::isdigit(codeStr[k]))
                 throw Exception("return directive: invalid code -> " + codeStr);
