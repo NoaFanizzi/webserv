@@ -5,12 +5,11 @@
 #include <fstream>
 #include <sys/stat.h>
 
-static bool _finalAutoIndex;
-
 void Response::setRequest(Request &req)
 {
 	_request = &req;
 	_isCgi = false;
+	_finalAutoIndex = false;
 	setMimes();
 	setErrorPages();
 }
@@ -254,13 +253,12 @@ void Response::generate(const ServerConfig &config)
 
 	if (_request->getMethod() == "DELETE")
 	{
+		if (access(_finalPath.c_str(), F_OK) != 0)
+			throw Http404Exception();
+		if (access(_finalPath.c_str(), W_OK) != 0)
+			throw Http403Exception();
 		if (std::remove(_finalPath.c_str()) != 0)
-		{
-			if (errno == EACCES)
-				throw Http403Exception();
-			else
-				throw Http404Exception();
-		}
+			throw Http500Exception();
 		_statusCode = "200";
 		_statusText = "OK";
 		_body = "{\"message\": \"File deleted successfully\"}";
@@ -292,6 +290,86 @@ void Response::generate(const ServerConfig &config)
 	_request->setPath(_finalPath);
 	if (!_isCgi)
 		_header = buildHeader(_body.size(), _statusCode, _statusText);
+}
+
+std::string Response::getFullResponse()
+{
+	if (!_isCgi)
+		return _header + _body;
+
+	// Find the blank line separating CGI headers from body (CRLF or LF)
+	std::string cgiHeaderBlock;
+	std::string cgiBody;
+	size_t sep = _body.find("\r\n\r\n");
+	if (sep != std::string::npos) {
+		cgiHeaderBlock = _body.substr(0, sep);
+		cgiBody = _body.substr(sep + 4);
+	} else {
+		sep = _body.find("\n\n");
+		if (sep != std::string::npos) {
+			cgiHeaderBlock = _body.substr(0, sep);
+			cgiBody = _body.substr(sep + 2);
+		} else {
+			cgiBody = _body;
+		}
+	}
+
+	// Parse CGI headers: extract Status:, keep the rest
+	std::string statusCode = "200";
+	std::string statusText = "OK";
+	std::string filteredHeaders;
+	bool hasContentLength = false;
+
+	size_t pos = 0;
+	while (pos < cgiHeaderBlock.size()) {
+		size_t end = cgiHeaderBlock.find('\n', pos);
+		std::string line;
+		if (end == std::string::npos) {
+			line = cgiHeaderBlock.substr(pos);
+			pos = cgiHeaderBlock.size();
+		} else {
+			line = cgiHeaderBlock.substr(pos, end - pos);
+			pos = end + 1;
+		}
+		if (!line.empty() && line[line.size() - 1] == '\r')
+			line.erase(line.size() - 1);
+		if (line.empty())
+			continue;
+
+		size_t colon = line.find(':');
+		std::string key = (colon != std::string::npos) ? line.substr(0, colon) : line;
+		for (size_t i = 0; i < key.size(); i++)
+			key[i] = std::tolower((unsigned char)key[i]);
+
+		if (key == "status" && colon != std::string::npos) {
+			std::string val = line.substr(colon + 1);
+			size_t start = val.find_first_not_of(" \t");
+			if (start != std::string::npos) {
+				val = val.substr(start);
+				size_t space = val.find(' ');
+				if (space != std::string::npos) {
+					statusCode = val.substr(0, space);
+					statusText = val.substr(space + 1);
+				} else {
+					statusCode = val;
+				}
+			}
+		} else {
+			if (key == "content-length")
+				hasContentLength = true;
+			filteredHeaders += line + "\r\n";
+		}
+	}
+
+	std::ostringstream response;
+	response << "HTTP/1.1 " << statusCode << " " << statusText << "\r\n";
+	response << filteredHeaders;
+	if (!hasContentLength)
+		response << "Content-Length: " << cgiBody.size() << "\r\n";
+	response << "\r\n";
+	response << cgiBody;
+
+	return response.str();
 }
 
 void Response::setMimes()

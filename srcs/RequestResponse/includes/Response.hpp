@@ -15,6 +15,7 @@ class Response {
 	std::map<int, std::string> _errorPages;
 	std::map<std::string, std::string> _mimeTypes;
 	bool _isCgi;
+	bool _finalAutoIndex;
 	std::string _redirectLocation;
 
 	// functions
@@ -28,7 +29,7 @@ class Response {
 	
   public:
 	// constructor
-	Response() : _isCgi(false), _redirectLocation("") {};
+	Response() : _isCgi(false), _finalAutoIndex(false), _redirectLocation("") {};
 	void setRequest(Request &request);
 	std::string getErrorPageContent(int code, const ServerConfig &config);
 	void setStatusCode(const std::string &code) { _statusCode = code; }
@@ -40,9 +41,5 @@ class Response {
 	void buildErrorHeader();
 	// functions
 	void generate(const ServerConfig &config);
-	std::string getFullResponse() {
-		if (_isCgi)
-			return _body;
-		return _header + _body; 
-	}
+	std::string getFullResponse();
 };

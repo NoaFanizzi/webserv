@@ -111,6 +111,11 @@ bool CgiManager::start() {
 		close(fdOut[0]);
 		close(fdOut[1]);
 
+		// Run the script from its own directory so relative paths work
+		size_t slash = _scriptPath.rfind('/');
+		if (slash != std::string::npos)
+			chdir(_scriptPath.substr(0, slash).c_str());
+
 		char **envp = envToCharArray();
 		char *argv[] = {
 			const_cast<char *>(_scriptPath.c_str()),
@@ -131,7 +136,6 @@ bool CgiManager::start() {
 	_stdinFd = fdIn[1];
 	_fd = fdOut[0];
 
-	// TODO demande a mat comment get le body
 	if (_client.getRequest().getMethod() == "POST") {
 		new CgiWriter(_stdinFd, _client.getRequest().getBody());
 	}

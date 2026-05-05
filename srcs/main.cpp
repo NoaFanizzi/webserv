@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/24 11:58:11 by mvachon           #+#    #+#             */
-/*   Updated: 2026/05/04 13:02:14 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/05 12:20:19 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,17 @@ int main(int ac, char **av)
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
 	signal(SIGTERM, SIG_IGN);
-	Config config;
-	if (!config.setFile(av[1]))
-		return 1;
-
 	try
 	{
-		const std::vector<ServerConfig> &SavedServers = config.getServers();
-		for (size_t i = 0; i < SavedServers.size(); i++)
-			new Server(SavedServers[i]);
+		{
+			Config config;
+			if (!config.setFile(av[1]))
+				return 1;
+			const std::vector<ServerConfig> &SavedServers = config.getServers();
+			for (size_t i = 0; i < SavedServers.size(); i++)
+				new Server(SavedServers[i]);
+			
+		}
 		std::signal(SIGINT, signalHandler);
 		std::signal(SIGQUIT, signalHandler);
 		std::signal(SIGTERM, signalHandler);

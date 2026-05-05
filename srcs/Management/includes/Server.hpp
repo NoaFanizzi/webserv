@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 11:35:23 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/05/04 13:42:48 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/05 12:18:59 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class Server : public AManager {
   private:
 	// variables
 	struct sockaddr_in _servAddr;
-	const ServerConfig &_serverConfig;
+	const ServerConfig _serverConfig;
 
 	// functions
 	int createSocket();

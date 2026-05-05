@@ -34,7 +34,6 @@ body = f"""<!DOCTYPE html>
 body_bytes = body.encode("utf-8")
 
 headers = (
-    "HTTP/1.1 200 OK\r\n"
     "Content-Type: text/html; charset=UTF-8\r\n"
     f"Content-Length: {len(body_bytes)}\r\n"
     "Connection: close\r\n"

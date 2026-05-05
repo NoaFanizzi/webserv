@@ -47,6 +47,7 @@ void Client::pollInHandler()
 				_events = 0;
 				_response.setIsCgi(true);
 				_cgi = true;
+				//TODO fix le leak lié a ce new quand execve crash
 				new CgiManager(*this, realPath);
 				_startTime = std::time(NULL);
 			}

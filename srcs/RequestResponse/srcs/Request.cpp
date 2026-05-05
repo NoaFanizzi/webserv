@@ -122,6 +122,15 @@ bool Request::isValid(const std::string &req, const ServerConfig &config)
 		return true;
 	if (_method == "POST")
 	{
+		std::string headers_section = lower_req.substr(0, header_end);
+		bool isChunked = (headers_section.find("transfer-encoding: chunked") != std::string::npos);
+
+		if (isChunked)
+		{
+			std::string body_part = req.substr(header_end + 4);
+			return (body_part.find("0\r\n\r\n") != std::string::npos);
+		}
+
 		if (_contentLengthBody == static_cast<size_t>(-1))
 		{
 			std::string headers_only = req.substr(0, header_end);
@@ -146,8 +155,13 @@ void Request::checkRequest()
 		throw Http505Exception();
 	if (_headers.find("host") == _headers.end())
 		throw Http400Exception();
-	if (_method == "POST" && _headers.find("content-length") == _headers.end())
-		throw Http411Exception();
+	if (_method == "POST")
+	{
+		std::map<std::string, std::string>::const_iterator te = _headers.find("transfer-encoding");
+		bool isChunked = (te != _headers.end() && toLower(te->second) == "chunked");
+		if (!isChunked && _headers.find("content-length") == _headers.end())
+			throw Http411Exception();
+	}
 	if (_path.empty() || _path[0] != '/')
 		throw Http400Exception();
 	if (_path.size() > 2048)
@@ -304,9 +318,9 @@ void Request::printDebug() const
 	std::cout << "======================" << std::endl;
 }
 
-void Request::parsePostMethod(const std::string &request, size_t body_start, const std::string &uploadDir)
+void Request::parsePostMethod(const std::string &uploadDir)
 {
-	std::vector<std::string> parts = split(request.substr(body_start, _contentLengthBody), "--" + _webKitForm);
+	std::vector<std::string> parts = split(_body.substr(0, _contentLengthBody), "--" + _webKitForm);
 	for (size_t i = 0; i + 1 < parts.size(); ++i)
 	{
 		std::string &part = parts[i];
@@ -347,6 +361,48 @@ void Request::parsePostMethod(const std::string &request, size_t body_start, con
 		if (ofs.fail())
 			throw Http500Exception();
 	}
+}
+
+static std::string unchunkBody(const std::string &chunked)
+{
+	std::string result;
+	size_t pos = 0;
+
+	while (pos < chunked.size())
+	{
+		size_t crlf = chunked.find("\r\n", pos);
+		if (crlf == std::string::npos)
+			throw Http400Exception();
+
+		std::string sizeStr = chunked.substr(pos, crlf - pos);
+		size_t semi = sizeStr.find(';');
+		if (semi != std::string::npos)
+			sizeStr = sizeStr.substr(0, semi);
+		size_t first = sizeStr.find_first_not_of(" \t");
+		if (first == std::string::npos)
+			throw Http400Exception();
+		sizeStr = sizeStr.substr(first);
+
+		char *end;
+		errno = 0;
+		unsigned long chunkSize = std::strtoul(sizeStr.c_str(), &end, 16);
+		if (errno == ERANGE || *end != '\0')
+			throw Http400Exception();
+
+		pos = crlf + 2;
+		if (chunkSize == 0)
+			break;
+		if (pos + chunkSize > chunked.size())
+			throw Http400Exception();
+
+		result.append(chunked, pos, chunkSize);
+		pos += chunkSize;
+
+		if (pos + 2 > chunked.size() || chunked[pos] != '\r' || chunked[pos + 1] != '\n')
+			throw Http400Exception();
+		pos += 2;
+	}
+	return result;
 }
 
 // parse request
@@ -403,6 +459,19 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 	setCurrentLocations(config);
 	_body = request.substr(body_start);
 
+	{
+		std::map<std::string, std::string>::const_iterator te = _headers.find("transfer-encoding");
+		if (te != _headers.end() && toLower(te->second) == "chunked")
+		{
+			_body = unchunkBody(_body);
+			_contentLengthBody = _body.size();
+			if (static_cast<long long>(_contentLengthBody) > config.client_max_body_size)
+				throw Http413Exception();
+			std::string headers_only = request.substr(0, body_start - 4);
+			parseWebKitForm(headers_only);
+		}
+	}
+
 	if (_method == "POST" && static_cast<long long>(_contentLengthBody) <= config.client_max_body_size)
 	{
 		std::string uploadDir;
@@ -414,7 +483,7 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 			uploadDir = config.root + _path;
 		if (!uploadDir.empty() && uploadDir[uploadDir.size() - 1] != '/')
 			uploadDir += '/';
-		parsePostMethod(request, body_start, uploadDir);
+		parsePostMethod(uploadDir);
 	}
 	else
 	{

@@ -12,7 +12,6 @@ form = cgi.FieldStorage()
 user_input = form.getfirst("input", "")
 
 # CGI header
-print("HTTP/1.1 200 OK")
 print("Content-Type: text/html")
 print()
 
