@@ -12,6 +12,7 @@
 
 #include "Config.hpp"
 #include <iostream>
+#include <map>
 
 void Config::printServers()
 {
@@ -74,7 +75,7 @@ void Config::printServers()
                 
                 if (!loc.allowed_methods.empty())
                 {
-                    std::cout << prefix << "└── Methods: ";
+                    std::cout << prefix << "├── Methods: ";
                     for (size_t m = 0; m < loc.allowed_methods.size(); ++m)
                     {
                         std::cout << loc.allowed_methods[m];
@@ -82,6 +83,14 @@ void Config::printServers()
                             std::cout << ", ";
                     }
                     std::cout << std::endl;
+                }
+
+                if (!loc.cgi_pass.empty())
+                {
+                    std::cout << prefix << "└── CGI pass:" << std::endl;
+                    for (std::map<std::string, std::string>::const_iterator it = loc.cgi_pass.begin();
+                         it != loc.cgi_pass.end(); ++it)
+                        std::cout << prefix << "    " << it->first << " → " << it->second << std::endl;
                 }
                 
                 if (j < srv.locations.size() - 1)

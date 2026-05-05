@@ -14,6 +14,7 @@
 #define CONFIG_HPP
 
 #include <fcntl.h>
+#include <map>
 #include <vector>
 #include <unistd.h>
 #include <string>
@@ -39,6 +40,7 @@ struct LocationConfig
     std::vector<std::string> allowed_methods;
     int         redirectCode;
     std::string redirectUrl;
+    std::map<std::string, std::string> cgi_pass;
     LocationConfig() : autoindex(false), redirectCode(0){}
 };
 
@@ -70,7 +72,7 @@ class Config
         std::vector<std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
         std::string _keysServer[9];
-        std::string _keysLocation[7];
+        std::string _keysLocation[8];
 
         void initServerKeys();
         void initLocationKeys();

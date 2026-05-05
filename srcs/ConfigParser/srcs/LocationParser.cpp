@@ -13,7 +13,7 @@
 #include "Config.hpp"
 #include <cstdlib>
 
-static const size_t LOCATION_KEYS_COUNT = 7;
+static const size_t LOCATION_KEYS_COUNT = 8;
 
 void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
 {
@@ -78,6 +78,30 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
     if (key == "allow_methods")
     {
         parseAllowMethods(location.allowed_methods, line, j);
+        return;
+    }
+
+    if (key == "cgi_pass")
+    {
+        if (j + 2 >= line.size())
+            throw Exception("cgi_pass requires an extension and an executable path");
+        std::string ext = line[j + 1];
+        std::string executable = line[j + 2];
+        bool semicolon = false;
+        if (!executable.empty() && executable[executable.size() - 1] == ';')
+        {
+            executable = executable.substr(0, executable.size() - 1);
+            semicolon = true;
+        }
+        else if (j + 3 < line.size() && line[j + 3] == ";")
+            semicolon = true;
+        if (!semicolon)
+            throw Exception("No semicolon on the line -> cgi_pass");
+        if (ext.empty() || ext[0] != '.')
+            throw Exception("cgi_pass extension must start with '.' -> " + ext);
+        if (executable.empty())
+            throw Exception("cgi_pass executable path is empty");
+        location.cgi_pass[ext] = executable;
         return;
     }
 
