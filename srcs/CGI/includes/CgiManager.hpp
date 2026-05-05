@@ -26,6 +26,7 @@ private:
 
 public:
 	// constructor
+	CgiManager(Client &client, const std::string &scriptPath, const bool writter);
 	CgiManager(Client &client, const std::string &scriptPath);
 	~CgiManager();
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: lmarcucc <lmarcucc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/31 11:01:51 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/04/01 17:56:19 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/04 16:07:45 by lmarcucc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -359,7 +359,6 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 	if (body_start == std::string::npos)
 		return;
 	body_start += 4; // \r\n\r\n
-
 	for (size_t i = 0; i < request.size(); ++i)
 	{
 		char c = request[i];
@@ -402,6 +401,7 @@ void Request::parse(const std::string &request, const ServerConfig &config)
 
 	checkRequest();
 	setCurrentLocations(config);
+	_body = request.substr(body_start);
 
 	if (_method == "POST" && static_cast<long long>(_contentLengthBody) <= config.client_max_body_size)
 	{
@@ -434,6 +434,10 @@ std::string Request::getHeaders(const std::string toGet) const
 	if (it != _headers.end())
 		return it->second;
 	return "";
+}
+
+std::string Request::getBody() const {
+	return _body;
 }
 
 void Request::setCurrentLocations(const ServerConfig &serverConfig)

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Client.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/30 10:35:02 by mvachon           #+#    #+#             */
-/*   Updated: 2026/05/04 13:43:28 by nofanizz         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "Client.hpp"
 #include "Request.hpp"
@@ -53,8 +42,7 @@ void Client::pollInHandler()
 				std::string realPath = "website" + _request.getPath();
 				if (access(realPath.c_str(), F_OK) == -1)
 					throw Http404Exception();
-				// TODO check if R_OK is needed
-				if (access(realPath.c_str(), R_OK | X_OK) == -1)
+				if (access(realPath.c_str(), X_OK) == -1)
 					throw Http403Exception();
 				_events = 0;
 				_response.setIsCgi(true);

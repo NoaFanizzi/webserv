@@ -15,7 +15,6 @@ class Client : public AManager {
 	std::string _sendBuffer;
 	size_t _sendOffset;
 	Request _request;
-	bool _firstLoopRequets;
 	bool _requestEnded;
 	bool _timedOut;
 	bool _cgi;
