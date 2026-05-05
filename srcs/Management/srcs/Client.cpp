@@ -19,10 +19,12 @@
 #include <sys/stat.h>
 
 #include "CgiManager.hpp"
+#include <cerrno>
 
 Client::Client(int fd, const ServerConfig &config) : _config(config)
 {
 	_fd = fd;
+	_sendOffset = 0;
 	_requestEnded = false;
 	_closedStatus = false;
 	_events = POLLIN;
@@ -114,35 +116,34 @@ void Client::onTimeout()
 		   << "Content-Length: " << body.size() << "\r\n"
 		   << "Connection: close\r\n"
 		   << "\r\n";
-
-	const std::string full = header.str() + body;
-	size_t sent = 0;
-	while (sent < full.size())
-	{
-		const ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
-		if (n <= 0)
-			break;
-		sent += n;
-	}
-
-	_events = 0;
-	_closedStatus = true;
+	_sendBuffer = header.str() + body;
+	_sendOffset = 0;
+	_events = POLLOUT;
 }
 
 void Client::pollOutHandler()
 {
-	const std::string full = _response.getFullResponse();
-	size_t sent = 0;
-	while (sent < full.size())
+	if (_sendBuffer.empty())
 	{
-		const ssize_t n = send(_fd, full.c_str() + sent, full.size() - sent, 0);
-		if (n <= 0)
-			break;
-		sent += n;
+		_sendBuffer = _response.getFullResponse();
+		_sendOffset = 0;
 	}
 
-	_events = 0;
-	_closedStatus = true;
+	const ssize_t n = send(_fd, _sendBuffer.c_str() + _sendOffset, _sendBuffer.size() - _sendOffset, 0);
+	if (n > 0)
+		_sendOffset += static_cast<size_t>(n);
+	else if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+	{
+		_events = 0;
+		_closedStatus = true;
+		return;
+	}
+
+	if (_sendOffset >= _sendBuffer.size())
+	{
+		_events = 0;
+		_closedStatus = true;
+	}
 }
 
 void Client::setCgiOutput(const std::string &output, const int error) {

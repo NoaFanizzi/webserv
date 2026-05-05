@@ -12,6 +12,8 @@ class Client : public AManager {
 	// variables
 	const ServerConfig _config;
 	std::string _rawRequest;
+	std::string _sendBuffer;
+	size_t _sendOffset;
 	Request _request;
 	bool _firstLoopRequets;
 	bool _requestEnded;
