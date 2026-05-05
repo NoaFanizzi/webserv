@@ -37,18 +37,15 @@ void Client::pollInHandler()
 			_request.parse(_rawRequest, _config);
 			_response.setRequest(_request);
 
-			if (CgiManager::isCgi(_request.getPath())) {
-				 // TODO vrai path
+			std::string interpreter = CgiManager::getCgiInterpreter(_request.getPath(), _request);
+			if (!interpreter.empty()) {
 				std::string realPath = "website" + _request.getPath();
 				if (access(realPath.c_str(), F_OK) == -1)
 					throw Http404Exception();
-				if (access(realPath.c_str(), X_OK) == -1)
-					throw Http403Exception();
 				_events = 0;
 				_response.setIsCgi(true);
 				_cgi = true;
-				//TODO fix le leak lié a ce new quand execve crash
-				new CgiManager(*this, realPath);
+				new CgiManager(*this, realPath, interpreter);
 				_startTime = std::time(NULL);
 			}
 			else {

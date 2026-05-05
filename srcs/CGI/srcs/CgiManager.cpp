@@ -12,9 +12,10 @@
 #include <poll.h>
 
 // constructor
-CgiManager::CgiManager(Client &client, const std::string &scriptPath)
+CgiManager::CgiManager(Client &client, const std::string &scriptPath, const std::string &interpreter)
 	: _request(client.getRequest()),
 	  _scriptPath(scriptPath),
+	  _interpreter(interpreter),
 	  _client(client),
 	  _pid(-1),
 	  _stdinFd(-1),
@@ -35,13 +36,21 @@ CgiManager::CgiManager(Client &client, const std::string &scriptPath)
 CgiManager::~CgiManager() {
 }
 
-// static function
-bool CgiManager::isCgi(const std::string &path) {
-	if (path.size() >= 3 && path.compare(path.size() - 3, 3, ".py") == 0)
-		return true;
-	if (path.size() >= 4 && path.compare(path.size() - 4, 4, ".php") == 0)
-		return true;
-	return false;
+// Returns the interpreter path if the request maps to a CGI script, empty string otherwise
+std::string CgiManager::getCgiInterpreter(const std::string &path, const Request &req)
+{
+	size_t dot = path.rfind('.');
+	if (dot == std::string::npos)
+		return "";
+	std::string ext = path.substr(dot);
+
+	const std::vector<LocationConfig> &locs = req.getCurrentLocations();
+	if (!locs.empty()) {
+		std::map<std::string, std::string>::const_iterator it = locs.back().cgi_pass.find(ext);
+		if (it != locs.back().cgi_pass.end())
+			return it->second;
+	}
+	return "";
 }
 
 static void freeEnv(char **env) {
@@ -113,12 +122,16 @@ bool CgiManager::start() {
 
 		// Run the script from its own directory so relative paths work
 		size_t slash = _scriptPath.rfind('/');
-		if (slash != std::string::npos)
+		std::string scriptArg = _scriptPath;
+		if (slash != std::string::npos) {
 			chdir(_scriptPath.substr(0, slash).c_str());
+			scriptArg = _scriptPath.substr(slash + 1);
+		}
 
 		char **envp = envToCharArray();
 		char *argv[] = {
-			const_cast<char *>(_scriptPath.c_str()),
+			const_cast<char *>(_interpreter.c_str()),
+			const_cast<char *>(scriptArg.c_str()),
 			NULL
 		};
 		execve(argv[0], argv, envp);

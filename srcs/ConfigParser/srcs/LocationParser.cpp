@@ -38,7 +38,7 @@ void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
             std::string token = _fileContent[*i][*j];
             
             if (token == "{")
-            { 
+            {
                 brace_level++;
                 continue;
             }
@@ -53,7 +53,9 @@ void Config::parseLocationBlock(ServerConfig &server, size_t *i, size_t *j)
                 }
                 continue;
             }
-            
+
+            if (brace_level == 0)
+                throw Exception("Expected '{' to open location block: " + location.path);
             if (brace_level == 1)
             {
                 for (size_t k = 0; k < LOCATION_KEYS_COUNT; k++)

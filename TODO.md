@@ -46,31 +46,13 @@ Vérifié : `GET / HTTP/1.0` → `505`. Sujet : *« HTTP 1.0 is suggested as a r
 ### R4. ~~`errno` consulté après `std::remove`~~ — FIXÉ
 `Response.cpp` : `access(F_OK)` avant `remove` pour le 404, `access(W_OK)` pour le 403, `remove` restant échoue → 500. Plus de lecture fragile de `errno` après `std::remove`.
 
-### R5. Fonctions hors-liste utilisées
-- `std::remove` (cstdio) — pour DELETE
-- `std::time(NULL)` (ctime) — pour les timeouts
-- `perror` — `Server.cpp:78`, `CgiManager.cpp:121`
-Aucune n'est dans la liste **External Function** du sujet. Toléré dans 99 % des défenses, mais peut être bloqué.
-**À faire (si évaluateur strict)** : noter dans le README qu'on les considère comme libc standard.
+### R6. ~~Condition bancale dans `main.cpp` (ligne 30)~~ — FIXÉ
+Remplacé par `if (ac != 2)` : couvre `ac == 0`, `ac == 1`, `ac >= 3`. Message d'usage sur `stderr`.
 
-### R6. Condition bancale dans `main.cpp` (ligne 30)
-```cpp
-if (!av[1] && ac != 2) { … }
-```
-Si `ac == 0`, `av[1]` est un accès hors-tableau (UB). Si `ac >= 3`, on ne rentre pas dans le `if` mais on passe à `config.setFile(av[1])` avec `av[1]` non-null → OK pour ce cas. Le vrai danger : `ac == 0`.
-**À faire** : `if (ac != 2) { std::cerr << "Usage: ./webserv <config>\n"; return 1; }`.
-
-### C1. `config.conf` actuel **mal formé**
-Lignes 10-13 :
-```
-location /upload/
-    autoindex on;
-    allow_methods GET POST DELETE;
-    upload_dir website/upload/;
-```
-→ pas d'accolade ouvrante ni fermante. C'est le 1er fichier que le correcteur lance. **À corriger.**
-
-Ligne 23 : `return 301 /upload` — **manque `;`**.
+### C1. ~~`config.conf` actuel **mal formé**~~ — FIXÉ
+- `location /upload/` : accolades `{` `}` ajoutées.
+- `return 301 /upload` → `return 301 /upload/;` (`;` ajouté, `/` final pour cohérence).
+- `LocationParser.cpp` : si un token est rencontré hors d'un bloc `{}` (`brace_level == 0`), exception `"Expected '{' to open location block"` levée — le parser ne silenciait plus les configs malformés.
 
 ---
 

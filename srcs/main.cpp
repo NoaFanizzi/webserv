@@ -27,9 +27,9 @@ void signalHandler(int)
 
 int main(int ac, char **av)
 {
-	if (!av[1] && ac != 2)
+	if (ac != 2)
 	{
-		std::cout << "No config file" << std::endl;
+		std::cerr << "Usage: ./webserv <config>" << std::endl;
 		return 1;
 	}
 	signal(SIGINT, SIG_IGN);

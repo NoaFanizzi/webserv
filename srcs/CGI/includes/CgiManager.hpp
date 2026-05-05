@@ -13,6 +13,7 @@ private:
 	std::vector<std::string> _env;
 	const Request &_request;
 	std::string _scriptPath;
+	std::string _interpreter;
 	std::string _output;
 	Client &_client;
 
@@ -26,12 +27,11 @@ private:
 
 public:
 	// constructor
-	CgiManager(Client &client, const std::string &scriptPath, const bool writter);
-	CgiManager(Client &client, const std::string &scriptPath);
+	CgiManager(Client &client, const std::string &scriptPath, const std::string &interpreter);
 	~CgiManager();
 
-	// static function
-	static bool isCgi(const std::string& path);
+	// static function — returns interpreter path if CGI, empty string otherwise
+	static std::string getCgiInterpreter(const std::string &path, const Request &req);
 
 	// function
 	bool start();
