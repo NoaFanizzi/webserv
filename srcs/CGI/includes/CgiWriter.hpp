@@ -23,8 +23,8 @@ public:
 	CgiWriter(const int _fd, const std::string body);
 	~CgiWriter() {};
 
-	void PollInHandler();
-	void PollOutHandler();
+	void pollInHandler();
+	void pollOutHandler();
 
 	void onTimeout();
 };
