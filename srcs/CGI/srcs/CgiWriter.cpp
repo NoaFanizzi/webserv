@@ -16,7 +16,7 @@ CgiWriter::CgiWriter(const int fd, const std::string body) : _timedOut(false), _
 	WebServer::pollFdCreation(_fd, this);
 }
 
-void CgiWriter::PollOutHandler() {
+void CgiWriter::pollOutHandler() {
 
 	if (_timedOut)
 		return ;
@@ -43,7 +43,7 @@ void CgiWriter::PollOutHandler() {
 	}
 }
 
-void CgiWriter::PollInHandler() {}
+void CgiWriter::pollInHandler() {}
 
 void CgiWriter::onTimeout() {
 	_closedStatus = true;
