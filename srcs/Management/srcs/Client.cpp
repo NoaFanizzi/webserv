@@ -8,7 +8,6 @@
 #include <sys/stat.h>
 
 #include "CgiManager.hpp"
-#include <cerrno>
 
 Client::Client(int fd, const ServerConfig &config) : _config(config)
 {
@@ -118,7 +117,7 @@ void Client::pollOutHandler()
 	const ssize_t n = send(_fd, _sendBuffer.c_str() + _sendOffset, _sendBuffer.size() - _sendOffset, 0);
 	if (n > 0)
 		_sendOffset += static_cast<size_t>(n);
-	else if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+	else
 	{
 		_events = 0;
 		_closedStatus = true;
