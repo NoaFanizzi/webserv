@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/05 15:01:52 by nofanizz          #+#    #+#             */
-/*   Updated: 2026/04/01 13:29:10 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/11 12:13:46 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,8 +111,8 @@ std::string AutoIndex::_header =
 		"    method: 'DELETE'"
 		"  });"
 		"  if (response.ok) {"
-		"    button.closest('tr')?.remove();"
 		"    alert(\"File deleted\");"
+		" 	 window.location.reload();"
 		"  }"
 		"}"
 	"</script>"
