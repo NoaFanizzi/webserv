@@ -31,6 +31,7 @@ void Config::initServerKeys()
     _keysServer[6] = "autoindex";
     _keysServer[7] = "allow_methods";
     _keysServer[8] = "upload_dir";
+    _keysServer[9] = "server_name";
 }
 
 void Config::initLocationKeys()
@@ -80,12 +81,12 @@ int Config::parseConfigFile()
             i++;
     }
     
-    validateDuplicatePorts();
+    validateVirtualHosts();
     printServers();
     return 1;
 }
 
-void Config::validateDuplicatePorts()
+void Config::validateVirtualHosts()
 {
     if (_servers.size() <= 1)
         return;
@@ -94,10 +95,29 @@ void Config::validateDuplicatePorts()
     {
         for (size_t k = j + 1; k < _servers.size(); k++)
         {
-            if (_servers[k].port == _servers[j].port)
+            if (_servers[k].port != _servers[j].port)
+                continue;
+            // Same port — only allowed if server_names differ
+            const std::vector<std::string> &names_j = _servers[j].server_names;
+            const std::vector<std::string> &names_k = _servers[k].server_names;
+            for (size_t a = 0; a < names_j.size(); a++)
+            {
+                for (size_t b = 0; b < names_k.size(); b++)
+                {
+                    if (names_j[a] == names_k[b])
+                    {
+                        std::ostringstream oss;
+                        oss << "Duplicate server_name \"" << names_j[a]
+                            << "\" on port " << _servers[j].port;
+                        throw Exception(oss.str());
+                    }
+                }
+            }
+            if (names_j.empty() && names_k.empty())
             {
                 std::ostringstream oss;
-                oss << "Duplicate port -> " << _servers[j].port;
+                oss << "Duplicate server on port " << _servers[j].port
+                    << " without server_name";
                 throw Exception(oss.str());
             }
         }

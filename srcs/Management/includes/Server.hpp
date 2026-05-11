@@ -14,6 +14,7 @@
 #define SERVER_HPP
 
 #include <netinet/in.h>
+#include <vector>
 
 #include "AManager.hpp"
 #include "Config.hpp"
@@ -22,7 +23,7 @@ class Server : public AManager {
   private:
 	// variables
 	struct sockaddr_in _servAddr;
-	const ServerConfig _serverConfig;
+	const std::vector<ServerConfig> _serverConfigs;
 
 	// functions
 	int createSocket();
@@ -31,7 +32,7 @@ class Server : public AManager {
 
   public:
 	// constructor
-	Server(const ServerConfig &servconfig);
+	Server(const std::vector<ServerConfig> &configs);
 	~Server();
 
 	// functions
@@ -40,7 +41,6 @@ class Server : public AManager {
 
 	// getters
 	sockaddr_in getSockddr_in() const { return _servAddr; }
-	const ServerConfig getConfig() const { return _serverConfig; }
 };
 
 #endif

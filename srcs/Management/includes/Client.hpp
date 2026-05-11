@@ -6,11 +6,13 @@
 #include "Request.hpp"
 #include "Response.hpp"
 #include <string>
+#include <vector>
 
 class Client : public AManager {
   private:
 	// variables
-	const ServerConfig _config;
+	const std::vector<ServerConfig> _configs;
+	ServerConfig _activeConfig;
 	std::string _rawRequest;
 	std::string _sendBuffer;
 	size_t _sendOffset;
@@ -24,7 +26,7 @@ class Client : public AManager {
 
   public:
 	// constructor
-	Client(int fd, const ServerConfig &config);
+	Client(int fd, const std::vector<ServerConfig> &configs);
 	Client() {};
 	~Client() {};
 

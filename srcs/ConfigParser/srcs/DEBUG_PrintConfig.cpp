@@ -27,6 +27,13 @@ void Config::printServers()
         std::cout << "📦 Server #" << (i + 1) << std::endl;
         std::cout << "├── 🔌 Port: " << srv.port << std::endl;
         std::cout << "├── 🌐 Host: " << srv.host << std::endl;
+        if (!srv.server_names.empty())
+        {
+            std::cout << "├── 🏷  Server names:";
+            for (size_t j = 0; j < srv.server_names.size(); ++j)
+                std::cout << " " << srv.server_names[j];
+            std::cout << std::endl;
+        }
         std::cout << "├── 📁 Root: " << srv.root << std::endl;
         std::cout << "├── 📄 Index: " << srv.index << std::endl;
         std::cout << "├── 📂 Autoindex: " << (srv.autoindex ? "✓ on" : "✗ off") << std::endl;

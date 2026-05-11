@@ -12,7 +12,7 @@
 
 #include "Config.hpp"
 
-static const size_t SERVER_KEYS_COUNT = 9;
+static const size_t SERVER_KEYS_COUNT = 10;
 
 void Config::parseServerBlock(size_t *i)
 {

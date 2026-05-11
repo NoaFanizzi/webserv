@@ -6,16 +6,25 @@
 #include <netdb.h> // Obligatoire pour getaddrinfo
 #include <poll.h>
 
-Server::Server(const ServerConfig &serverconfig) : _serverConfig(serverconfig)
+Server::Server(const std::vector<ServerConfig> &configs) : _serverConfigs(configs)
 {
 	_closedStatus = false;
 	_startTime = std::time(NULL);
 	_fd = createSocket();
-	createSocketAdress(serverconfig);
-	int opt = 1;
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-	bindClient(_fd);
-	listen(_fd, 4096);
+	try
+	{
+		createSocketAdress(_serverConfigs[0]);
+		int opt = 1;
+		setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+		bindClient(_fd);
+		listen(_fd, 4096);
+	}
+	catch (...)
+	{
+		close(_fd);
+		_fd = -1;
+		throw;
+	}
 	WebServer::pollFdCreation(_fd, this);
 	_events = POLLIN;
 }
@@ -79,5 +88,5 @@ void Server::pollInHandler()
 		return;
 	}
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
-	new Client(client_fd, _serverConfig);
+	new Client(client_fd, _serverConfigs);
 }

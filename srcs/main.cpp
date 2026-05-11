@@ -15,6 +15,8 @@
 #include "Server.hpp"
 #include <iostream>
 #include <csignal>
+#include <map>
+#include <utility>
 
 void signalHandler(int)
 {
@@ -42,8 +44,22 @@ int main(int ac, char **av)
 			if (!config.setFile(av[1]))
 				return 1;
 			const std::vector<ServerConfig> &SavedServers = config.getServers();
+			std::map<int, std::vector<ServerConfig> > groups;
 			for (size_t i = 0; i < SavedServers.size(); i++)
-				new Server(SavedServers[i]);
+				groups[SavedServers[i].port].push_back(SavedServers[i]);
+			for (std::map<int, std::vector<ServerConfig> >::iterator it = groups.begin(); it != groups.end(); ++it)
+			{
+				std::vector<ServerConfig> &grp = it->second;
+				// Si les hosts diffèrent dans le groupe, binder sur 0.0.0.0
+				const std::string &firstHost = grp[0].host;
+				bool mixedHosts = false;
+				for (size_t i = 1; i < grp.size(); i++)
+					if (grp[i].host != firstHost) { mixedHosts = true; break; }
+				if (mixedHosts)
+					for (size_t i = 0; i < grp.size(); i++)
+						grp[i].host = "0.0.0.0";
+				new Server(grp);
+			}
 			
 		}
 		std::signal(SIGINT, signalHandler);
@@ -54,5 +70,6 @@ int main(int ac, char **av)
 	catch (const std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
+		WebServer::destroy();
 	}
 }
