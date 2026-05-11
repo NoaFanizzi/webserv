@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationParser.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/26 12:23:43 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/05/11 14:32:41 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
     if (j + 1 >= line.size())
         throw Exception("No argument found for -> " + key);
 
-    if (key == "allow_methods")
+    if (key == "allowed_methods")
     {
         parseAllowMethods(location.allowed_methods, line, j);
         return;
@@ -207,5 +207,5 @@ void Config::parseAllowMethods(std::vector<std::string> &allowed_methods, const 
     }
 
     if (!semicolon)
-        throw Exception("No semicolon on the line -> allow_methods");
+        throw Exception("No semicolon on the line -> allowed_methods");
 }

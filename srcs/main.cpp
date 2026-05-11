@@ -17,6 +17,11 @@
 #include <csignal>
 #include <map>
 #include <utility>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <cstring>
 
 void signalHandler(int)
 {
@@ -44,22 +49,68 @@ int main(int ac, char **av)
 			if (!config.setFile(av[1]))
 				return 1;
 			const std::vector<ServerConfig> &SavedServers = config.getServers();
-			std::map<int, std::vector<ServerConfig> > groups;
+			std::map<std::pair<std::string, int>, std::vector<ServerConfig> > groups;
 			for (size_t i = 0; i < SavedServers.size(); i++)
-				groups[SavedServers[i].port].push_back(SavedServers[i]);
-			for (std::map<int, std::vector<ServerConfig> >::iterator it = groups.begin(); it != groups.end(); ++it)
+				groups[std::make_pair(SavedServers[i].host, SavedServers[i].port)].push_back(SavedServers[i]);
+
+			std::map<std::pair<std::string, int>, std::vector<ServerConfig> > finalGroups;
+			for (std::map<std::pair<std::string, int>, std::vector<ServerConfig> >::iterator it = groups.begin(); it != groups.end(); ++it)
 			{
-				std::vector<ServerConfig> &grp = it->second;
-				// Si les hosts diffèrent dans le groupe, binder sur 0.0.0.0
-				const std::string &firstHost = grp[0].host;
-				bool mixedHosts = false;
-				for (size_t i = 1; i < grp.size(); i++)
-					if (grp[i].host != firstHost) { mixedHosts = true; break; }
-				if (mixedHosts)
-					for (size_t i = 0; i < grp.size(); i++)
-						grp[i].host = "0.0.0.0";
-				new Server(grp);
+				const std::string &host = it->first.first;
+				int port = it->first.second;
+
+				if (host == "0.0.0.0")
+				{
+					finalGroups[it->first].insert(finalGroups[it->first].end(), it->second.begin(), it->second.end());
+					continue;
+				}
+
+				bool bindable = false;
+				int testFd = socket(AF_INET, SOCK_STREAM, 0);
+				if (testFd != -1)
+				{
+					int opt = 1;
+					setsockopt(testFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+					struct addrinfo hints, *res;
+					std::memset(&hints, 0, sizeof(hints));
+					hints.ai_family = AF_INET;
+					hints.ai_socktype = SOCK_STREAM;
+					if (getaddrinfo(host.c_str(), NULL, &hints, &res) == 0)
+					{
+						struct sockaddr_in addr;
+						std::memset(&addr, 0, sizeof(addr));
+						addr.sin_family = AF_INET;
+						addr.sin_addr = ((struct sockaddr_in *)res->ai_addr)->sin_addr;
+						addr.sin_port = htons(port);
+						freeaddrinfo(res);
+						if (bind(testFd, (struct sockaddr *)&addr, sizeof(addr)) == 0)
+							bindable = true;
+					}
+					close(testFd);
+				}
+
+				if (bindable)
+					finalGroups[it->first].insert(finalGroups[it->first].end(), it->second.begin(), it->second.end());
+				else
+				{
+					std::pair<std::string, int> wildcardKey = std::make_pair(std::string("0.0.0.0"), port);
+					if (groups.count(wildcardKey))
+					{
+						std::cerr << "Warning: cannot bind to " << host << ":" << port << ", falling back to 0.0.0.0" << std::endl;
+						for (size_t i = 0; i < it->second.size(); i++)
+						{
+							ServerConfig cfg = it->second[i];
+							cfg.host = "0.0.0.0";
+							finalGroups[wildcardKey].push_back(cfg);
+						}
+					}
+					else
+						finalGroups[it->first].insert(finalGroups[it->first].end(), it->second.begin(), it->second.end());
+				}
 			}
+
+			for (std::map<std::pair<std::string, int>, std::vector<ServerConfig> >::iterator it = finalGroups.begin(); it != finalGroups.end(); ++it)
+				new Server(it->second);
 			
 		}
 		std::signal(SIGINT, signalHandler);

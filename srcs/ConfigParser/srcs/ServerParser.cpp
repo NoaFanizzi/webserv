@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/26 12:29:44 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/05/11 14:31:15 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void validateServerConfig(const ServerConfig& server)
     if (server.client_max_body_size == -1)
         throw Exception("client_max_body_size is not set");
     if (server.allowed_methods.empty())
-        throw Exception("allowd_methods is not set");
+        throw Exception("allowed_methods is not set");
 }
 
 ServerConfig::ServerConfig()

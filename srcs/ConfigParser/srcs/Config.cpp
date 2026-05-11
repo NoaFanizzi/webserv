@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:22:15 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/26 12:12:37 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/05/11 14:32:35 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void Config::initServerKeys()
     _keysServer[4] = "error_page";
     _keysServer[5] = "client_max_body_size";
     _keysServer[6] = "autoindex";
-    _keysServer[7] = "allow_methods";
+    _keysServer[7] = "allowed_methods";
     _keysServer[8] = "upload_dir";
     _keysServer[9] = "server_name";
 }
@@ -40,7 +40,7 @@ void Config::initLocationKeys()
     _keysLocation[1] = "root";
     _keysLocation[2] = "index";
     _keysLocation[3] = "autoindex";
-    _keysLocation[4] = "allow_methods";
+    _keysLocation[4] = "allowed_methods";
     _keysLocation[5] = "return";
     _keysLocation[6] = "upload_dir";
     _keysLocation[7] = "cgi_pass";

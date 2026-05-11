@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerDirectives.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/26 12:30:45 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/05/11 14:33:03 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void Config::parseServerDirective(ServerConfig &server, const std::string &key,
         parseClientMaxBodySize(server, value);
     else if (key == "autoindex")
         parseAutoindex(server, value);
-    else if (key == "allow_methods")
+    else if (key == "allowed_methods")
         parseAllowMethods(server.allowed_methods, line, j);
     else if (key == "error_page")
         parseErrorPage(server, line, j);
@@ -76,7 +76,7 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
 {
     bool semicolon = false;
     std::string value = line[j + 1];
-    if (_keysServer->find(key) && key != "error_page" && key != "allow_methods" && key != "server_name")
+    if (_keysServer->find(key) && key != "error_page" && key != "allowed_methods" && key != "server_name")
     {
         if (line.size() > 2)
         {
@@ -93,10 +93,10 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
         semicolon = true;
     }
 
-    if (!semicolon && key != "error_page" && key != "allow_methods" && key != "server_name")
+    if (!semicolon && key != "error_page" && key != "allowed_methods" && key != "server_name")
         throw Exception("No semicolon on the line -> " + key);
 
-    if (value.empty() && key != "error_page" && key != "allow_methods")
+    if (value.empty() && key != "error_page" && key != "allowed_methods")
         throw Exception("Empty value for -> " + key);
 
     return value;
