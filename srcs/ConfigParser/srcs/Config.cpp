@@ -94,8 +94,7 @@ void Config::validateDuplicatePorts()
     {
         for (size_t k = j + 1; k < _servers.size(); k++)
         {
-            if (_servers[k].port == _servers[j].port && 
-                _servers[k].host == _servers[j].host)
+            if (_servers[k].port == _servers[j].port)
             {
                 std::ostringstream oss;
                 oss << "Duplicate port -> " << _servers[j].port;
