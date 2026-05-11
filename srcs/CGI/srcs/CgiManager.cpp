@@ -68,7 +68,6 @@ void CgiManager::buildEnv() {
 	_env.push_back("SCRIPT_NAME=" + _request.getPath());
 	_env.push_back("QUERY_STRING=" + _request.getQuery());
 	_env.push_back("CONTENT_LENGTH=" + _request.getHeaders("Content-Length"));
-	std::cout << "metssshod:" <<  _request.getMethod() << std::endl;
 	_env.push_back("CONTENT_TYPE=" + _request.getHeaders("Content-Type"));
 	_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
