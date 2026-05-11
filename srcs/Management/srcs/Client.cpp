@@ -115,12 +115,10 @@ void Client::pollInHandler()
 				if (!locs.empty() && !locs.back().root.empty())
 					root = locs.back().root;
 				std::string realPath = root + _request.getPath();
-				if (access(realPath.c_str(), F_OK) == -1)
-					throw Http404Exception();
+				CgiManager cgi(*this, realPath, interpreter);
 				_events = 0;
 				_response.setIsCgi(true);
 				_cgi = true;
-				new CgiManager(*this, realPath, interpreter);
 				_startTime = std::time(NULL);
 			}
 			else {

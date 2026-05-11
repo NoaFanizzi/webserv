@@ -7,19 +7,19 @@
 
 #include "Client.hpp"
 
-class CgiManager : public AManager {
+class CgiManager
+{
 private:
 	// variables
 	std::vector<std::string> _env;
 	const Request &_request;
-	std::string _scriptPath;
-	std::string _interpreter;
-	std::string _output;
+	std::string &_scriptPath;
+	std::string &_interpreter;
 	Client &_client;
 
+	int _fdIn[2];
+	int _fdOut[2];
 	pid_t _pid;
-	int _stdinFd;
-	bool _timedOut;
 
 	// function
 	void buildEnv();
@@ -27,20 +27,12 @@ private:
 
 public:
 	// constructor
-	CgiManager(Client &client, const std::string &scriptPath, const std::string &interpreter);
-	~CgiManager();
+	CgiManager(Client &client, std::string &scriptPath, std::string &interpreter);
+	~CgiManager() {}
 
 	// static function — returns interpreter path if CGI, empty string otherwise
 	static std::string getCgiInterpreter(const std::string &path, const Request &req);
 
 	// function
 	bool start();
-
-	void pollInHandler();
-	void pollOutHandler();
-
-	void onTimeout();
-
-	// getter
-	std::string getOutput() const { return _output; }
 };
