@@ -35,10 +35,15 @@ void Client::pollInHandler()
 			_requestEnded = true;
 			_request.parse(_rawRequest, _config);
 			_response.setRequest(_request);
+			_response.checkAllowedMethods(_config);
 
 			std::string interpreter = CgiManager::getCgiInterpreter(_request.getPath(), _request);
 			if (!interpreter.empty()) {
-				std::string realPath = "website" + _request.getPath();
+				const std::vector<LocationConfig> &locs = _request.getCurrentLocations();
+				std::string root = _config.root;
+				if (!locs.empty() && !locs.back().root.empty())
+					root = locs.back().root;
+				std::string realPath = root + _request.getPath();
 				if (access(realPath.c_str(), F_OK) == -1)
 					throw Http404Exception();
 				_events = 0;

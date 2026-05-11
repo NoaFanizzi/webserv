@@ -193,6 +193,24 @@ std::string Response::buildHeader(size_t contentLength,
 	return header;
 }
 
+void Response::checkAllowedMethods(const ServerConfig &config)
+{
+	const std::vector<LocationConfig> &locs = _request->getCurrentLocations();
+	const std::vector<std::string> *methods = NULL;
+	if (!locs.empty() && !locs.back().allowed_methods.empty())
+		methods = &locs.back().allowed_methods;
+	else if (!config.allowed_methods.empty())
+		methods = &config.allowed_methods;
+	if (!methods)
+		return;
+	for (size_t i = 0; i < methods->size(); i++)
+	{
+		if ((*methods)[i] == _request->getMethod())
+			return;
+	}
+	throw Http405Exception();
+}
+
 void Response::generate(const ServerConfig &config)
 {
 
@@ -221,25 +239,7 @@ void Response::generate(const ServerConfig &config)
 		return;
 	}
 
-	const std::vector<std::string> *methods = NULL;
-	if (!locs.empty() && !locs.back().allowed_methods.empty())
-		methods = &locs.back().allowed_methods;
-	else if (!config.allowed_methods.empty())
-		methods = &config.allowed_methods;
-	if (methods)
-	{
-		bool allowed = false;
-		for (size_t i = 0; i < methods->size(); i++)
-		{
-			if ((*methods)[i] == _request->getMethod())
-			{
-				allowed = true;
-				break;
-			}
-		}
-		if (!allowed)
-			throw Http405Exception();
-	}
+	checkAllowedMethods(config);
 	_finalPath = checkUrl(config);
 	if (!_redirectLocation.empty())
 	{

@@ -39,6 +39,7 @@ class Response {
 	void setBody(const std::string &body) { _body = body; }
 	void setIsCgi(bool value) { _isCgi = value; }
 	void buildErrorHeader();
+	void checkAllowedMethods(const ServerConfig &config);
 	// functions
 	void generate(const ServerConfig &config);
 	std::string getFullResponse();
