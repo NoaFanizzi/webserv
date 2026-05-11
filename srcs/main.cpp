@@ -82,11 +82,7 @@ static ServerGroups buildFinalGroups(const ServerGroups &groups)
 		if (groups.count(wildcardKey))
 		{
 			for (size_t i = 0; i < it->second.size(); i++)
-			{
-				ServerConfig cfg = it->second[i];
-				cfg.host = "0.0.0.0";
-				finalGroups[wildcardKey].push_back(cfg);
-			}
+				finalGroups[wildcardKey].push_back(it->second[i]);
 			continue;
 		}
 

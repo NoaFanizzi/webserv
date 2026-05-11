@@ -6,6 +6,9 @@
 #include <iostream>
 #include <poll.h>
 #include <sys/stat.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <cstring>
 
 #include "CgiManager.hpp"
 
@@ -43,11 +46,30 @@ static std::string extractHostFromRaw(const std::string &raw)
 	return host;
 }
 
+static std::string resolveToIp(const std::string &hostname)
+{
+	struct addrinfo hints, *res;
+	std::memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	if (getaddrinfo(hostname.c_str(), NULL, &hints, &res) != 0)
+		return hostname;
+	char ip[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &((struct sockaddr_in *)res->ai_addr)->sin_addr, ip, sizeof(ip));
+	freeaddrinfo(res);
+	return std::string(ip);
+}
+
 static const ServerConfig &selectActiveConfig(const std::vector<ServerConfig> &configs, const std::string &hostname)
 {
+	std::string resolvedIp = resolveToIp(hostname);
+
 	for (size_t i = 0; i < configs.size(); i++)
 	{
 		const std::vector<std::string> &names = configs[i].server_names;
+
+		if (configs[i].host == hostname || configs[i].host == resolvedIp)
+			return configs[i];
 		for (size_t j = 0; j < names.size(); j++)
 		{
 			if (names[j] == hostname)
