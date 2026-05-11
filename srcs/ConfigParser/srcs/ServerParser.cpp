@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/05/11 15:43:55 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/11 15:49:15 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,13 +82,13 @@ void validateServerConfig(const ServerConfig& server)
     if (server.host.empty())
         throw Exception("Host is not set");
     if (server.root.empty())
-        throw Exception("root is not set");
+        throw Exception("Root is not set");
     if (server.index.empty())
-        throw Exception("index is not set");
+        throw Exception("Index is not set");
     if (server.client_max_body_size == -1)
-        throw Exception("client_max_body_size is not set");
+        throw Exception("Client_max_body_size is not set");
     if (server.allowed_methods.empty())
-        throw Exception("allowed_methods is not set");
+        throw Exception("Allowed_methods is not set");
     if (server.server_names.empty())
         throw Exception("Servername is not set");
 }

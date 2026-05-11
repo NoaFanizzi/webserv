@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 20:22:15 by mvachon           #+#    #+#             */
-/*   Updated: 2026/05/11 14:32:35 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/11 15:52:19 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,13 +112,6 @@ void Config::validateVirtualHosts()
                         throw Exception(oss.str());
                     }
                 }
-            }
-            if (names_j.empty() && names_k.empty())
-            {
-                std::ostringstream oss;
-                oss << "Duplicate server on port " << _servers[j].port
-                    << " without server_name";
-                throw Exception(oss.str());
             }
         }
     }
