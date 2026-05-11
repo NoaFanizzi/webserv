@@ -6,7 +6,7 @@
 /*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/05/11 14:31:15 by nofanizz         ###   ########.fr       */
+/*   Updated: 2026/05/11 15:43:55 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ void validateServerConfig(const ServerConfig& server)
         throw Exception("client_max_body_size is not set");
     if (server.allowed_methods.empty())
         throw Exception("allowed_methods is not set");
+    if (server.server_names.empty())
+        throw Exception("Servername is not set");
 }
 
 ServerConfig::ServerConfig()
