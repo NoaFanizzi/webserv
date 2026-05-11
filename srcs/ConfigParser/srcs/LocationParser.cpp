@@ -168,8 +168,10 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
 
 void Config::parseLocationAutoindex(LocationConfig &location, const std::string &value)
 {
-    if (value == "on" || value == "off")
-        location.autoindex = (value == "on");
+    if (value == "on")
+        location.autoindex = 1;
+    else if (value == "off")
+        location.autoindex = 0;
     else
         throw Exception("Invalid value for autoindex -> " + value);
 }

@@ -144,7 +144,11 @@ std::string Response::checkUrl(const ServerConfig &config)
 			return indexPath;
 
 		const std::vector<LocationConfig> &autoLocs = _request->getCurrentLocations();
-		bool autoindex = (!autoLocs.empty()) ? autoLocs.back().autoindex : config.autoindex;
+		bool autoindex;
+		if (!autoLocs.empty() && autoLocs.back().autoindex != -1)
+			autoindex = autoLocs.back().autoindex == 1;
+		else
+			autoindex = config.autoindex;
 		if (autoindex)
 		{
 			_finalAutoIndex = true;

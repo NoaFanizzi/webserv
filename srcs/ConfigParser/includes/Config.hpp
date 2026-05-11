@@ -36,12 +36,12 @@ struct LocationConfig
     std::string root;
     std::string index;
     std::string upload_dir;
-    bool autoindex;
+    int autoindex; // -1 = inherit from server, 0 = off, 1 = on
     std::vector<std::string> allowed_methods;
     int         redirectCode;
     std::string redirectUrl;
     std::map<std::string, std::string> cgi_pass;
-    LocationConfig() : autoindex(false), redirectCode(0){}
+    LocationConfig() : autoindex(-1), redirectCode(0){}
 };
 
 struct ErrorPage
