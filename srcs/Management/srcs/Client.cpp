@@ -39,12 +39,10 @@ void Client::pollInHandler()
 			std::string interpreter = CgiManager::getCgiInterpreter(_request.getPath(), _request);
 			if (!interpreter.empty()) {
 				std::string realPath = "website" + _request.getPath();
-				if (access(realPath.c_str(), F_OK) == -1)
-					throw Http404Exception();
+				CgiManager cgi(*this, realPath, interpreter);
 				_events = 0;
 				_response.setIsCgi(true);
 				_cgi = true;
-				new CgiManager(*this, realPath, interpreter);
 				_startTime = std::time(NULL);
 			}
 			else {

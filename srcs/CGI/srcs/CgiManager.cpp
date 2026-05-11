@@ -1,7 +1,8 @@
 #include "CgiManager.hpp"
-
 #include "WebServer.hpp"
 #include "CgiWriter.hpp"
+#include "CgiReader.hpp"
+#include "HttpExceptions.hpp"
 #include <cerrno>
 #include <cstring>
 #include <iostream>
@@ -12,28 +13,32 @@
 #include <poll.h>
 
 // constructor
-CgiManager::CgiManager(Client &client, const std::string &scriptPath, const std::string &interpreter)
+CgiManager::CgiManager(Client &client, std::string &scriptPath, std::string &interpreter)
 	: _request(client.getRequest()),
 	  _scriptPath(scriptPath),
 	  _interpreter(interpreter),
 	  _client(client),
-	  _pid(-1),
-	  _stdinFd(-1),
-	  _timedOut(false) {
-	_fd = -1;
-	_closedStatus = false;
-	_events = POLLIN;
-	_startTime = std::time(NULL);
-	if (!start()) {
-		// TODO manage error500
-		_client.setCgiOutput("", 500);
-		return;
-	}
-	fcntl(_fd, F_SETFL, O_NONBLOCK);
-	WebServer::pollFdCreation(_fd, this);
-}
+	  _pid(-1) {
 
-CgiManager::~CgiManager() {
+	if (access(_scriptPath.c_str(), F_OK) == -1)
+		throw Http404Exception();
+	if (pipe(_fdIn) == -1) {
+		throw Http500Exception();
+	}
+	if (pipe(_fdOut) == -1) {
+		close(_fdIn[0]);
+		close(_fdIn[1]);
+		throw Http500Exception();
+	}
+	if (fcntl(_fdOut[0], F_SETFL, O_NONBLOCK) == -1 ||
+		fcntl(_fdIn[1], F_SETFL, O_NONBLOCK) == -1 ||
+		!start()) {
+		close(_fdIn[0]);
+		close(_fdIn[1]);
+		close(_fdOut[0]);
+		close(_fdOut[1]);
+		throw Http500Exception();
+	}
 }
 
 // Returns the interpreter path if the request maps to a CGI script, empty string otherwise
@@ -94,136 +99,41 @@ char **CgiManager::envToCharArray() const {
 bool CgiManager::start() {
 	buildEnv();
 
-	int fdIn[2];
-	int fdOut[2];
-
-	if (pipe(fdIn) < 0 || pipe(fdOut) < 0)
+	if ((_pid = fork()) == -1)
 		return false;
-
-	_pid = fork();
-
-	if (_pid < 0) {
-		close(fdIn[0]);
-		close(fdIn[1]);
-		close(fdOut[0]);
-		close(fdOut[1]);
-		return false;
-	}
 
 	if (_pid == 0) {
-		dup2(fdIn[0], STDIN_FILENO);
-		dup2(fdOut[1], STDOUT_FILENO);
+		dup2(_fdIn[0], STDIN_FILENO);
+		dup2(_fdOut[1], STDOUT_FILENO);
 
-		close(fdIn[0]);
-		close(fdIn[1]);
-		close(fdOut[0]);
-		close(fdOut[1]);
-
-		// Run the script from its own directory so relative paths work
-		size_t slash = _scriptPath.rfind('/');
-		std::string scriptArg = _scriptPath;
-		if (slash != std::string::npos) {
-			chdir(_scriptPath.substr(0, slash).c_str());
-			scriptArg = _scriptPath.substr(slash + 1);
-		}
+		close(_fdIn[0]);
+		close(_fdIn[1]);
+		close(_fdOut[0]);
+		close(_fdOut[1]);
 
 		char **envp = envToCharArray();
 		char *argv[] = {
 			const_cast<char *>(_interpreter.c_str()),
-			const_cast<char *>(scriptArg.c_str()),
+			const_cast<char *>(_scriptPath.c_str()),
 			NULL
 		};
 		execve(argv[0], argv, envp);
-		std::cerr << _scriptPath;
-		perror(": ");
+		perror(_scriptPath.c_str());
 		freeEnv(envp);
-		(*this).~CgiManager();
 		WebServer::destroy();
+		_scriptPath.~basic_string();
+		_interpreter.~basic_string();
 		exit(127);
 	}
 
-	close(fdIn[0]);
-	close(fdOut[1]);
+	close(_fdIn[0]);
+	close(_fdOut[1]);
 
-	_stdinFd = fdIn[1];
-	_fd = fdOut[0];
-
-	if (_client.getRequest().getMethod() == "POST") {
-		new CgiWriter(_stdinFd, _client.getRequest().getBody());
-	}
+	new CgiReader(_client, _pid, _fdOut[0]);
+	if (_client.getRequest().getMethod() == "POST")
+		new CgiWriter(_fdIn[1], _client.getRequest().getBody());
 	else
-		close(_stdinFd);
-	_stdinFd = -1;
+		close(_fdIn[1]);
 
 	return true;
-}
-
-void CgiManager::pollInHandler() {
-	if (_timedOut) {
-		return ;
-	}
-	char buffer[4096];
-	const ssize_t readSize = read(_fd, buffer, sizeof(buffer));
-
-	if (readSize > 0) {
-		_output.append(buffer, readSize);
-		return;
-	}
-	if (readSize < 0) {
-		_client.setCgiOutput("", 500);
-		_events = 0;
-		_closedStatus = true;
-		return;
-	}
-
-	if (_pid > 0) {
-		int status;
-		const pid_t ret = waitpid(_pid, &status, WNOHANG);
-
-		if (ret == 0)
-			return;
-		if (ret < 0) {
-			_client.setCgiOutput("", 500);
-			_events = 0;
-			_closedStatus = true;
-			_pid = -1;
-			return;
-		}
-
-		if (WIFEXITED(status)) {
-			const int code = WEXITSTATUS(status);
-
-			if (code != 0) {
-				_client.setCgiOutput("", 500);
-				_events = 0;
-				_closedStatus = true;
-				return;
-			}
-		}
-	}
-
-	_client.setCgiOutput(_output, 0);
-
-	_pid = -1;
-	_events = 0;
-	_closedStatus = true;
-}
-
-void CgiManager::pollOutHandler() {
-	_closedStatus = true;
-	_events = 0;
-}
-
-void CgiManager::onTimeout() {
-	if (_timedOut)
-		return ;
-	if (_pid != -1) {
-		kill(_pid, SIGKILL);
-		waitpid(_pid, NULL, 0);
-		_pid = -1;
-	}
-	_client.setCgiOutput("", 504);
-	_events = 0;
-	_closedStatus = true;
-	_timedOut = true;
 }

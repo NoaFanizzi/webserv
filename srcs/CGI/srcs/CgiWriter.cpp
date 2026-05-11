@@ -12,7 +12,6 @@ CgiWriter::CgiWriter(const int fd, const std::string body) : _timedOut(false), _
 	_closedStatus = false;
 	_events = POLLOUT;
 	_startTime = std::time(NULL);
-	fcntl(_fd, F_SETFL, O_NONBLOCK);
 	WebServer::pollFdCreation(_fd, this);
 }
 
@@ -42,8 +41,6 @@ void CgiWriter::pollOutHandler() {
 		_closedStatus = true;
 	}
 }
-
-void CgiWriter::pollInHandler() {}
 
 void CgiWriter::onTimeout() {
 	_closedStatus = true;
