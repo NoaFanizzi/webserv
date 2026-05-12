@@ -18,6 +18,8 @@
 #include <fstream>
 #include <iostream>
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 void Request::readRaw(int &fd, bool &closedStatus,
 					  std::string &request)
@@ -320,6 +322,11 @@ void Request::printDebug() const
 
 void Request::parsePostMethod(const std::string &uploadDir)
 {
+	struct stat st;
+	if (stat(uploadDir.c_str(), &st) != 0 || !S_ISDIR(st.st_mode))
+		throw Http404Exception();
+	if (access(uploadDir.c_str(), W_OK) != 0)
+		throw Http403Exception();
 	std::vector<std::string> parts = split(_body.substr(0, _contentLengthBody), "--" + _webKitForm);
 	for (size_t i = 0; i + 1 < parts.size(); ++i)
 	{
