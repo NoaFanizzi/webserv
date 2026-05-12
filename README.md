@@ -5,34 +5,24 @@
 ## Description
 
 This project was developed as part of the 42 curriculum.
-Its goal is to explore and apply the concepts related to **[PROJECT TOPIC]** through the implementation of **[SHORT DESCRIPTION OF THE PROGRAM]**.
+Its goal is to explore C++ and apply the concepts related to HTTP servers.
 
 The project focuses on:
-- [Main feature or objective]
-- [Second important aspect]
-- [Third important aspect]
+- Making & parsing a formated configuration file
+- HTTP protocol understanding
+- using only 1 non blocking Poll for all the I/O
 
 ### Overview
 
 The program is designed to:
-- [What the program does]
-- [How the user interacts with it]
-- [Expected output or behavior]
+- parse a configuration file
+- launch a local server
+- let you communicate with that server
 
 This project helped us improve our understanding of:
-- [Relevant concepts]
-- [Algorithms / system programming / networking / graphics / etc.]
+- HTTP protocol
+- poll, poll.h library
 - Team collaboration and project organization
-
----
-
-# Features
-
-- [Feature 1]
-- [Feature 2]
-- [Feature 3]
-- Error handling and input validation
-- Optimized and modular code structure
 
 ---
 
@@ -49,6 +39,45 @@ This project helped us improve our understanding of:
 Clone the repository and compile the project using:
 
 ```bash
-git clone <repository_url>
-cd <repository_name>
+git clone git@github.com:NoaFanizzi/webserv.git
+```
+```bash
+cd git@github.com:NoaFanizzi/webserv.git
+```
+```bash
 make
+```
+
+## Config file
+
+- (see default config file for an example)
+- yourconfigfile.conf (.conf extension is essential)
+
+## Executable
+
+```bash
+./webserv ConfigFile.conf
+```
+
+---
+
+# Ressources
+
+## Useful links
+HTTP protocol
+- https://developer.mozilla.org/fr/docs/Web/HTTP/Guides/Overview
+
+Response Status
+- https://developer.mozilla.org/fr/docs/Web/HTTP/Reference/Status
+
+Configuration file
+- https://nginx.org/en/docs/http/configuring_https_servers.html
+
+CGI (common Gateway Interface)
+- https://en.wikipedia.org/wiki/Common_Gateway_Interface
+
+## A.I.
+Mainly used for specific cases information and repetitive tasks
+
+- Claude Code
+- Chat GPT

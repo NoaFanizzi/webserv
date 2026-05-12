@@ -121,6 +121,7 @@ bool CgiManager::start() {
 		perror(_scriptPath.c_str());
 		freeEnv(envp);
 		WebServer::destroy();
+		_env.~vector();
 		_scriptPath.~basic_string();
 		_interpreter.~basic_string();
 		exit(127);
