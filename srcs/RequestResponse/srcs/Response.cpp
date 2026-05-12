@@ -240,6 +240,16 @@ void Response::generate(const ServerConfig &config)
 	}
 
 	checkAllowedMethods(config);
+
+	if (_request->getMethod() == "POST")
+	{
+		_statusCode = "201";
+		_statusText = "Created";
+		_body = "";
+		_header = buildHeader(0, _statusCode, _statusText);
+		return;
+	}
+
 	_finalPath = checkUrl(config);
 	if (!_redirectLocation.empty())
 	{
