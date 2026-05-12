@@ -76,8 +76,6 @@ std::string Response::checkUrl(const ServerConfig &config)
 		const LocationConfig &loc = locs.back();
 		std::string subPath = reqPath.substr(std::min(loc.path.size(), reqPath.size()));
 		std::string locRoot = loc.root;
-		if (!locRoot.empty() && locRoot[0] == '/')
-			locRoot = "." + locRoot;
 		path = locRoot;
 		if (!subPath.empty())
 		{
@@ -104,11 +102,16 @@ std::string Response::checkUrl(const ServerConfig &config)
 			else
 				i++;
 		}
+		while (!path.empty() && path[path.size() - 1] == '/')
+			path.erase(path.size() - 1);
 		i = 0;
 		while (i < tempPath.size())
 		{
-			path = path + '/';
-			path = path + tempPath[i];
+			if (!tempPath[i].empty())
+			{
+				path += '/';
+				path += tempPath[i];
+			}
 			i++;
 		}
 	}
