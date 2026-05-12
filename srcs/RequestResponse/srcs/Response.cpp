@@ -76,6 +76,8 @@ std::string Response::checkUrl(const ServerConfig &config)
 		const LocationConfig &loc = locs.back();
 		std::string subPath = reqPath.substr(std::min(loc.path.size(), reqPath.size()));
 		std::string locRoot = loc.root;
+		if (!locRoot.empty() && locRoot[0] == '/')
+			locRoot = "." + locRoot;
 		path = locRoot;
 		if (!subPath.empty())
 		{
@@ -102,16 +104,11 @@ std::string Response::checkUrl(const ServerConfig &config)
 			else
 				i++;
 		}
-		while (!path.empty() && path[path.size() - 1] == '/')
-			path.erase(path.size() - 1);
 		i = 0;
 		while (i < tempPath.size())
 		{
-			if (!tempPath[i].empty())
-			{
-				path += '/';
-				path += tempPath[i];
-			}
+			path = path + '/';
+			path = path + tempPath[i];
 			i++;
 		}
 	}
@@ -243,16 +240,6 @@ void Response::generate(const ServerConfig &config)
 	}
 
 	checkAllowedMethods(config);
-
-	if (_request->getMethod() == "POST")
-	{
-		_statusCode = "201";
-		_statusText = "Created";
-		_body = "";
-		_header = buildHeader(0, _statusCode, _statusText);
-		return;
-	}
-
 	_finalPath = checkUrl(config);
 	if (!_redirectLocation.empty())
 	{

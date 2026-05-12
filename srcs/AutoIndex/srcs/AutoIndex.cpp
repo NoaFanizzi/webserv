@@ -191,7 +191,7 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &r
 	struct stat file;
 
 	std::string filepath = rPath + "/" + sdir.d_name;
-	if (lstat(filepath.c_str(), &file) == -1)
+	if(stat(filepath.c_str(), &file) == -1)
 		return "";
 		
 	if (S_ISDIR(file.st_mode))
