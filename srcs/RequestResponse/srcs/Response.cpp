@@ -264,6 +264,46 @@ void Response::generate(const ServerConfig &config)
 		return;
 	}
 
+	if (config.redirectCode != 0)
+	{
+		std::ostringstream code;
+		code << config.redirectCode;
+		_statusCode = code.str();
+		if (config.redirectCode >= 300 && config.redirectCode < 400)
+		{
+			if (config.redirectCode == 301)
+				_statusText = "Moved Permanently";
+			else if (config.redirectCode == 302)
+				_statusText = "Found";
+			else if (config.redirectCode == 307)
+				_statusText = "Temporary Redirect";
+			else if (config.redirectCode == 308)
+				_statusText = "Permanent Redirect";
+			else
+				_statusText = "Redirect";
+			_body = "";
+			_header = "HTTP/1.1 " + _statusCode + " " + _statusText + "\r\n"
+																	  "Location: " +
+					  config.redirectUrl + "\r\n"
+										   "Content-Length: 0\r\n"
+										   "Connection: close\r\n"
+										   "\r\n";
+		}
+		else
+		{
+			_statusText = "OK";
+			_body = config.redirectUrl;
+			std::ostringstream len;
+			len << _body.size();
+			_header = "HTTP/1.1 " + _statusCode + " " + _statusText + "\r\n"
+																	  "Content-Length: " +
+					  len.str() + "\r\n"
+								  "Connection: close\r\n"
+								  "\r\n";
+		}
+		return;
+	}
+
 	checkAllowedMethods(config);
 	_finalPath = checkUrl(config);
 	if (!_redirectLocation.empty())

@@ -63,6 +63,8 @@ struct ServerConfig
     long long                   client_max_body_size;
     bool                        autoindex;
     std::vector<std::string>    allowed_methods;
+    int                         redirectCode;
+    std::string                 redirectUrl;
     LocationConfig              defaults;
     std::vector<LocationConfig> locations;
 };
@@ -72,7 +74,7 @@ class Config
     private:
         std::vector<std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
-        std::string _keysServer[10];
+        std::string _keysServer[11];
         std::string _keysLocation[8];
 
         void initServerKeys();

@@ -11,17 +11,42 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <cstdlib>
 #include <sstream>
 #include <ostream>
 
-void Config::parseServerDirective(ServerConfig &server, const std::string &key, 
+void Config::parseServerDirective(ServerConfig &server, const std::string &key,
                                    const std::vector<std::string> &line, size_t j)
 {
     if (j + 1 >= line.size())
         throw Exception("No argument found for -> " + key);
 
+    if (key == "return")
+    {
+        if (j + 2 >= line.size())
+            throw Exception("return directive requires a code and a url/message");
+        std::string codeStr = line[j + 1];
+        std::string url = line[j + 2];
+        bool semicolon = false;
+        if (!url.empty() && url[url.size() - 1] == ';')
+        {
+            url = url.substr(0, url.size() - 1);
+            semicolon = true;
+        }
+        else if (j + 3 < line.size() && line[j + 3] == ";")
+            semicolon = true;
+        if (!semicolon)
+            throw Exception("No semicolon on the line -> return");
+        for (size_t k = 0; k < codeStr.size(); k++)
+            if (!std::isdigit(codeStr[k]))
+                throw Exception("return directive: invalid code -> " + codeStr);
+        server.redirectCode = std::atoi(codeStr.c_str());
+        server.redirectUrl = url;
+        return;
+    }
+
     std::string value = extractValue(line, j, key);
-    
+
     if (key == "port")
         parsePort(server, value);
     else if (key == "host")
@@ -76,7 +101,7 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
 {
     bool semicolon = false;
     std::string value = line[j + 1];
-    if (_keysServer->find(key) && key != "error_page" && key != "allowed_methods" && key != "server_name")
+    if (_keysServer->find(key) && key != "error_page" && key != "allowed_methods" && key != "server_name" && key != "return")
     {
         if (line.size() > 2)
         {
@@ -93,10 +118,10 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
         semicolon = true;
     }
 
-    if (!semicolon && key != "error_page" && key != "allowed_methods" && key != "server_name")
+    if (!semicolon && key != "error_page" && key != "allowed_methods" && key != "server_name" && key != "return")
         throw Exception("No semicolon on the line -> " + key);
 
-    if (value.empty() && key != "error_page" && key != "allowed_methods")
+    if (value.empty() && key != "error_page" && key != "allowed_methods" && key != "return")
         throw Exception("Empty value for -> " + key);
 
     return value;
@@ -174,15 +199,7 @@ void Config::parseErrorPage(ServerConfig &server, const std::vector<std::string>
     if (j + 2 >= line.size())
         throw Exception("error_page requires code and path");
 
-    std::string path = line[j + line.size() - 1];
-    std::istringstream iss(line[j + line.size() - 2]);
-    long long code;
-    
-    if (!(iss >> code) || !iss.eof())
-        throw Exception("Invalid error_page code -> " + line[j + 1]);
-
-    if (code < 400 || code > 599)
-        throw Exception("error_page out of range [400-599] -> " + line[j + 1]);
+    std::string path = line[line.size() - 1];
 
     bool semicolon = false;
     if (!path.empty() && path[path.size() - 1] == ';')
@@ -193,9 +210,22 @@ void Config::parseErrorPage(ServerConfig &server, const std::vector<std::string>
     if (!semicolon)
         throw Exception("No semicolon on the line -> error_page");
 
-    ErrorPage page;
-    page.index = static_cast<int>(code);
-    page.path = path;
+    // iterate over all codes between "error_page" and the path
+    for (size_t k = j + 1; k < line.size() - 1; k++)
+    {
+        std::istringstream iss(line[k]);
+        long long code;
 
-    server.error_page.push_back(page);
+        if (!(iss >> code) || !iss.eof())
+            throw Exception("Invalid error_page code -> " + line[k]);
+
+        if (code < 400 || code > 599)
+            throw Exception("error_page out of range [400-599] -> " + line[k]);
+
+        ErrorPage page;
+        page.index = static_cast<int>(code);
+        page.path = path;
+
+        server.error_page.push_back(page);
+    }
 }
