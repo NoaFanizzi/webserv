@@ -326,7 +326,6 @@ std::string Response::getFullResponse()
 	if (!_isCgi)
 		return _header + _body;
 
-	// Find the blank line separating CGI headers from body (CRLF or LF)
 	std::string cgiHeaderBlock;
 	std::string cgiBody;
 	size_t sep = _body.find("\r\n\r\n");
@@ -343,7 +342,6 @@ std::string Response::getFullResponse()
 		}
 	}
 
-	// Parse CGI headers: extract Status:, keep the rest
 	std::string statusCode = "200";
 	std::string statusText = "OK";
 	std::string filteredHeaders;
