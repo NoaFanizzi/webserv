@@ -109,18 +109,32 @@ void Config::parseLocationDirective(LocationConfig &location, const std::string 
 
     if (key == "return")
     {
-        if (j + 2 >= line.size())
-            throw Exception("return directive requires a code and a url");
+        if (j + 1 >= line.size())
+            throw Exception("return directive requires at least a code");
         std::string codeStr = line[j + 1];
-        std::string url = line[j + 2];
+        std::string url = "";
         bool semicolon = false;
-        if (!url.empty() && url[url.size() - 1] == ';')
+        if (!codeStr.empty() && codeStr[codeStr.size() - 1] == ';')
         {
-            url = url.substr(0, url.size() - 1);
+            codeStr = codeStr.substr(0, codeStr.size() - 1);
             semicolon = true;
         }
-        else if (j + 3 < line.size() && line[j + 3] == ";")
-            semicolon = true;
+        else if (j + 2 < line.size())
+        {
+            url = line[j + 2];
+            if (!url.empty() && url[url.size() - 1] == ';')
+            {
+                url = url.substr(0, url.size() - 1);
+                semicolon = true;
+            }
+            else if (url == ";")
+            {
+                url = "";
+                semicolon = true;
+            }
+            else if (j + 3 < line.size() && line[j + 3] == ";")
+                semicolon = true;
+        }
         if (!semicolon)
             throw Exception("No semicolon on the line -> return");
         for (size_t k = 0; k < codeStr.size(); k++)

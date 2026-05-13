@@ -137,6 +137,7 @@ void Client::pollInHandler()
 		oss << errorCode;
 		_request.setPath(".html");
 		_response.setRequest(_request);
+		_response.setIsCgi(false);
 		_response.setStatusCode(oss.str());
 		_response.setStatusText(e.getStatusText());
 		_response.setBody(_response.getErrorPageContent(errorCode, _activeConfig));
@@ -148,6 +149,7 @@ void Client::pollInHandler()
 	{
 		_request.setPath(".html");
 		_response.setRequest(_request);
+		_response.setIsCgi(false);
 		_response.setStatusCode("500");
 		_response.setStatusText("Internal Server Error");
 		_response.setBody(_response.getErrorPageContent(500, _activeConfig));
