@@ -192,7 +192,7 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &r
 
 	std::string filepath = rPath + "/" + sdir.d_name;
 	if(stat(filepath.c_str(), &file) == -1)
-		throw Http403Exception();
+		return "";
 		
 	if (S_ISDIR(file.st_mode))
 		newTemplate.replace(newTemplate.find("{{ TYPE }}"), 10, "dir");
@@ -210,7 +210,8 @@ std::string AutoIndex::replaceTemplate(struct dirent &sdir, const std::string &r
 void AutoIndex::addNewRow(struct dirent &sdir, const std::string &rPath)
 {
 	std::string newRow = replaceTemplate(sdir, rPath);
-	_content.append(newRow);
+	if (!newRow.empty())
+		_content.append(newRow);
 }
 
 std::string AutoIndex::initAutoIndex(const std::string &rPath)

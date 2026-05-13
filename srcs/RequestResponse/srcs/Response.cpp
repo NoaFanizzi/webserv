@@ -76,8 +76,6 @@ std::string Response::checkUrl(const ServerConfig &config)
 		const LocationConfig &loc = locs.back();
 		std::string subPath = reqPath.substr(std::min(loc.path.size(), reqPath.size()));
 		std::string locRoot = loc.root;
-		if (!locRoot.empty() && locRoot[0] == '/')
-			locRoot = "." + locRoot;
 		path = locRoot;
 		if (!subPath.empty())
 		{
@@ -193,6 +191,24 @@ std::string Response::buildHeader(size_t contentLength,
 	return header;
 }
 
+void Response::checkAllowedMethods(const ServerConfig &config)
+{
+	const std::vector<LocationConfig> &locs = _request->getCurrentLocations();
+	const std::vector<std::string> *methods = NULL;
+	if (!locs.empty() && !locs.back().allowed_methods.empty())
+		methods = &locs.back().allowed_methods;
+	else if (!config.allowed_methods.empty())
+		methods = &config.allowed_methods;
+	if (!methods)
+		return;
+	for (size_t i = 0; i < methods->size(); i++)
+	{
+		if ((*methods)[i] == _request->getMethod())
+			return;
+	}
+	throw Http405Exception();
+}
+
 void Response::generate(const ServerConfig &config)
 {
 
@@ -210,36 +226,45 @@ void Response::generate(const ServerConfig &config)
 		std::ostringstream code;
 		code << loc.redirectCode;
 		_statusCode = code.str();
-		_statusText = "Moved Permanently";
-		_body = "";
-		_header = "HTTP/1.1 " + _statusCode + " " + _statusText + "\r\n"
-																  "Location: " +
-				  loc.redirectUrl + "\r\n"
-									"Content-Length: 0\r\n"
-									"Connection: close\r\n"
-									"\r\n";
+		if (loc.redirectCode >= 300 && loc.redirectCode < 400)
+		{
+			if (loc.redirectCode == 301)
+				_statusText = "Moved Permanently";
+			else if (loc.redirectCode == 302)
+				_statusText = "Found";
+			else if (loc.redirectCode == 307)
+				_statusText = "Temporary Redirect";
+			else if (loc.redirectCode == 308)
+				_statusText = "Permanent Redirect";
+			else
+				_statusText = "Redirect";
+			_body = "";
+			_header = "HTTP/1.1 " + _statusCode + " " + _statusText + "\r\n"
+																	  "Location: " +
+					  loc.redirectUrl + "\r\n"
+									   "Content-Length: 0\r\n"
+									   "Connection: close\r\n"
+									   "\r\n";
+		}
+		else
+		{
+			if (loc.redirectCode == 200)
+				_statusText = "OK";
+			else
+				_statusText = "OK";
+			_body = loc.redirectUrl;
+			std::ostringstream len;
+			len << _body.size();
+			_header = "HTTP/1.1 " + _statusCode + " " + _statusText + "\r\n"
+																	  "Content-Length: " +
+					  len.str() + "\r\n"
+								  "Connection: close\r\n"
+								  "\r\n";
+		}
 		return;
 	}
 
-	const std::vector<std::string> *methods = NULL;
-	if (!locs.empty() && !locs.back().allowed_methods.empty())
-		methods = &locs.back().allowed_methods;
-	else if (!config.allowed_methods.empty())
-		methods = &config.allowed_methods;
-	if (methods)
-	{
-		bool allowed = false;
-		for (size_t i = 0; i < methods->size(); i++)
-		{
-			if ((*methods)[i] == _request->getMethod())
-			{
-				allowed = true;
-				break;
-			}
-		}
-		if (!allowed)
-			throw Http405Exception();
-	}
+	checkAllowedMethods(config);
 	_finalPath = checkUrl(config);
 	if (!_redirectLocation.empty())
 	{

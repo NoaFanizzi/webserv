@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ServerParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nofanizz <nofanizz@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:30:00 by mvachon           #+#    #+#             */
-/*   Updated: 2026/03/26 12:29:44 by mvachon          ###   ########.fr       */
+/*   Updated: 2026/05/11 15:49:15 by nofanizz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 
-static const size_t SERVER_KEYS_COUNT = 9;
+static const size_t SERVER_KEYS_COUNT = 10;
 
 void Config::parseServerBlock(size_t *i)
 {
@@ -82,13 +82,15 @@ void validateServerConfig(const ServerConfig& server)
     if (server.host.empty())
         throw Exception("Host is not set");
     if (server.root.empty())
-        throw Exception("root is not set");
+        throw Exception("Root is not set");
     if (server.index.empty())
-        throw Exception("index is not set");
+        throw Exception("Index is not set");
     if (server.client_max_body_size == -1)
-        throw Exception("client_max_body_size is not set");
+        throw Exception("Client_max_body_size is not set");
     if (server.allowed_methods.empty())
-        throw Exception("allowd_methods is not set");
+        throw Exception("Allowed_methods is not set");
+    if (server.server_names.empty())
+        throw Exception("Servername is not set");
 }
 
 ServerConfig::ServerConfig()

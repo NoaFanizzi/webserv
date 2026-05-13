@@ -55,6 +55,7 @@ struct ServerConfig
     ServerConfig();
     int                         port;
     std::string                 host;
+    std::vector<std::string>    server_names;
     std::string                 root;
     std::string                 index;
     std::string                 upload_dir;
@@ -62,7 +63,7 @@ struct ServerConfig
     long long                   client_max_body_size;
     bool                        autoindex;
     std::vector<std::string>    allowed_methods;
-    LocationConfig              defaults; // faut faire
+    LocationConfig              defaults;
     std::vector<LocationConfig> locations;
 };
 
@@ -71,7 +72,7 @@ class Config
     private:
         std::vector<std::vector<std::string> > _fileContent;
         std::vector<ServerConfig> _servers;
-        std::string _keysServer[9];
+        std::string _keysServer[10];
         std::string _keysLocation[8];
 
         void initServerKeys();
@@ -88,6 +89,7 @@ class Config
         void parseClientMaxBodySize(ServerConfig &server, const std::string &value);
         void parseAutoindex(ServerConfig &server, const std::string &value);
         void parseErrorPage(ServerConfig &server, const std::vector<std::string> &line, size_t j);
+        void parseServerName(ServerConfig &server, const std::vector<std::string> &line, size_t j);
 
         void parseLocationBlock(ServerConfig &server, size_t *i, size_t *j);
         void parseLocationDirective(LocationConfig &location, const std::string &key, 
@@ -95,7 +97,7 @@ class Config
         void parseLocationAutoindex(LocationConfig &location, const std::string &value);
         void parseAllowMethods(std::vector<std::string> &allowed_method, const std::vector<std::string> &line, size_t j);
 
-        void validateDuplicatePorts();
+        void validateVirtualHosts();
         
         int parseConfigFile();
 

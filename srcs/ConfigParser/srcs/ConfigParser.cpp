@@ -23,12 +23,31 @@ std::vector<std::vector<std::string> > splitLinesWords(const std::string &conten
     while (std::getline(contentStream, line))
     {
         std::vector<std::string> lineWords;
-        std::istringstream lineStream(line);
-        std::string word;
-        
-        while (lineStream >> word)
-            lineWords.push_back(word);
-        
+        size_t i = 0;
+        while (i < line.size())
+        {
+            while (i < line.size() && std::isspace((unsigned char)line[i]))
+                i++;
+            if (i >= line.size())
+                break;
+            if (line[i] == '"')
+            {
+                i++;
+                std::string word;
+                while (i < line.size() && line[i] != '"')
+                    word += line[i++];
+                if (i < line.size())
+                    i++;
+                lineWords.push_back(word);
+            }
+            else
+            {
+                std::string word;
+                while (i < line.size() && !std::isspace((unsigned char)line[i]))
+                    word += line[i++];
+                lineWords.push_back(word);
+            }
+        }
         if (!lineWords.empty())
             result.push_back(lineWords);
     }

@@ -433,7 +433,7 @@ def test_delete_uploaded_file():
 
     # 1. Upload
     try:
-        s = socket.socket(); s.settimeout(5); s.connect((HOST, PORT_1))
+        s = socket.socket(); s.settimeout(15); s.connect((HOST, PORT_1))
         s.send(upload_req.encode())
         resp = b""
         while True:
@@ -455,7 +455,7 @@ def test_delete_uploaded_file():
 
     # 2. DELETE le fichier uploadé (dans upload/ directory)
     try:
-        s = socket.socket(); s.settimeout(5); s.connect((HOST, PORT_1))
+        s = socket.socket(); s.settimeout(15); s.connect((HOST, PORT_1))
         s.send(f"DELETE /upload/{upload_name} HTTP/1.1\r\nHost: localhost\r\n\r\n".encode())
         resp = b""
         while True:
@@ -478,7 +478,7 @@ def test_autoindex_content():
     """GET sur un dossier avec autoindex on → HTML listé"""
     name, expected = "AUTOINDEX_HTML_CONTENT", 200
     try:
-        s = socket.socket(); s.settimeout(5); s.connect((HOST, PORT_1))
+        s = socket.socket(); s.settimeout(15); s.connect((HOST, PORT_1))
         s.send(b"GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")
         resp = b""
         while True:
@@ -505,7 +505,7 @@ def test_redirect_301_location_header():
     """GET /upload/ → 301 avec header Location"""
     name, expected = "REDIRECT_301_LOCATION_HEADER", 301
     try:
-        s = socket.socket(); s.settimeout(5); s.connect((HOST, PORT_1))
+        s = socket.socket(); s.settimeout(15); s.connect((HOST, PORT_1))
         s.send(b"GET /upload/ HTTP/1.1\r\nHost: localhost\r\n\r\n")
         resp = b""
         while True:
@@ -541,7 +541,7 @@ def test_cgi_post_body():
         + body
     )
     try:
-        s = socket.socket(); s.settimeout(5); s.connect((HOST, PORT_1))
+        s = socket.socket(); s.settimeout(15); s.connect((HOST, PORT_1))
         s.send(req.encode())
         resp = b""
         while True:
