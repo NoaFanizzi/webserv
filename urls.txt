@@ -1,0 +1,6 @@
+http://localhost:8080/
+http://localhost:8080/api/users
+http://localhost:8080/api/posts
+http://mon-serveur.com/
+http://mon-serveur.com/api/users
+http://mon-serveur.com/api/posts

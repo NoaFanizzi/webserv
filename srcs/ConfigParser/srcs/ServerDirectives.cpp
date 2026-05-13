@@ -174,15 +174,7 @@ void Config::parseErrorPage(ServerConfig &server, const std::vector<std::string>
     if (j + 2 >= line.size())
         throw Exception("error_page requires code and path");
 
-    std::string path = line[j + line.size() - 1];
-    std::istringstream iss(line[j + line.size() - 2]);
-    long long code;
-    
-    if (!(iss >> code) || !iss.eof())
-        throw Exception("Invalid error_page code -> " + line[j + 1]);
-
-    if (code < 400 || code > 599)
-        throw Exception("error_page out of range [400-599] -> " + line[j + 1]);
+    std::string path = line[line.size() - 1];
 
     bool semicolon = false;
     if (!path.empty() && path[path.size() - 1] == ';')
@@ -193,9 +185,22 @@ void Config::parseErrorPage(ServerConfig &server, const std::vector<std::string>
     if (!semicolon)
         throw Exception("No semicolon on the line -> error_page");
 
-    ErrorPage page;
-    page.index = static_cast<int>(code);
-    page.path = path;
+    // iterate over all codes between "error_page" and the path
+    for (size_t k = j + 1; k < line.size() - 1; k++)
+    {
+        std::istringstream iss(line[k]);
+        long long code;
 
-    server.error_page.push_back(page);
+        if (!(iss >> code) || !iss.eof())
+            throw Exception("Invalid error_page code -> " + line[k]);
+
+        if (code < 400 || code > 599)
+            throw Exception("error_page out of range [400-599] -> " + line[k]);
+
+        ErrorPage page;
+        page.index = static_cast<int>(code);
+        page.path = path;
+
+        server.error_page.push_back(page);
+    }
 }
