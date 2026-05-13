@@ -32,6 +32,7 @@ void Config::initServerKeys()
     _keysServer[7] = "allowed_methods";
     _keysServer[8] = "upload_dir";
     _keysServer[9] = "server_name";
+    _keysServer[10] = "return";
 }
 
 void Config::initLocationKeys()

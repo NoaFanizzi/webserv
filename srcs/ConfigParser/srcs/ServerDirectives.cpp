@@ -11,17 +11,42 @@
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <cstdlib>
 #include <sstream>
 #include <ostream>
 
-void Config::parseServerDirective(ServerConfig &server, const std::string &key, 
+void Config::parseServerDirective(ServerConfig &server, const std::string &key,
                                    const std::vector<std::string> &line, size_t j)
 {
     if (j + 1 >= line.size())
         throw Exception("No argument found for -> " + key);
 
+    if (key == "return")
+    {
+        if (j + 2 >= line.size())
+            throw Exception("return directive requires a code and a url/message");
+        std::string codeStr = line[j + 1];
+        std::string url = line[j + 2];
+        bool semicolon = false;
+        if (!url.empty() && url[url.size() - 1] == ';')
+        {
+            url = url.substr(0, url.size() - 1);
+            semicolon = true;
+        }
+        else if (j + 3 < line.size() && line[j + 3] == ";")
+            semicolon = true;
+        if (!semicolon)
+            throw Exception("No semicolon on the line -> return");
+        for (size_t k = 0; k < codeStr.size(); k++)
+            if (!std::isdigit(codeStr[k]))
+                throw Exception("return directive: invalid code -> " + codeStr);
+        server.redirectCode = std::atoi(codeStr.c_str());
+        server.redirectUrl = url;
+        return;
+    }
+
     std::string value = extractValue(line, j, key);
-    
+
     if (key == "port")
         parsePort(server, value);
     else if (key == "host")
@@ -76,7 +101,7 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
 {
     bool semicolon = false;
     std::string value = line[j + 1];
-    if (_keysServer->find(key) && key != "error_page" && key != "allowed_methods" && key != "server_name")
+    if (_keysServer->find(key) && key != "error_page" && key != "allowed_methods" && key != "server_name" && key != "return")
     {
         if (line.size() > 2)
         {
@@ -93,10 +118,10 @@ std::string Config::extractValue(const std::vector<std::string> &line, size_t j,
         semicolon = true;
     }
 
-    if (!semicolon && key != "error_page" && key != "allowed_methods" && key != "server_name")
+    if (!semicolon && key != "error_page" && key != "allowed_methods" && key != "server_name" && key != "return")
         throw Exception("No semicolon on the line -> " + key);
 
-    if (value.empty() && key != "error_page" && key != "allowed_methods")
+    if (value.empty() && key != "error_page" && key != "allowed_methods" && key != "return")
         throw Exception("Empty value for -> " + key);
 
     return value;

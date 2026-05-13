@@ -12,7 +12,7 @@
 
 #include "Config.hpp"
 
-static const size_t SERVER_KEYS_COUNT = 10;
+static const size_t SERVER_KEYS_COUNT = 11;
 
 void Config::parseServerBlock(size_t *i)
 {
@@ -98,4 +98,5 @@ ServerConfig::ServerConfig()
     port = -1;
     client_max_body_size = -1;
     autoindex = false;
+    redirectCode = 0;
 }
